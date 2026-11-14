@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<title>Workout Tracker</title>
+<style>
+  :root { --bg:#0f1115; --card:#1a1d24; --line:#2a2f3a; --text:#eef0f4; --muted:#8b93a3; --accent:#4ade80; --danger:#f87171; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 22px; margin: 8px 0 16px; }
+  h2 { font-size: 15px; color: var(--muted); font-weight: 600; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: .04em; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  label { display:block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+  input { width:100%; padding: 14px; font-size: 17px; background:#0f1115; color:var(--text); border:1px solid var(--line); border-radius: 10px; }
+  input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .row { display:flex; gap:10px; }
+  .row > div { flex:1; }
+  button { width:100%; padding: 15px; font-size: 17px; font-weight: 700; border:0; border-radius: 12px; background: var(--accent); color:#06210f; margin-top: 16px; cursor:pointer; }
+  button.secondary { background: transparent; color: var(--text); border:1px solid var(--line); font-weight:600; }
+  button.link { background:none; color:var(--muted); border:0; margin-top:10px; font-weight:500; font-size:15px; text-decoration: underline; }
+  button:disabled { opacity:.5; }
+  .msg { margin-top: 12px; font-size: 14px; min-height: 18px; }
+  .msg.err { color: var(--danger); } .msg.ok { color: var(--accent); }
+  .topbar { display:flex; justify-content:space-between; align-items:center; }
+  .topbar button { width:auto; margin:0; padding: 8px 14px; font-size: 14px; }
+  .day { margin-top: 18px; }
+  .day h3 { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
+  .set { display:flex; justify-content:space-between; align-items:center; padding: 12px 14px; background: var(--card); border:1px solid var(--line); border-radius: 12px; margin-bottom: 8px; }
+  .set .name { font-weight: 600; }
+  .set .detail { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .set .del { background:none; border:0; color: var(--danger); font-size: 22px; width: 44px; height: 44px; padding:0; margin:0; }
+  .hidden { display:none; }
+  .empty { color: var(--muted); text-align:center; padding: 24px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- AUTH SCREEN -->
+  <div id="auth" class="hidden">
+    <h1>🏋️ Workout Tracker</h1>
+    <div class="card">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" inputmode="email">
+      <label for="password">Password (6+ characters)</label>
+      <input id="password" type="password" autocomplete="current-password">
+      <button id="authBtn">Log in</button>
+      <button id="toggleBtn" class="link">No account? Sign up</button>
+      <div id="authMsg" class="msg"></div>
+    </div>
+  </div>
+
+  <!-- APP SCREEN -->
+  <div id="app" class="hidden">
+    <div class="topbar">
+      <h1>🏋️ Workout Tracker</h1>
+      <button id="logoutBtn" class="secondary">Log out</button>
+    </div>
+
+    <h2>Log a set</h2>
+    <div class="card">
+      <label for="exercise">Exercise</label>
+      <input id="exercise" list="exerciseList" placeholder="e.g. Bench Press" autocomplete="off">
+      <datalist id="exerciseList"></datalist>
+      <div class="row">
+        <div><label for="weight">Weight</label><input id="weight" type="number" inputmode="decimal" step="any" placeholder="lbs"></div>
+        <div><label for="reps">Reps</label><input id="reps" type="number" inputmode="numeric" placeholder="reps"></div>
+      </div>
+      <label for="date">Date</label>
+      <input id="date" type="date">
+      <button id="addBtn">Add set</button>
+      <div id="appMsg" class="msg"></div>
+    </div>
+
+    <h2>History</h2>
+    <div id="history"></div>
+
+    <button id="exportBtn" class="secondary">Export backup (CSV)</button>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://wklvtfsmizkwvcbxwtaj.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_YbRH3DR60qgH7PrX0Z0BDw_F9_ZMWFA';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const TABLE = 'workout_sets';
+
+  const $ = (id) => document.getElementById(id);
+  let signupMode = false;
+  let sets = [];
+
+  function todayLocal() {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 10);
+  }
+  function say(el, text, kind) { el.textContent = text || ''; el.className = 'msg ' + (kind || ''); }
+
+  // ---------- AUTH ----------
+  $('toggleBtn').onclick = () => {
+    signupMode = !signupMode;
+    $('authBtn').textContent = signupMode ? 'Create account' : 'Log in';
+    $('toggleBtn').textContent = signupMode ? 'Have an account? Log in' : 'No account? Sign up';
+    say($('authMsg'), '');
+  };
+
+  $('authBtn').onclick = async () => {
+    const email = $('email').value.trim();
+    const password = $('password').value;
+    if (!email || password.length < 6) return say($('authMsg'), 'Enter an email and a 6+ character password.', 'err');
+    $('authBtn').disabled = true;
+    say($('authMsg'), 'Working...');
+    try {
+      if (signupMode) {
+        const { data, error } = await sb.auth.signUp({ email, password });
+        if (error) throw error;
+        if (!data.session) say($('authMsg'), 'Account created! Check your email to confirm, then log in.', 'ok');
+      } else {
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+      }
+    } catch (e) {
+      say($('authMsg'), e.message, 'err');
+    }
+    $('authBtn').disabled = false;
+  };
+
+  $('logoutBtn').onclick = () => sb.auth.signOut();
+
+  sb.auth.onAuthStateChange((_event, session) => showScreen(session));
+  sb.auth.getSession().then(({ data }) => showScreen(data.session));
+
+  function showScreen(session) {
+    if (session) {
+      $('auth').classList.add('hidden');
+      $('app').classList.remove('hidden');
+      if (!$('date').value) $('date').value = todayLocal();
+      loadSets();
+    } else {
+      $('app').classList.add('hidden');
+      $('auth').classList.remove('hidden');
+      sets = [];
+    }
+  }
+
+  // ---------- DATA ----------
+  async function loadSets() {
+    const { data, error } = await sb.from(TABLE).select('*')
+      .order('performed_on', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(1000);
+    if (error) return say($('appMsg'), error.message, 'err');
+    sets = data;
+    render();
+  }
+
+  $('addBtn').onclick = async () => {
+    const exercise = $('exercise').value.trim();
+    const weight = $('weight').value === '' ? null : Number($('weight').value);
+    const reps = $('reps').value === '' ? null : parseInt($('reps').value, 10);
+    const performed_on = $('date').value || todayLocal();
+    if (!exercise) return say($('appMsg'), 'Enter an exercise name.', 'err');
+    $('addBtn').disabled = true;
+    const { error } = await sb.from(TABLE).insert({ exercise, weight, reps, performed_on });
+    $('addBtn').disabled = false;
+    if (error) return say($('appMsg'), error.message, 'err');
+    say($('appMsg'), 'Saved ✓', 'ok');
+    setTimeout(() => say($('appMsg'), ''), 1500);
+    $('reps').value = '';   // keep exercise + weight for quick next set
+    $('reps').focus();
+    loadSets();
+  };
+
+  async function deleteSet(id) {
+    if (!confirm('Delete this set?')) return;
+    const { error } = await sb.from(TABLE).delete().eq('id', id);
+    if (error) return say($('appMsg'), error.message, 'err');
+    loadSets();
+  }
+
+  // ---------- RENDER ----------
+  function render() {
+    // exercise suggestions
+    const names = [...new Set(sets.map(s => s.exercise))].sort();
+    $('exerciseList').replaceChildren(...names.map(n => { const o = document.createElement('option'); o.value = n; return o; }));
+
+    const box = $('history');
+    box.replaceChildren();
+    if (!sets.length) {
+      const p = document.createElement('div');
+      p.className = 'empty';
+      p.textContent = 'No sets yet. Log your first one above.';
+      box.appendChild(p);
+      return;
+    }
+    const byDay = {};
+    sets.forEach(s => (byDay[s.performed_on] ||= []).push(s));
+    Object.keys(byDay).sort().reverse().forEach(day => {
+      const wrap = document.createElement('div');
+      wrap.className = 'day';
+      const h = document.createElement('h3');
+      h.textContent = new Date(day + 'T00:00:00').toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric', year:'numeric' });
+      wrap.appendChild(h);
+      byDay[day].forEach(s => {
+        const row = document.createElement('div'); row.className = 'set';
+        const left = document.createElement('div');
+        const n = document.createElement('div'); n.className = 'name'; n.textContent = s.exercise;
+        const d = document.createElement('div'); d.className = 'detail';
+        d.textContent = [s.weight != null ? s.weight + ' lbs' : null, s.reps != null ? s.reps + ' reps' : null].filter(Boolean).join(' × ');
+        left.append(n, d);
+        const del = document.createElement('button'); del.className = 'del'; del.textContent = '×'; del.setAttribute('aria-label', 'Delete set');
+        del.onclick = () => deleteSet(s.id);
+        row.append(left, del);
+        wrap.appendChild(row);
+      });
+      box.appendChild(wrap);
+    });
+  }
+
+  // ---------- EXPORT ----------
+  $('exportBtn').onclick = () => {
+    const esc = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const lines = ['date,exercise,weight,reps'].concat(
+      sets.map(s => [s.performed_on, s.exercise, s.weight, s.reps].map(esc).join(','))
+    );
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'workouts-backup.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+</script>
+</body>
+</html>
