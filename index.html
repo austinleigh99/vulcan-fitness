@@ -130,6 +130,41 @@
   .ss-label { font-size:11px; font-weight:800; letter-spacing:.1em; color:#8f85ff; padding: 12px 0 2px; }
   .rest-note { font-size:12px; color: var(--muted); padding: 10px 0 4px; font-weight:600; }
 
+  /* Cardio configuration */
+  .dur-row { position: relative; }
+  #cardioCfg { --accent: #ff1a66; }
+  #cardioCfg .cfg-title .s { color: var(--accent); }
+  .wc-row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 22px; }
+  .wc { margin:0; padding:18px; border-radius: 26px; background: var(--card); border:1px solid var(--line); color: var(--text); text-align:left; display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+  .wc .ico { width:40px; height:40px; border-radius:12px; background:#2a2a40; display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:10px; }
+  .wc .wl { font-size:12px; font-weight:800; letter-spacing:.1em; }
+  .wc .wv { font-size:15px; color: var(--muted); font-weight:600; }
+  .dur-head { display:flex; justify-content:space-between; align-items:baseline; }
+  .dur-head h2 { margin-bottom: 8px; }
+  .durval { font-size:22px; font-weight:900; color: var(--accent); }
+  #cardioCfg .dur.active { background: var(--accent); color:#fff; border-color: var(--accent); }
+  #cardioCfg .area.active { box-shadow: 0 6px 18px rgba(255,26,102,.4); }
+  .ctype-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .ctype { margin:0; padding:18px 16px; border-radius:999px; background: var(--card); border:1px solid var(--line); color: var(--text); font-size:15px; font-weight:800; display:flex; align-items:center; justify-content:space-between; text-align:left; }
+  .ctype::after { content:''; flex:none; width:18px; height:18px; border-radius:50%; border:2px solid var(--muted); }
+  .ctype.active { border-color: var(--accent); background: rgba(255,26,102,.12); }
+  .ctype.active::after { background: var(--accent); border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--card); }
+  .divider { display:flex; align-items:center; gap:14px; margin: 30px 0 4px; color: var(--muted); font-size:11px; font-weight:800; letter-spacing:.25em; }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background: var(--line); }
+  .goal-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .zone-list { background: var(--card); border:1px solid var(--line); border-radius: 26px; padding: 8px; }
+  .zone { display:flex; align-items:center; justify-content:space-between; width:100%; margin:0; padding:18px 16px; border-radius:20px; background:transparent; color: var(--text); font-size:14px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+  .zone::after { content: attr(data-name); font-size:13px; font-style:italic; font-weight:500; letter-spacing:0; text-transform:none; color: var(--muted); }
+  .zone.active { background:#f2f2f8; color:#14141f; }
+  .zone.active::after { color:#6b6b80; }
+  #cardioCfg .seg3 button.active { background: var(--accent); color:#fff; }
+  #cStyleRow button { font-size: 11px; letter-spacing: .04em; }
+  #cBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(255,26,102,.45); margin-top: 26px; }
+  #cOut { margin-top: 18px; }
+  #cardioCfg .opt-tag { color:#ff6b9a; background: rgba(255,26,102,.15); }
+  #cardioCfg .opt-ico { background: rgba(255,26,102,.2); }
+  .mnote { font-size:12px; color:#7a7a92; margin-top:3px; }
+
   /* Coming soon tabs */
   .soon { text-align:center; padding: 56px 16px; }
   .soon .big { font-size: 48px; }
@@ -266,6 +301,48 @@
         <button id="cfgBuild">Build My Workout</button>
         <div id="cfgMsg" class="msg"></div>
         <div id="cfgOut"></div>
+      </div>
+
+      <!-- CARDIO CONFIGURATION -->
+      <div id="cardioCfg" class="hidden">
+        <div class="cfg-top">
+          <button id="cBack" class="backbtn" aria-label="Back">←</button>
+          <div class="cfg-title"><div class="t">CARDIO</div><div class="s">CONFIGURATION</div></div>
+        </div>
+
+        <div class="wc-row">
+          <button id="warmCard" class="wc"><span class="ico">✨</span><span class="wl">WARM UP</span><span class="wv" id="warmVal">None</span></button>
+          <button id="coolCard" class="wc"><span class="ico">🌬️</span><span class="wl">COOL DOWN</span><span class="wv" id="coolVal">None</span></button>
+        </div>
+
+        <div class="dur-head"><h2>Duration</h2><span class="durval" id="cDurVal">30m</span></div>
+        <div id="cDurRow" class="dur-row"></div>
+
+        <h2>Intensity</h2>
+        <div id="cIntRow" class="area-row"></div>
+
+        <h2>Cardio Type</h2>
+        <div class="sub">SELECT ONE OR MORE</div>
+        <div id="cTypeRow" class="ctype-grid"></div>
+
+        <div class="toggle-card">
+          <div><div class="tt">Advanced Settings</div><div class="ts">CUSTOMIZE GOALS, ZONES, AND STYLES</div></div>
+          <button id="cAdvSwitch" class="switch" aria-pressed="false" aria-label="Advanced settings"></button>
+        </div>
+
+        <div id="cAdv" class="hidden">
+          <div class="divider">CONFIGURATION DETAILS</div>
+          <h2>Primary Goal</h2>
+          <div id="cGoalRow" class="goal-grid"></div>
+          <h2>Zone Training</h2>
+          <div id="cZoneRow" class="zone-list"></div>
+          <h2>Workout Style</h2>
+          <div id="cStyleRow" class="seg3"></div>
+        </div>
+
+        <button id="cBuild">Build Workout</button>
+        <div id="cMsg" class="msg"></div>
+        <div id="cOut"></div>
       </div>
       </div>
     </section>
@@ -626,6 +703,7 @@
     if (!planLoc || !planType) return say($('planMsg'), 'Pick a location and a workout type first.', 'err');
     say($('planMsg'), '');
     if (planType === 'strength') return openStrengthConfig();
+    if (planType === 'cardio') return openCardioConfig();
     const p = PLAN[planType];
     const pool = p.both.concat(p[planLoc]);
     const r = rng(Math.floor(Math.random() * 4294967296));
@@ -809,7 +887,7 @@
 
     const r = rng(Math.floor(Math.random() * 4294967296));
     const avail = EXERCISES.filter(e => groups.includes(e[1]) && reqOk(e[2]));
-    if (!avail.length) return say($('cfgMsg'), 'No exercises match. Add more equipment or muscle groups.', 'err');
+    if (!avail.length) { $('cfgOut').replaceChildren(); return say($('cfgMsg'), 'No exercises match. Add more equipment or muscle groups.', 'err'); }
     say($('cfgMsg'), '');
 
     const buckets = {};
@@ -878,6 +956,201 @@
     card.appendChild(actions);
 
     $('cfgOut').replaceChildren(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- CARDIO CONFIGURATION ----------
+  const CARDIO_TYPES = ['Running','Cycling','Rowing','Elliptical','Swimming','Stair Climber','Walking'];
+  const CARDIO_ICON = { 'Running':'🏃', 'Cycling':'🚴', 'Rowing':'🚣', 'Elliptical':'🌀', 'Swimming':'🏊', 'Stair Climber':'🧗', 'Walking':'🚶' };
+  const CARDIO_DURS = Array.from({ length: 18 }, (_, i) => (i + 1) * 5);   // 5, 10, ... 90
+  const WARM_OPTS = [0, 5, 10];
+  const CINT = { easy:'Easy', moderate:'Moderate', hard:'Hard' };
+  const ZONES = {
+    z1:  { label:'Zone 1',   name:'Recovery', hr:'50-60%',  feel:'Very easy. You could hold a full conversation.' },
+    z2:  { label:'Zone 2',   name:'Aerobic',  hr:'60-70%',  feel:'Easy and steady. Full sentences, no gasping.' },
+    z34: { label:'Zone 3-4', name:'Tempo',    hr:'70-90%',  feel:'Comfortably hard. Short phrases only.' },
+    z5:  { label:'Zone 5',   name:'VO2 Max',  hr:'90-100%', feel:'Very hard. A few words at most.' }
+  };
+  const ZONE_ORDER = ['z1', 'z2', 'z34', 'z5'];
+  const GOALS = {
+    fatburn:     { label:'Fat Burn',           zone:'z2',  style:'steady',    tip:'Consistency matters more than speed. Keep the effort sustainable and repeat it often.' },
+    endurance:   { label:'Endurance Building', zone:'z34', style:'tempo',     tip:'Build gradually. Add a few minutes to your sessions over the coming weeks.' },
+    speed:       { label:'Speed Work',         zone:'z5',  style:'intervals', tip:'Keep the hard efforts crisp and take the recoveries seriously.' },
+    hearthealth: { label:'Heart Health',       zone:'z34', style:'steady',    tip:'Regular, moderate sessions where you can still talk in short phrases are a great base.' }
+  };
+  const STYLES = { steady:'Steady', intervals:'Intervals', pyramid:'Pyramid', tempo:'Tempo' };
+  const ccfg = { dur: 30, warm: 0, cool: 0, intensity: 'moderate', types: new Set(), adv: false, goal: 'fatburn', zone: 'z2', style: 'steady' };
+  let lastCardioRows = [];
+
+  const fmtT = (sec) => sec < 60 ? sec + ' sec' : (sec % 60 === 0 ? (sec / 60) + ' min' : Math.floor(sec / 60) + ' min ' + (sec % 60) + ' sec');
+
+  function syncCardio() {
+    mark($('cDurRow'), k => k === String(ccfg.dur));
+    $('cDurVal').textContent = ccfg.dur + 'm';
+    mark($('cIntRow'), k => k === ccfg.intensity);
+    mark($('cTypeRow'), k => ccfg.types.has(k));
+    mark($('cGoalRow'), k => k === ccfg.goal);
+    mark($('cZoneRow'), k => k === ccfg.zone);
+    mark($('cStyleRow'), k => k === ccfg.style);
+    $('cAdvSwitch').classList.toggle('on', ccfg.adv);
+    $('cAdvSwitch').setAttribute('aria-pressed', String(ccfg.adv));
+    $('cAdv').classList.toggle('hidden', !ccfg.adv);
+    $('warmVal').textContent = ccfg.warm ? ccfg.warm + ' min' : 'None';
+    $('coolVal').textContent = ccfg.cool ? ccfg.cool + ' min' : 'None';
+  }
+
+  buildChips($('cDurRow'), 'dur', CARDIO_DURS.map(d => [d, String(d)]), k => { ccfg.dur = Number(k); syncCardio(); });
+  buildChips($('cIntRow'), 'area', Object.entries(CINT), k => { ccfg.intensity = k; syncCardio(); });
+  buildChips($('cTypeRow'), 'ctype', CARDIO_TYPES.map(t => [t, t]), k => { toggleIn(ccfg.types, k); syncCardio(); });
+  buildChips($('cGoalRow'), 'area', Object.entries(GOALS).map(([k, g]) => [k, g.label]), k => {
+    ccfg.goal = k; ccfg.zone = GOALS[k].zone; ccfg.style = GOALS[k].style; syncCardio();
+  });
+  buildChips($('cZoneRow'), 'zone', ZONE_ORDER.map(z => [z, ZONES[z].label]), k => { ccfg.zone = k; syncCardio(); });
+  $('cZoneRow').querySelectorAll('button').forEach(b => { b.dataset.name = ZONES[b.dataset.k].name; });
+  buildChips($('cStyleRow'), '', Object.entries(STYLES), k => { ccfg.style = k; syncCardio(); });
+  $('warmCard').onclick = () => { ccfg.warm = WARM_OPTS[(WARM_OPTS.indexOf(ccfg.warm) + 1) % WARM_OPTS.length]; syncCardio(); };
+  $('coolCard').onclick = () => { ccfg.cool = WARM_OPTS[(WARM_OPTS.indexOf(ccfg.cool) + 1) % WARM_OPTS.length]; syncCardio(); };
+  $('cAdvSwitch').onclick = () => { ccfg.adv = !ccfg.adv; syncCardio(); };
+  $('cBuild').onclick = buildCardio;
+  $('cBack').onclick = () => {
+    $('cardioCfg').classList.add('hidden');
+    $('builderMain').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  };
+
+  function openCardioConfig() {
+    syncCardio();
+    $('cOut').replaceChildren();
+    say($('cMsg'), '');
+    $('builderMain').classList.add('hidden');
+    $('cardioCfg').classList.remove('hidden');
+    window.scrollTo(0, 0);
+    const row = $('cDurRow');
+    const sel = row.querySelectorAll('.active')[0];
+    if (sel && typeof sel.offsetLeft === 'number') row.scrollLeft = sel.offsetLeft - (row.clientWidth - sel.offsetWidth) / 2;
+  }
+
+  // Rows for one part of the main set (M whole minutes on one cardio type)
+  function partRows(type, M, zone, style, notes) {
+    const total = M * 60;
+    const rows = [];
+    const add = (title, sec, z, note) => rows.push({ title, sec, sub: fmtT(sec) + ' • ' + ZONES[z].label + ' • ' + type, note: note == null ? ZONES[z].feel : note });
+    const steady = () => {
+      let z = zone;
+      if (z === 'z5') { z = 'z34'; notes.add('Zone 5 cannot be held steadily, so Zone 3-4 was used for the steady portion.'); }
+      add('Steady Effort', total, z);
+      return rows;
+    };
+    if (zone === 'z1' || style === 'steady') return steady();
+
+    if (style === 'intervals') {
+      const [w, rest] = { z2:[240, 60], z34:[180, 90], z5:[60, 90] }[zone];
+      const rz = { z2:'z1', z34:'z2', z5:'z1' }[zone];
+      const r = Math.floor((total + rest) / (w + rest));
+      if (r < 1) return steady();
+      const used = r * w + (r - 1) * rest;
+      rows.push({ title: r + ' × Intervals', sec: used, sub: fmtT(w) + ' ' + ZONES[zone].label + ' / ' + fmtT(rest) + ' ' + ZONES[rz].label + ' • ' + type,
+        note: 'Work: ' + ZONES[zone].feel + ' Recover: ' + ZONES[rz].feel });
+      const left = total - used;
+      if (left >= 30) add('Easy Finish', left, rz);
+      else rows[0].sec += left;
+      return rows;
+    }
+
+    if (style === 'pyramid') {
+      let lad = { z2:['z1','z2','z1'], z34:['z1','z2','z34','z2','z1'], z5:['z1','z2','z34','z5','z34','z2','z1'] }[zone].slice();
+      while (lad.length > 3 && M < lad.length * 2) lad = lad.slice(1, -1);
+      if (M < lad.length * 2) return steady();
+      const reps = Math.max(1, Math.min(Math.round(M / (lad.length * 4)), Math.floor(M / (lad.length * 2))));
+      const per = Math.floor(M / reps);
+      const wts = { z1:1, z2:2, z34:2, z5:1 };
+      const sum = lad.reduce((a, z) => a + wts[z], 0);
+      const raw = lad.map(z => per * wts[z] / sum);
+      const mins = raw.map(Math.floor);
+      let left = per - mins.reduce((a, b) => a + b, 0);
+      raw.map((v, i) => [v - Math.floor(v), i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { mins[i]++; left--; } });
+      rows.push({ title: reps > 1 ? reps + ' × Pyramid' : 'Pyramid', sec: per * reps * 60,
+        sub: fmtT(per * 60) + (reps > 1 ? ' each' : '') + ' • ' + type,
+        note: lad.map((z, i) => mins[i] + ' min ' + ZONES[z].label).join(' → ') });
+      const extra = M - per * reps;
+      if (extra > 0) add('Easy Finish', extra * 60, 'z1');
+      return rows;
+    }
+
+    // tempo
+    const mz = zone === 'z5' ? 'z34' : zone;
+    if (zone === 'z5') notes.add('Zone 5 cannot be held for a tempo block, so Zone 3-4 was used.');
+    const lead = Math.max(1, Math.round(M * 0.2));
+    const mid = M - 2 * lead;
+    if (mid < 1) return steady();
+    const ez = ZONE_ORDER[Math.max(0, ZONE_ORDER.indexOf(mz) - 1)];
+    add('Build', lead * 60, ez, 'Start easy and settle into your rhythm.');
+    add('Tempo Block', mid * 60, mz);
+    add('Ease Down', lead * 60, ez, 'Relax the effort and let your breathing settle.');
+    return rows;
+  }
+
+  function buildCardio() {
+    const types = CARDIO_TYPES.filter(t => ccfg.types.has(t));
+    const fail = (msg) => { $('cOut').replaceChildren(); return say($('cMsg'), msg, 'err'); };
+    if (!types.length) return fail('Pick at least one cardio type.');
+    const main = ccfg.dur - ccfg.warm - ccfg.cool;
+    if (main < 5) return fail('That duration is too short for your warm-up and cool-down. Pick a longer duration or a shorter warm-up/cool-down.');
+    say($('cMsg'), '');
+
+    const notes = new Set();
+    let zone, style;
+    if (ccfg.adv) { zone = ccfg.zone; style = ccfg.style; }
+    else { [zone, style] = { easy:['z2', 'steady'], moderate:['z34', 'intervals'], hard:['z5', 'intervals'] }[ccfg.intensity]; }
+    if (style === 'steady' && zone === 'z5') { style = 'intervals'; notes.add('Zone 5 cannot be held steadily, so it is split into hard efforts with recovery.'); }
+
+    // split the main set across the chosen types (each part at least 5 minutes)
+    const k = Math.max(1, Math.min(types.length, Math.floor(main / 5)));
+    const used = types.slice(0, k);
+    if (k < types.length) notes.add('Your time fits ' + k + ' of your ' + types.length + ' chosen types, so the rotation was shortened. Pick a longer duration to include them all.');
+    const base = Math.floor(main / k), rem = main - base * k;
+
+    const rows = [];
+    if (ccfg.warm) rows.push({ title:'Warm-Up', sec: ccfg.warm * 60, sub: fmtT(ccfg.warm * 60) + ' • Zone 1 • ' + used[0], note:'Start easy and gradually raise your effort.' });
+    used.forEach((t, i) => partRows(t, base + (i < rem ? 1 : 0), zone, style, notes).forEach(r => rows.push(r)));
+    if (ccfg.cool) rows.push({ title:'Cool-Down', sec: ccfg.cool * 60, sub: fmtT(ccfg.cool * 60) + ' • Zone 1 • ' + used[used.length - 1], note:'Slow down gradually until your breathing is calm.' });
+    lastCardioRows = rows;
+    if (rows.filter(r => r.title !== 'Warm-Up' && r.title !== 'Cool-Down').every(r => r.title === 'Steady Effort')) style = 'steady';
+
+    const Z = ZONES[zone];
+    const title = (used.length === 1 ? used[0] : 'Cross-Training') + ' ' + STYLES[style];
+    const card = el('div', 'opt');
+    const head = el('div', 'opt-head');
+    head.style.cursor = 'default';
+    const info = el('div', 'opt-info');
+    info.append(el('span', 'opt-tag', 'YOUR WORKOUT'), el('div', 'opt-title', title),
+      el('div', 'opt-meta', ccfg.dur + 'm • ' + CINT[ccfg.intensity] + ' • ' + used.join(' + ') + ' • ' + LOC_LABEL[planLoc]));
+    head.append(el('div', 'opt-ico', used.length === 1 ? CARDIO_ICON[used[0]] : '🔥'), info);
+    card.appendChild(head);
+
+    const body = el('div', 'opt-body');
+    let summary = Z.label + ' (' + Z.name + ') • about ' + Z.hr + ' of max heart rate.';
+    if (ccfg.adv) summary += ' Aim for the ' + { easy:'lower end', moderate:'middle', hard:'upper end' }[ccfg.intensity] + ' of each zone.';
+    body.appendChild(el('div', 'rest-note', summary));
+    if (ccfg.adv) body.appendChild(el('div', 'rest-note', 'Goal: ' + GOALS[ccfg.goal].label + '. ' + GOALS[ccfg.goal].tip));
+    notes.forEach(n => body.appendChild(el('div', 'rest-note', n)));
+    rows.forEach(r => {
+      const row = el('div', 'mv');
+      const left = el('div');
+      left.append(el('div', 'mn', r.title), el('div', 'mr', r.sub), el('div', 'mnote', r.note));
+      row.appendChild(left);
+      body.appendChild(row);
+    });
+    body.appendChild(el('div', 'rest-note', 'Zones are rough estimates. Go by feel, and stop if something does not feel right.'));
+    card.appendChild(body);
+
+    const actions = el('div', 'plan-actions');
+    const edit = el('button', 'secondary', 'Edit settings');
+    edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    actions.appendChild(edit);
+    card.appendChild(actions);
+
+    $('cOut').replaceChildren(card);
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
