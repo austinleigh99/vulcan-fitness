@@ -165,6 +165,18 @@
   #cardioCfg .opt-ico { background: rgba(255,26,102,.2); }
   .mnote { font-size:12px; color:#7a7a92; margin-top:3px; }
 
+  /* Calisthenics configuration */
+  #calisCfg { --accent: #4fe3a7; }
+  #calisCfg .cfg-title .s { color: var(--accent); }
+  #calisCfg .dur.active { background: var(--accent); color:#06261a; border-color: var(--accent); }
+  .cat-list { display:grid; gap:12px; }
+  #calisCfg .ctype { padding: 22px 24px; font-size: 17px; }
+  #calisCfg .ctype.active { background: rgba(79,227,167,.12); }
+  #calBuild { background: var(--accent); color:#06261a; border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(79,227,167,.35); margin-top: 26px; }
+  #calOut { margin-top: 18px; }
+  #calisCfg .opt-tag { color: var(--accent); background: rgba(79,227,167,.15); }
+  #calisCfg .opt-ico { background: rgba(79,227,167,.2); }
+
   /* Coming soon tabs */
   .soon { text-align:center; padding: 56px 16px; }
   .soon .big { font-size: 48px; }
@@ -343,6 +355,28 @@
         <button id="cBuild">Build Workout</button>
         <div id="cMsg" class="msg"></div>
         <div id="cOut"></div>
+      </div>
+
+      <!-- CALISTHENICS CONFIGURATION -->
+      <div id="calisCfg" class="hidden">
+        <div class="cfg-top">
+          <button id="calBack" class="backbtn" aria-label="Back">←</button>
+          <div class="cfg-title"><div class="t">CALISTHENICS</div><div class="s">CONFIGURATION</div></div>
+        </div>
+
+        <h2>Duration (minutes)</h2>
+        <div id="calDurRow" class="dur-row"></div>
+
+        <h2>Target Categories</h2>
+        <div class="sub">SELECT ONE OR MORE</div>
+        <div id="calCatRow" class="cat-list"></div>
+
+        <h2>Intensity Level</h2>
+        <div id="calIntRow" class="seg3"></div>
+
+        <button id="calBuild">Build Workout</button>
+        <div id="calMsg" class="msg"></div>
+        <div id="calOut"></div>
       </div>
       </div>
     </section>
@@ -704,6 +738,7 @@
     say($('planMsg'), '');
     if (planType === 'strength') return openStrengthConfig();
     if (planType === 'cardio') return openCardioConfig();
+    if (planType === 'calisthenics') return openCalisConfig();
     const p = PLAN[planType];
     const pool = p.both.concat(p[planLoc]);
     const r = rng(Math.floor(Math.random() * 4294967296));
@@ -1151,6 +1186,143 @@
     card.appendChild(actions);
 
     $('cOut').replaceChildren(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- CALISTHENICS CONFIGURATION ----------
+  const CAL_DURS = [20, 30, 40, 50, 60, 75, 90, 100];
+  const CAL_CATS = [['back', 'Back/Bicep'], ['chest', 'Chest/Shoulder/Tricep'], ['core', 'Core'], ['legs', 'Legs/Glutes'], ['full', 'Full Body']];
+  const CAL_LABEL = Object.fromEntries(CAL_CATS);
+  const CAL_ORDER = ['chest', 'back', 'legs', 'core', 'full'];
+  const CAL_INT = {
+    light:    { label:'Light',    per:4.5, sets:[2,3], reps:'8-12',  each:'6-10',  hold:'20-30s', skill:'3-5', rest:60 },
+    moderate: { label:'Moderate', per:5.5, sets:[3,4], reps:'10-15', each:'8-12',  hold:'30-45s', skill:'4-6', rest:60 },
+    intense:  { label:'Intense',  per:6,   sets:[4,5], reps:'15-20', each:'10-15', hold:'45-60s', skill:'5-8', rest:45 }
+  };
+  // [name, category, where ('both' | 'gym' | 'home'), tier (1 easy - 3 advanced), kind]
+  // kinds: reps, each (per side), hold, holdeach, skill, skilleach, timed
+  const CAL_EX = [
+    ['Pull-Ups','back','gym',2,'reps'], ['Chin-Ups','back','gym',2,'reps'], ['Negative Pull-Ups','back','gym',1,'skill'], ['Scapular Pull-Ups','back','gym',1,'reps'], ['Dead Hang','back','gym',1,'hold'], ['Inverted Rows','back','gym',2,'reps'], ['Archer Pull-Ups','back','gym',3,'skill'], ['Bodyweight Biceps Curl','back','gym',2,'reps'],
+    ['Table Rows','back','home',1,'reps'], ['Towel Isometric Curl','back','home',1,'hold'],
+    ['Superman Raises','back','both',1,'reps'], ['Superman Hold','back','both',1,'hold'], ['Reverse Snow Angels','back','both',1,'reps'], ['Prone Y-T-W Raises','back','both',1,'reps'], ['Bird Dog','back','both',1,'each'], ['Prone Swimmers','back','both',1,'timed'],
+    ['Push-Ups','chest','both',1,'reps'], ['Knee Push-Ups','chest','both',1,'reps'], ['Incline Push-Ups','chest','both',1,'reps'], ['Wide Push-Ups','chest','both',1,'reps'], ['Close-Grip Push-Ups','chest','both',1,'reps'], ['Diamond Push-Ups','chest','both',2,'reps'], ['Decline Push-Ups','chest','both',2,'reps'], ['Pike Push-Ups','chest','both',2,'reps'], ['Hindu Push-Ups','chest','both',2,'reps'], ['Plank to Push-Up','chest','both',2,'reps'], ['Shoulder Taps','chest','both',1,'each'], ['Pike Shoulder Taps','chest','both',2,'each'], ['Archer Push-Ups','chest','both',3,'skill'], ['Pseudo Planche Push-Ups','chest','both',3,'skill'], ['Wall Handstand Hold','chest','both',3,'hold'],
+    ['Dips','chest','gym',2,'reps'], ['Bench Dips','chest','gym',1,'reps'], ['Bodyweight Triceps Extension','chest','gym',2,'reps'],
+    ['Chair Dips','chest','home',1,'reps'],
+    ['Plank','core','both',1,'hold'], ['Side Plank','core','both',1,'holdeach'], ['Hollow Body Hold','core','both',2,'hold'], ['Bear Plank Hold','core','both',2,'hold'], ['Dead Bug','core','both',1,'each'], ['Bicycle Crunch','core','both',1,'reps'], ['Mountain Climbers','core','both',1,'reps'], ['Flutter Kicks','core','both',1,'reps'], ['Russian Twists','core','both',1,'reps'], ['Reverse Crunch','core','both',1,'reps'], ['Lying Leg Raises','core','both',2,'reps'], ['V-Ups','core','both',2,'reps'], ['Plank Up-Downs','core','both',2,'reps'],
+    ['Hanging Knee Raises','core','gym',2,'reps'], ['Hanging Leg Raises','core','gym',3,'reps'], ['L-Sit Hold','core','gym',3,'hold'],
+    ['Bodyweight Squats','legs','both',1,'reps'], ['Squat Pulses','legs','both',1,'reps'], ['Reverse Lunges','legs','both',1,'each'], ['Walking Lunges','legs','both',1,'reps'], ['Lateral Lunges','legs','both',1,'each'], ['Glute Bridge','legs','both',1,'reps'], ['Step-Ups','legs','both',1,'each'], ['Wall Sit','legs','both',1,'hold'], ['Calf Raises','legs','both',1,'reps'], ['Donkey Kicks','legs','both',1,'each'], ['Fire Hydrants','legs','both',1,'each'],
+    ['Jump Squats','legs','both',2,'reps'], ['Bulgarian Split Squats','legs','both',2,'each'], ['Single-Leg Glute Bridge','legs','both',2,'each'], ['Single-Leg Calf Raises','legs','both',2,'each'], ['Cossack Squats','legs','both',2,'each'], ['Skater Jumps','legs','both',2,'reps'], ['Hamstring Walkouts','legs','both',2,'reps'], ['Single-Leg Romanian Deadlift','legs','both',2,'each'], ['Broad Jumps','legs','both',2,'reps'],
+    ['Pistol Squat Progression','legs','both',3,'skilleach'], ['Shrimp Squat Progression','legs','both',3,'skilleach'],
+    ['Jumping Jacks','full','both',1,'timed'], ['High Knees','full','both',1,'timed'], ['Bear Crawl','full','both',1,'timed'], ['Crab Walk','full','both',1,'timed'], ['Squat Thrusts','full','both',1,'reps'], ['Plank Jacks','full','both',1,'reps'],
+    ['Burpees','full','both',2,'reps'], ['Inchworm Push-Ups','full','both',2,'reps'], ['Star Jumps','full','both',2,'reps'], ['Sprawls','full','both',2,'reps'], ['Spiderman Push-Ups','full','both',2,'each'], ['Turkish Get-Up','full','both',2,'each'],
+    ['Tuck Jumps','full','both',3,'reps'], ['Burpee Pull-Ups','full','gym',3,'reps']
+  ];
+  const calCfg = { dur: 40, cats: new Set(), intensity: 'moderate' };
+  let lastCalItems = [];
+
+  function syncCal() {
+    mark($('calDurRow'), k => k === String(calCfg.dur));
+    mark($('calCatRow'), k => calCfg.cats.has(k));
+    mark($('calIntRow'), k => k === calCfg.intensity);
+  }
+  buildChips($('calDurRow'), 'dur', CAL_DURS.map(d => [d, String(d)]), k => { calCfg.dur = Number(k); syncCal(); });
+  buildChips($('calCatRow'), 'ctype', CAL_CATS, k => { toggleIn(calCfg.cats, k); syncCal(); });
+  buildChips($('calIntRow'), '', Object.entries(CAL_INT).map(([k, v]) => [k, v.label]), k => { calCfg.intensity = k; syncCal(); });
+  $('calBuild').onclick = buildCalis;
+  $('calBack').onclick = () => {
+    $('calisCfg').classList.add('hidden');
+    $('builderMain').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  };
+
+  function openCalisConfig() {
+    syncCal();
+    $('calOut').replaceChildren();
+    say($('calMsg'), '');
+    $('builderMain').classList.add('hidden');
+    $('calisCfg').classList.remove('hidden');
+    window.scrollTo(0, 0);
+    const row = $('calDurRow');
+    const sel = row.querySelectorAll('.active')[0];
+    if (sel && typeof sel.offsetLeft === 'number') row.scrollLeft = sel.offsetLeft - (row.clientWidth - sel.offsetWidth) / 2;
+  }
+
+  function calRx(e, I, sets) {
+    let kind = e[4];
+    if (e[3] === 3 && kind === 'reps') kind = 'skill';
+    if (e[3] === 3 && kind === 'each') kind = 'skilleach';
+    const s = sets + ' × ';
+    return { reps: s + I.reps + ' reps', each: s + I.each + ' each side', hold: s + I.hold + ' hold', holdeach: s + I.hold + ' each side',
+      skill: s + I.skill + ' reps', skilleach: s + I.skill + ' each side', timed: s + I.hold }[kind];
+  }
+
+  function buildCalis() {
+    const fail = (m) => { $('calOut').replaceChildren(); return say($('calMsg'), m, 'err'); };
+    if (!calCfg.cats.size) return fail('Pick at least one target category.');
+    say($('calMsg'), '');
+    const I = CAL_INT[calCfg.intensity];
+    const target = { light:1, moderate:2, intense:3 }[calCfg.intensity];
+    const want = new Set();
+    calCfg.cats.forEach(c => c === 'full' ? ['back', 'chest', 'legs', 'core', 'full'].forEach(x => want.add(x)) : want.add(c));
+    const n = Math.max(3, Math.min(15, Math.round(calCfg.dur / I.per)));
+    const r = rng(Math.floor(Math.random() * 4294967296));
+
+    const buckets = {};
+    want.forEach(c => {
+      let pool = CAL_EX.filter(e => e[1] === c && (e[2] === 'both' || e[2] === planLoc));
+      const capped = pool.filter(e => e[3] <= target + 1);
+      if (capped.length) pool = capped;
+      buckets[c] = pickN(r, pool, pool.length).sort((a, b) => Math.abs(a[3] - target) - Math.abs(b[3] - target));
+    });
+    const order = pickN(r, Object.keys(buckets), Object.keys(buckets).length);
+    const picked = [];
+    while (picked.length < n && order.some(c => buckets[c].length)) {
+      for (const c of order) {
+        if (picked.length >= n) break;
+        if (buckets[c].length) picked.push(buckets[c].shift());
+      }
+    }
+    picked.sort((a, b) => (CAL_ORDER.indexOf(a[1]) - CAL_ORDER.indexOf(b[1])) || (b[3] - a[3]));
+
+    const items = picked.map(e => {
+      const sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1));
+      return { name: e[0], cat: e[1], rx: calRx(e, I, sets) };
+    });
+    lastCalItems = items;
+
+    const names = CAL_CATS.filter(c => calCfg.cats.has(c[0])).map(c => c[1]);
+    const title = (calCfg.cats.has('full') ? 'Full Body' : names.length <= 2 ? names.join(' + ') : 'Custom Split') + ' Calisthenics';
+
+    const card = el('div', 'opt');
+    const head = el('div', 'opt-head');
+    head.style.cursor = 'default';
+    const info = el('div', 'opt-info');
+    info.append(el('span', 'opt-tag', 'YOUR WORKOUT'), el('div', 'opt-title', title),
+      el('div', 'opt-meta', calCfg.dur + 'm • ' + items.length + (items.length === 1 ? ' Exercise' : ' Exercises') + ' • ' + I.label + ' • ' + LOC_LABEL[planLoc]));
+    head.append(el('div', 'opt-ico', '🤸'), info);
+    card.appendChild(head);
+
+    const body = el('div', 'opt-body');
+    body.appendChild(el('div', 'rest-note', 'Rest ' + I.rest + 's between sets. Warm up for about 5 minutes first (jumping jacks, arm circles, easy squats) and stretch afterward.'));
+    if (items.length < n) body.appendChild(el('div', 'rest-note', 'Only ' + items.length + ' exercise' + (items.length === 1 ? '' : 's') + ' match your choices. Add more categories for a fuller workout.'));
+    items.forEach(m => {
+      const row = el('div', 'mv');
+      const left = el('div');
+      left.append(el('div', 'mn', m.name), el('div', 'mr', m.rx + ' • ' + CAL_LABEL[m.cat]));
+      row.appendChild(left);
+      body.appendChild(row);
+    });
+    card.appendChild(body);
+
+    const actions = el('div', 'plan-actions');
+    const shuffle = el('button', 'secondary', 'Shuffle');
+    shuffle.onclick = buildCalis;
+    const edit = el('button', 'secondary', 'Edit settings');
+    edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    actions.append(shuffle, edit);
+    card.appendChild(actions);
+
+    $('calOut').replaceChildren(card);
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
