@@ -73,6 +73,16 @@
   .mv .mr { font-size:13px; color:var(--muted); margin-top:2px; }
   .logbtn { width:auto; margin:0; padding:8px 14px; font-size:13px; border-radius:10px; }
 
+  /* Custom plan builder */
+  .loc-grid, .type-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .loc { margin:0; padding: 26px 10px; border-radius: 26px; background:#2a2a40; color: var(--text); border: 2px solid transparent; display:flex; flex-direction:column; align-items:center; gap: 12px; font-size: 16px; }
+  .loc svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .type { margin:0; padding: 16px 10px; border-radius: 999px; background:#2a2a40; color: var(--text); border: 2px solid transparent; font-size: 16px; }
+  .loc.active, .type.active { background: rgba(91,75,255,.28); border-color: var(--accent); }
+  #planOut { margin-top: 18px; }
+  .plan-actions { display:flex; gap:10px; padding: 4px 16px 16px; }
+  .plan-actions button { margin: 8px 0 0; padding: 12px 0; font-size: 15px; }
+
   /* Coming soon tabs */
   .soon { text-align:center; padding: 56px 16px; }
   .soon .big { font-size: 48px; }
@@ -139,7 +149,36 @@
 
       <!-- CUSTOM PLAN (manual logging + history) -->
       <div id="panelCustom" class="hidden">
-      <div class="card" style="margin-top:20px">
+
+        <h2>Location</h2>
+        <div class="loc-grid">
+          <button class="loc" data-loc="gym">
+            <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
+            <span>In the Gym</span>
+          </button>
+          <button class="loc" data-loc="home">
+            <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+            <span>At Home</span>
+          </button>
+        </div>
+
+        <h2>Workout Type</h2>
+        <div class="type-grid">
+          <button class="type" data-type="strength">Strength</button>
+          <button class="type" data-type="cardio">Cardio</button>
+          <button class="type" data-type="calisthenics">Calisthenics</button>
+          <button class="type" data-type="hiit">HIIT</button>
+          <button class="type" data-type="recovery">Recovery</button>
+          <button class="type" data-type="pilates">Pilates</button>
+          <button class="type" data-type="yoga">Yoga</button>
+        </div>
+
+        <button id="buildBtn">Build My Plan</button>
+        <div id="planMsg" class="msg"></div>
+        <div id="planOut"></div>
+
+        <h2>Log a Set</h2>
+      <div class="card" id="logCard">
         <label for="exercise">Exercise</label>
         <input id="exercise" list="exerciseList" placeholder="e.g. Bench Press" autocomplete="off">
         <datalist id="exerciseList"></datalist>
@@ -485,11 +524,104 @@
   function logExercise(name) {
     $('exercise').value = name;
     setMode('custom');
-    window.scrollTo(0, 0);
-    $('weight').focus();
+    $('logCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('weight').focus({ preventScroll: true });
   }
 
   renderLibrary();
+
+  // ---------- CUSTOM PLAN BUILDER ----------
+  const PLAN = {
+    strength: { label:'Strength', icon:'🏋️', per:11, count:[4,5],
+      rx:['3 × 8-10','4 × 6-8','3 × 10-12','4 × 8-10'],
+      both:['Walking Lunges','Dumbbell Curl','Bench Dips','Plank'],
+      gym:['Barbell Back Squat','Bench Press','Deadlift','Overhead Press','Barbell Row','Lat Pulldown','Leg Press','Romanian Deadlift','Triceps Pushdown'],
+      home:['Dumbbell Goblet Squat','Push-Ups','Dumbbell Row','Dumbbell Shoulder Press','Dumbbell Romanian Deadlift','Bulgarian Split Squat','Glute Bridge','Band Pull-Apart'] },
+    cardio: { label:'Cardio', icon:'🏃', per:8, count:[3,4],
+      rx:['10 min easy','8 min steady','5 × 2 min hard','15 min steady','6 × 1 min fast'],
+      both:['Brisk Walk','Easy Run','Interval Run','Cycling'],
+      gym:['Treadmill Incline Walk','Rowing Machine','Stair Climber','Elliptical','Stationary Bike'],
+      home:['Jump Rope','Jumping Jacks','Shadow Boxing','Stair Climbs'] },
+    calisthenics: { label:'Calisthenics', icon:'🤸', per:9, count:[5,6],
+      rx:['3 × 10','3 × 12','4 × 8','3 × max','3 × 30s hold'],
+      both:['Push-Ups','Bodyweight Squats','Plank','Reverse Lunges','Glute Bridge','Pike Push-Ups','Superman Hold'],
+      gym:['Pull-Ups','Hanging Knee Raises','Parallel Bar Dips'],
+      home:['Chair Dips','Table Rows','Wall Sit'] },
+    hiit: { label:'HIIT', icon:'⚡', per:5, count:[5,6],
+      rx:['40s on / 20s off','30s on / 30s off','45s on / 15s off'],
+      both:['Burpees','Mountain Climbers','Jump Squats','High Knees','Skater Jumps','Plank Jacks'],
+      gym:['Kettlebell Swings','Box Jumps','Battle Ropes','Assault Bike Sprints'],
+      home:['Squat Thrusts','Tuck Jumps','Shadow Boxing'] },
+    recovery: { label:'Recovery', icon:'🛌', per:4, count:[5,6],
+      rx:['60 sec','45 sec each side','90 sec','2 min','10 slow breaths'],
+      both:['Hip Flexor Stretch','Hamstring Stretch','Chest Opener','Thread the Needle','90/90 Hip Stretch','Neck Rolls','Easy Walk','Box Breathing','Calf Stretch'],
+      gym:['Foam Roll Quads','Foam Roll Upper Back','Light Bike Spin'],
+      home:['Child\'s Pose','Cat-Cow','Lat Stretch'] },
+    pilates: { label:'Pilates', icon:'🧘', per:5, count:[5,6],
+      rx:['10 reps','12 reps','8 each side','30 sec hold','15 reps'],
+      both:['The Hundred','Roll-Up','Single Leg Circles','Rolling Like a Ball','Single Leg Stretch','Double Leg Stretch','Criss-Cross','Swimming','Teaser','Glute Bridge'],
+      gym:['Stability Ball Roll-Out','Pilates Ring Squeeze'],
+      home:['Side Leg Series','Plank Hold'] },
+    yoga: { label:'Yoga', icon:'🧘', per:6, count:[5,7],
+      rx:['5 breaths','30 sec hold','45 sec hold','1 min hold'],
+      both:['Sun Salutation','Downward Dog','Warrior I','Warrior II','Triangle Pose','Pigeon Pose','Cobra Pose','Chair Pose','Tree Pose','Bridge Pose','Child\'s Pose','Cat-Cow'],
+      gym:[], home:[] }
+  };
+  const LOC_LABEL = { gym:'In the Gym', home:'At Home' };
+  let planLoc = null, planType = null;
+
+  document.querySelectorAll('.loc').forEach(b => b.onclick = () => {
+    planLoc = b.dataset.loc;
+    document.querySelectorAll('.loc').forEach(x => x.classList.toggle('active', x === b));
+  });
+  document.querySelectorAll('.type').forEach(b => b.onclick = () => {
+    planType = b.dataset.type;
+    document.querySelectorAll('.type').forEach(x => x.classList.toggle('active', x === b));
+  });
+  $('buildBtn').onclick = buildPlan;
+
+  function buildPlan() {
+    if (!planLoc || !planType) return say($('planMsg'), 'Pick a location and a workout type first.', 'err');
+    say($('planMsg'), '');
+    const p = PLAN[planType];
+    const pool = p.both.concat(p[planLoc]);
+    const r = rng(Math.floor(Math.random() * 4294967296));
+    const n = Math.min(pool.length, p.count[0] + Math.floor(r() * (p.count[1] - p.count[0] + 1)));
+    const moves = pickN(r, pool, n).map(name => ({ name, rx: p.rx[Math.floor(r() * p.rx.length)] }));
+    const mins = Math.max(10, Math.round(n * p.per / 5) * 5);
+
+    const out = $('planOut');
+    out.replaceChildren();
+    const card = el('div', 'opt');
+    const head = el('div', 'opt-head');
+    const info = el('div', 'opt-info');
+    info.append(el('span', 'opt-tag', 'YOUR PLAN'), el('div', 'opt-title', p.label + ' • ' + LOC_LABEL[planLoc]),
+      el('div', 'opt-meta', mins + 'm • ' + moves.length + ' Exercises'));
+    head.append(el('div', 'opt-ico', p.icon), info);
+    head.style.cursor = 'default';
+    card.appendChild(head);
+
+    const body = el('div', 'opt-body');
+    moves.forEach(m => {
+      const row = el('div', 'mv');
+      const left = el('div');
+      left.append(el('div', 'mn', m.name), el('div', 'mr', m.rx));
+      const btn = el('button', 'logbtn', 'Log');
+      btn.onclick = () => logExercise(m.name);
+      row.append(left, btn);
+      body.appendChild(row);
+    });
+    card.appendChild(body);
+
+    const actions = el('div', 'plan-actions');
+    const shuffle = el('button', 'secondary', 'Shuffle');
+    shuffle.onclick = buildPlan;
+    actions.appendChild(shuffle);
+    card.appendChild(actions);
+
+    out.appendChild(card);
+    out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   // ---------- EXPORT ----------
   $('exportBtn').onclick = () => {
