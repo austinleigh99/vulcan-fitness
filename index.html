@@ -83,6 +83,44 @@
   .plan-actions { display:flex; gap:10px; padding: 4px 16px 16px; }
   .plan-actions button { margin: 8px 0 0; padding: 12px 0; font-size: 15px; }
 
+  /* Strength configuration */
+  .cfg-top { display:flex; justify-content:space-between; align-items:flex-start; margin-top: 4px; }
+  .backbtn { width:48px; height:48px; margin:0; padding:0; border-radius:16px; background:#2a2a40; color:var(--text); font-size:22px; }
+  .cfg-title { text-align:right; }
+  .cfg-title .t { font-size: 30px; font-weight: 900; letter-spacing: -.01em; }
+  .cfg-title .s { font-size: 12px; font-weight: 800; letter-spacing: .14em; color:#6f62ff; }
+  .dur-row { display:flex; gap:10px; overflow-x:auto; padding-bottom: 6px; scrollbar-width:none; }
+  .dur-row::-webkit-scrollbar { display:none; }
+  .dur { flex:none; width:58px; height:62px; margin:0; padding:0; border-radius:18px; background:transparent; border:1px solid var(--line); color:var(--text); font-size:20px; font-weight:800; }
+  .dur.active { background:#f2f2f8; color:#14141f; border-color:#f2f2f8; }
+  .area-row { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+  .area { margin:0; padding: 15px 4px; border-radius:999px; background:#2a2a40; color:var(--text); font-size:12px; letter-spacing:.06em; text-transform:uppercase; font-weight:800; }
+  .area.active { background: var(--accent); box-shadow: 0 6px 18px rgba(91,75,255,.45); }
+  .sub { font-size:11px; color:var(--muted); font-weight:700; letter-spacing:.06em; margin:-2px 0 12px; }
+  .mus-wrap { display:flex; flex-wrap:wrap; gap:10px; }
+  .mus { margin:0; width:auto; padding: 12px 16px; border-radius:999px; background:transparent; border:1px solid var(--line); color:var(--text); font-size:12px; letter-spacing:.05em; text-transform:uppercase; font-weight:800; }
+  .mus.active { background: rgba(91,75,255,.3); border-color: var(--accent); }
+  .seg3 { display:flex; background: var(--card); border:1px solid var(--line); border-radius: 18px; padding: 6px; gap:4px; }
+  .seg3 button { margin:0; padding: 14px 0; border-radius: 14px; background:transparent; color: var(--muted); font-size: 13px; letter-spacing:.08em; font-weight:800; text-transform:uppercase; }
+  .seg3 button.active { background:#f2f2f8; color:#14141f; }
+  .toggle-card { display:flex; align-items:center; justify-content:space-between; background: var(--card); border:1px solid var(--line); border-radius: 22px; padding: 18px; margin-top: 22px; }
+  .toggle-card .tt { font-size: 18px; font-weight: 800; }
+  .toggle-card .ts { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .06em; margin-top: 4px; }
+  .switch { position:relative; flex:none; width:52px; height:30px; margin:0; padding:0; border-radius:999px; background:#3a3a52; }
+  .switch::after { content:''; position:absolute; top:4px; left:4px; width:22px; height:22px; border-radius:50%; background:#f2f2f8; transition: transform .15s; }
+  .switch.on { background: var(--accent); }
+  .switch.on::after { transform: translateX(22px); }
+  .eq-row { display:flex; align-items:center; gap:14px; width:100%; margin:12px 0 0; padding:16px; text-align:left; background: var(--card); border:1px solid var(--line); border-radius: 22px; color: var(--text); }
+  .eq-row .ico { width:44px; height:44px; border-radius:14px; background:#2a2a40; display:flex; align-items:center; justify-content:center; font-size:20px; flex:none; }
+  .eq-row .tx { flex:1; font-size:18px; font-weight:800; }
+  .eq-row .tx small { display:block; font-size:11px; color:var(--muted); letter-spacing:.06em; margin-top:3px; font-weight:700; }
+  .eq-row .chev { font-size:26px; flex:none; }
+  #eqPanel { margin-top: 12px; }
+  #cfgBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(91,75,255,.5); margin-top: 22px; }
+  #cfgOut { margin-top: 18px; }
+  .ss-label { font-size:11px; font-weight:800; letter-spacing:.1em; color:#8f85ff; padding: 12px 0 2px; }
+  .rest-note { font-size:12px; color: var(--muted); padding: 10px 0 4px; font-weight:600; }
+
   /* Coming soon tabs */
   .soon { text-align:center; padding: 56px 16px; }
   .soon .big { font-size: 48px; }
@@ -149,6 +187,7 @@
 
       <!-- CUSTOM PLAN (manual logging + history) -->
       <div id="panelCustom" class="hidden">
+      <div id="builderMain">
 
         <h2>Location</h2>
         <div class="loc-grid">
@@ -181,6 +220,44 @@
       <div id="appMsg" class="msg"></div>
       <div id="history"></div>
       <button id="exportBtn" class="secondary">Export backup (CSV)</button>
+      </div>
+
+      <!-- STRENGTH CONFIGURATION -->
+      <div id="strengthCfg" class="hidden">
+        <div class="cfg-top">
+          <button id="cfgBack" class="backbtn" aria-label="Back">←</button>
+          <div class="cfg-title"><div class="t">STRENGTH</div><div class="s">CONFIGURATION</div></div>
+        </div>
+
+        <h2>Duration (minutes)</h2>
+        <div id="durRow" class="dur-row"></div>
+
+        <h2>Target Area</h2>
+        <div id="areaRow" class="area-row"></div>
+
+        <h2>Muscle Groups</h2>
+        <div class="sub">SELECT ONE OR MORE</div>
+        <div id="musRow" class="mus-wrap"></div>
+
+        <h2>Intensity</h2>
+        <div id="intRow" class="seg3"></div>
+
+        <div class="toggle-card">
+          <div><div class="tt">Super Sets</div><div class="ts">MINIMIZE REST BETWEEN SETS</div></div>
+          <button id="supSwitch" class="switch" aria-pressed="false" aria-label="Super sets"></button>
+        </div>
+
+        <button id="eqRow" class="eq-row">
+          <span class="ico">🏋️</span>
+          <span class="tx">Available Equipment<small id="eqCount"></small></span>
+          <span class="chev" id="eqChev">›</span>
+        </button>
+        <div id="eqPanel" class="mus-wrap hidden"></div>
+
+        <button id="cfgBuild">Build My Workout</button>
+        <div id="cfgMsg" class="msg"></div>
+        <div id="cfgOut"></div>
+      </div>
       </div>
     </section>
 
@@ -539,6 +616,7 @@
   function buildPlan() {
     if (!planLoc || !planType) return say($('planMsg'), 'Pick a location and a workout type first.', 'err');
     say($('planMsg'), '');
+    if (planType === 'strength') return openStrengthConfig();
     const p = PLAN[planType];
     const pool = p.both.concat(p[planLoc]);
     const r = rng(Math.floor(Math.random() * 4294967296));
@@ -575,6 +653,164 @@
 
     out.appendChild(card);
     out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- STRENGTH CONFIGURATION ----------
+  const MUSCLES = ['shoulders','biceps','triceps','back','chest','abs','lower back','glutes','quadriceps','hamstrings'];
+  const AREAS = {
+    full:  { label:'Full Body',  groups: MUSCLES },
+    upper: { label:'Upper Body', groups: ['shoulders','biceps','triceps','back','chest'] },
+    lower: { label:'Lower Body', groups: ['lower back','glutes','quadriceps','hamstrings'] }
+  };
+  const DURS = [20, 30, 40, 50, 60, 75, 90];
+  const INTENSITY = {
+    basic:    { label:'Basic',    per:10, sets:[2,3], reps:['12-15','12-15','15'], bw:['10-12','12'], rest:60 },
+    moderate: { label:'Moderate', per:8,  sets:[3,4], reps:['8-12','10-12','8-10'], bw:['12-15','15'], rest:75 },
+    high:     { label:'High',     per:7,  sets:[4,5], reps:['4-6','5-8','6-8'], bw:['15-20','20'], rest:120 }
+  };
+  const EQUIP = { barbell:'Barbell', dumbbells:'Dumbbells', kettlebell:'Kettlebell', cable:'Cable Machine', machines:'Machines', bench:'Bench', pullupbar:'Pull-Up Bar', bands:'Resistance Bands' };
+  // [name, muscle, equipment, isTimedHold]
+  const EXERCISES = [
+    ['Barbell Bench Press','chest','barbell'], ['Incline Dumbbell Press','chest','dumbbells'], ['Dumbbell Fly','chest','dumbbells'], ['Push-Ups','chest','bodyweight'], ['Cable Fly','chest','cable'], ['Machine Chest Press','chest','machines'], ['Band Chest Press','chest','bands'],
+    ['Barbell Row','back','barbell'], ['One-Arm Dumbbell Row','back','dumbbells'], ['Lat Pulldown','back','cable'], ['Seated Cable Row','back','cable'], ['Pull-Ups','back','pullupbar'], ['Machine Row','back','machines'], ['Band Row','back','bands'],
+    ['Overhead Press','shoulders','barbell'], ['Dumbbell Shoulder Press','shoulders','dumbbells'], ['Lateral Raise','shoulders','dumbbells'], ['Face Pulls','shoulders','cable'], ['Machine Shoulder Press','shoulders','machines'], ['Band Pull-Apart','shoulders','bands'], ['Pike Push-Ups','shoulders','bodyweight'],
+    ['Barbell Curl','biceps','barbell'], ['Dumbbell Curl','biceps','dumbbells'], ['Hammer Curl','biceps','dumbbells'], ['Cable Curl','biceps','cable'], ['Band Curl','biceps','bands'], ['Chin-Ups','biceps','pullupbar'],
+    ['Close-Grip Bench Press','triceps','barbell'], ['Overhead Dumbbell Extension','triceps','dumbbells'], ['Triceps Pushdown','triceps','cable'], ['Bench Dips','triceps','bench'], ['Diamond Push-Ups','triceps','bodyweight'], ['Band Pushdown','triceps','bands'], ['Skull Crushers','triceps','barbell'],
+    ['Plank','abs','bodyweight',true], ['Hanging Knee Raises','abs','pullupbar'], ['Cable Crunch','abs','cable'], ['Bicycle Crunch','abs','bodyweight'], ['Dead Bug','abs','bodyweight'], ['Russian Twist','abs','dumbbells'],
+    ['Superman Hold','lower back','bodyweight',true], ['Good Morning','lower back','barbell'], ['Bird Dog','lower back','bodyweight'], ['Kettlebell Swings','lower back','kettlebell'], ['Back Extension','lower back','machines'],
+    ['Barbell Hip Thrust','glutes','barbell'], ['Glute Bridge','glutes','bodyweight'], ['Dumbbell Glute Bridge','glutes','dumbbells'], ['Cable Kickback','glutes','cable'], ['Bulgarian Split Squat','glutes','dumbbells'], ['Banded Glute Bridge','glutes','bands'], ['Kettlebell Sumo Squat','glutes','kettlebell'],
+    ['Barbell Back Squat','quadriceps','barbell'], ['Dumbbell Goblet Squat','quadriceps','dumbbells'], ['Leg Press','quadriceps','machines'], ['Leg Extension','quadriceps','machines'], ['Walking Lunges','quadriceps','bodyweight'], ['Bodyweight Squats','quadriceps','bodyweight'], ['Kettlebell Goblet Squat','quadriceps','kettlebell'], ['Step-Ups','quadriceps','bench'],
+    ['Romanian Deadlift','hamstrings','barbell'], ['Dumbbell Romanian Deadlift','hamstrings','dumbbells'], ['Lying Leg Curl','hamstrings','machines'], ['Cable Pull-Through','hamstrings','cable'], ['Banded Good Morning','hamstrings','bands'], ['Hamstring Walkouts','hamstrings','bodyweight'], ['Kettlebell Deadlift','hamstrings','kettlebell']
+  ];
+  const cfg = { dur: 40, area: 'full', muscles: new Set(), intensity: 'moderate', sup: false, equip: new Set() };
+  const cap = (s) => s.replace(/\b\w/g, c => c.toUpperCase());
+
+  function buildChips(container, cls, items, onPick) {
+    container.replaceChildren(...items.map(([k, label]) => {
+      const b = el('button', cls, label);
+      b.dataset.k = String(k);
+      b.onclick = () => onPick(String(k));
+      return b;
+    }));
+  }
+  function mark(container, test) {
+    container.querySelectorAll('button').forEach(b => b.classList.toggle('active', test(b.dataset.k)));
+  }
+  function syncCfg() {
+    mark($('durRow'), k => k === String(cfg.dur));
+    mark($('areaRow'), k => k === cfg.area);
+    mark($('musRow'), k => cfg.muscles.has(k));
+    mark($('intRow'), k => k === cfg.intensity);
+    mark($('eqPanel'), k => cfg.equip.has(k));
+    $('supSwitch').classList.toggle('on', cfg.sup);
+    $('supSwitch').setAttribute('aria-pressed', String(cfg.sup));
+    $('eqCount').textContent = cfg.equip.size + ' OF ' + Object.keys(EQUIP).length + ' SELECTED';
+  }
+  function toggleIn(set, k) { set.has(k) ? set.delete(k) : set.add(k); }
+
+  buildChips($('durRow'), 'dur', DURS.map(d => [d, String(d)]), k => { cfg.dur = Number(k); syncCfg(); });
+  buildChips($('areaRow'), 'area', Object.entries(AREAS).map(([k, a]) => [k, a.label]), k => { cfg.area = k; syncCfg(); });
+  buildChips($('musRow'), 'mus', MUSCLES.map(m => [m, m]), k => { toggleIn(cfg.muscles, k); syncCfg(); });
+  buildChips($('intRow'), '', Object.entries(INTENSITY).map(([k, v]) => [k, v.label]), k => { cfg.intensity = k; syncCfg(); });
+  buildChips($('eqPanel'), 'mus', Object.entries(EQUIP), k => { toggleIn(cfg.equip, k); syncCfg(); });
+  $('supSwitch').onclick = () => { cfg.sup = !cfg.sup; syncCfg(); };
+  $('eqRow').onclick = () => {
+    const hidden = $('eqPanel').classList.toggle('hidden');
+    $('eqChev').textContent = hidden ? '›' : '⌄';
+  };
+  $('cfgBuild').onclick = buildStrength;
+  $('cfgBack').onclick = () => {
+    $('strengthCfg').classList.add('hidden');
+    $('builderMain').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  };
+
+  function openStrengthConfig() {
+    cfg.equip = new Set(planLoc === 'gym' ? Object.keys(EQUIP) : ['dumbbells', 'bench', 'bands']);
+    syncCfg();
+    $('cfgOut').replaceChildren();
+    say($('cfgMsg'), '');
+    $('builderMain').classList.add('hidden');
+    $('strengthCfg').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  function buildStrength() {
+    const I = INTENSITY[cfg.intensity];
+    const groups = cfg.muscles.size ? MUSCLES.filter(m => cfg.muscles.has(m)) : AREAS[cfg.area].groups;
+    let n = Math.round(cfg.dur / (I.per * (cfg.sup ? 0.8 : 1)));
+    n = Math.max(3, Math.min(12, n));
+    if (cfg.sup && n % 2) n += 1;
+
+    const r = rng(Math.floor(Math.random() * 4294967296));
+    const avail = EXERCISES.filter(e => groups.includes(e[1]) && (e[2] === 'bodyweight' || cfg.equip.has(e[2])));
+    if (!avail.length) return say($('cfgMsg'), 'No exercises match. Add more equipment or muscle groups.', 'err');
+    say($('cfgMsg'), '');
+
+    const buckets = {};
+    pickN(r, avail, avail.length).forEach(e => (buckets[e[1]] ||= []).push(e));
+    const order = pickN(r, Object.keys(buckets), Object.keys(buckets).length);
+    const picked = [];
+    while (picked.length < n && order.some(g => buckets[g].length)) {
+      for (const g of order) {
+        if (picked.length >= n) break;
+        if (buckets[g].length) picked.push(buckets[g].shift());
+      }
+    }
+    picked.sort((a, b) => groups.indexOf(a[1]) - groups.indexOf(b[1]));
+
+    const items = picked.map(e => {
+      const sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1));
+      const pool = e[2] === 'bodyweight' ? I.bw : I.reps;
+      const rx = e[3] ? sets + ' × 30-45s hold' : sets + ' × ' + pool[Math.floor(r() * pool.length)];
+      return { name: e[0], muscle: e[1], rx };
+    });
+
+    const title = cfg.muscles.size
+      ? (groups.length <= 3 ? groups.map(cap).join(groups.length === 2 ? ' & ' : ', ') : 'Custom Split')
+      : AREAS[cfg.area].label + ' Strength';
+
+    const card = el('div', 'opt');
+    const head = el('div', 'opt-head');
+    head.style.cursor = 'default';
+    const info = el('div', 'opt-info');
+    info.append(el('span', 'opt-tag', 'YOUR WORKOUT'), el('div', 'opt-title', title),
+      el('div', 'opt-meta', cfg.dur + 'm • ' + items.length + ' Exercises • ' + I.label + ' • ' + LOC_LABEL[planLoc]));
+    head.append(el('div', 'opt-ico', '🏋️'), info);
+    card.appendChild(head);
+
+    const body = el('div', 'opt-body');
+    body.appendChild(el('div', 'rest-note', cfg.sup
+      ? 'Super sets: alternate the pair back-to-back, rest 30s between exercises and 90s after each pair.'
+      : 'Rest ' + I.rest + 's between sets.'));
+    const addRow = (m) => {
+      const row = el('div', 'mv');
+      const left = el('div');
+      left.append(el('div', 'mn', m.name), el('div', 'mr', m.rx + ' • ' + cap(m.muscle)));
+      row.appendChild(left);
+      body.appendChild(row);
+    };
+    if (cfg.sup) {
+      for (let i = 0; i < items.length; i += 2) {
+        body.appendChild(el('div', 'ss-label', 'SUPERSET ' + (i / 2 + 1)));
+        addRow(items[i]);
+        if (items[i + 1]) addRow(items[i + 1]);
+      }
+    } else {
+      items.forEach(addRow);
+    }
+    card.appendChild(body);
+
+    const actions = el('div', 'plan-actions');
+    const shuffle = el('button', 'secondary', 'Shuffle');
+    shuffle.onclick = buildStrength;
+    const edit = el('button', 'secondary', 'Edit settings');
+    edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    actions.append(shuffle, edit);
+    card.appendChild(actions);
+
+    $('cfgOut').replaceChildren(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ---------- EXPORT ----------
