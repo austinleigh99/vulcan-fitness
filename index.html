@@ -115,7 +115,16 @@
   .eq-row .tx { flex:1; font-size:18px; font-weight:800; }
   .eq-row .tx small { display:block; font-size:11px; color:var(--muted); letter-spacing:.06em; margin-top:3px; font-weight:700; }
   .eq-row .chev { font-size:26px; flex:none; }
-  #eqPanel { margin-top: 12px; }
+  #eqPanel { margin-top: 12px; background: var(--card); border:1px solid var(--line); border-radius: 22px; padding: 16px; }
+  .eq-presets { display:flex; gap:8px; flex-wrap:wrap; }
+  .preset { width:auto; margin:0; padding: 9px 14px; border-radius:999px; background: var(--accent); color:#fff; font-size:12px; font-weight:800; letter-spacing:.04em; }
+  .eq-group { margin-top: 20px; }
+  .eq-ghead { display:flex; align-items:center; gap:10px; margin-bottom: 10px; }
+  .eq-gname { font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#7b6dff; }
+  .eq-gcount { font-size:11px; color: var(--muted); font-weight:700; }
+  .eq-gall { width:auto; margin:0 0 0 auto; padding: 6px 4px; background:none; color: var(--muted); font-size:12px; font-weight:700; text-decoration: underline; }
+  .eqchip { text-transform:none; letter-spacing:0; font-size:13px; padding: 10px 14px; }
+  .eqchip.active::before { content:'✓ '; }
   #cfgBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(91,75,255,.5); margin-top: 22px; }
   #cfgOut { margin-top: 18px; }
   .ss-label { font-size:11px; font-weight:800; letter-spacing:.1em; color:#8f85ff; padding: 12px 0 2px; }
@@ -252,7 +261,7 @@
           <span class="tx">Available Equipment<small id="eqCount"></small></span>
           <span class="chev" id="eqChev">›</span>
         </button>
-        <div id="eqPanel" class="mus-wrap hidden"></div>
+        <div id="eqPanel" class="hidden"></div>
 
         <button id="cfgBuild">Build My Workout</button>
         <div id="cfgMsg" class="msg"></div>
@@ -668,20 +677,35 @@
     moderate: { label:'Moderate', per:8,  sets:[3,4], reps:['8-12','10-12','8-10'], bw:['12-15','15'], rest:75 },
     high:     { label:'High',     per:7,  sets:[4,5], reps:['4-6','5-8','6-8'], bw:['15-20','20'], rest:120 }
   };
-  const EQUIP = { barbell:'Barbell', dumbbells:'Dumbbells', kettlebell:'Kettlebell', cable:'Cable Machine', machines:'Machines', bench:'Bench', pullupbar:'Pull-Up Bar', bands:'Resistance Bands' };
-  // [name, muscle, equipment, isTimedHold]
-  const EXERCISES = [
-    ['Barbell Bench Press','chest','barbell'], ['Incline Dumbbell Press','chest','dumbbells'], ['Dumbbell Fly','chest','dumbbells'], ['Push-Ups','chest','bodyweight'], ['Cable Fly','chest','cable'], ['Machine Chest Press','chest','machines'], ['Band Chest Press','chest','bands'],
-    ['Barbell Row','back','barbell'], ['One-Arm Dumbbell Row','back','dumbbells'], ['Lat Pulldown','back','cable'], ['Seated Cable Row','back','cable'], ['Pull-Ups','back','pullupbar'], ['Machine Row','back','machines'], ['Band Row','back','bands'],
-    ['Overhead Press','shoulders','barbell'], ['Dumbbell Shoulder Press','shoulders','dumbbells'], ['Lateral Raise','shoulders','dumbbells'], ['Face Pulls','shoulders','cable'], ['Machine Shoulder Press','shoulders','machines'], ['Band Pull-Apart','shoulders','bands'], ['Pike Push-Ups','shoulders','bodyweight'],
-    ['Barbell Curl','biceps','barbell'], ['Dumbbell Curl','biceps','dumbbells'], ['Hammer Curl','biceps','dumbbells'], ['Cable Curl','biceps','cable'], ['Band Curl','biceps','bands'], ['Chin-Ups','biceps','pullupbar'],
-    ['Close-Grip Bench Press','triceps','barbell'], ['Overhead Dumbbell Extension','triceps','dumbbells'], ['Triceps Pushdown','triceps','cable'], ['Bench Dips','triceps','bench'], ['Diamond Push-Ups','triceps','bodyweight'], ['Band Pushdown','triceps','bands'], ['Skull Crushers','triceps','barbell'],
-    ['Plank','abs','bodyweight',true], ['Hanging Knee Raises','abs','pullupbar'], ['Cable Crunch','abs','cable'], ['Bicycle Crunch','abs','bodyweight'], ['Dead Bug','abs','bodyweight'], ['Russian Twist','abs','dumbbells'],
-    ['Superman Hold','lower back','bodyweight',true], ['Good Morning','lower back','barbell'], ['Bird Dog','lower back','bodyweight'], ['Kettlebell Swings','lower back','kettlebell'], ['Back Extension','lower back','machines'],
-    ['Barbell Hip Thrust','glutes','barbell'], ['Glute Bridge','glutes','bodyweight'], ['Dumbbell Glute Bridge','glutes','dumbbells'], ['Cable Kickback','glutes','cable'], ['Bulgarian Split Squat','glutes','dumbbells'], ['Banded Glute Bridge','glutes','bands'], ['Kettlebell Sumo Squat','glutes','kettlebell'],
-    ['Barbell Back Squat','quadriceps','barbell'], ['Dumbbell Goblet Squat','quadriceps','dumbbells'], ['Leg Press','quadriceps','machines'], ['Leg Extension','quadriceps','machines'], ['Walking Lunges','quadriceps','bodyweight'], ['Bodyweight Squats','quadriceps','bodyweight'], ['Kettlebell Goblet Squat','quadriceps','kettlebell'], ['Step-Ups','quadriceps','bench'],
-    ['Romanian Deadlift','hamstrings','barbell'], ['Dumbbell Romanian Deadlift','hamstrings','dumbbells'], ['Lying Leg Curl','hamstrings','machines'], ['Cable Pull-Through','hamstrings','cable'], ['Banded Good Morning','hamstrings','bands'], ['Hamstring Walkouts','hamstrings','bodyweight'], ['Kettlebell Deadlift','hamstrings','kettlebell']
+  const A = (...k) => ({ all: k });
+  const EQUIP_GROUPS = [
+    { name:'Free Weights', items:[['barbell','Barbell'],['dumbbells','Dumbbells'],['ezbar','EZ-Bar'],['kettlebell','Kettlebells'],['landmine','Landmine'],['plates','Plates'],['trapbar','Trap Bar']] },
+    { name:'Weight Machines', items:[['cable','Cable Machines'],['absmachine','Abs Crunch Machine'],['bicepsmachine','Biceps Machine'],['chestpress','Chest Press'],['deltmachine','Delt Machine'],['flymachine','Fly Machine'],['hipabduction','Hip Abduction Machine'],['hipadduction','Hip Adduction Machine'],['legcurl','Leg Curl'],['legextension','Leg Extension'],['legpress','Leg Press'],['legpress45','Leg Press 45°'],['seatedlegcurl','Seated Leg Curl'],['seatedrow','Seated Row Machine'],['shoulderpress','Shoulder Press Machine'],['smith','Smith Machine'],['tbarrow','T-Bar Row'],['tricepsdip','Triceps Dip Machine']] },
+    { name:'Bars & Benches', items:[['bench','Bench'],['crunchbench','Crunch Bench'],['inclinebench','Incline Bench'],['preacherbench','Preacher Curl Bench'],['pullupbar','Pull-Up Bar'],['rack','Rack']] },
+    { name:'Cardio', items:[['assaultbike','Assault Bike'],['elliptical','Elliptical'],['rower','Rowing Machine'],['stairclimber','Stair Climber'],['bike','Stationary Bike'],['treadmill','Treadmill']] },
+    { name:'Miscellaneous', items:[['medball','Medicine Ball'],['jumprope','Jump Rope'],['boxjump','Box Jump'],['stabilityball','Stability Ball'],['abwheel','Ab Wheel Carver'],['bands','Resistance Bands']] }
   ];
+  const EQUIP = Object.fromEntries(EQUIP_GROUPS.flatMap(g => g.items));
+  // [name, muscle, requirement, isTimedHold]
+  // requirement: 'bodyweight' | an equipment key | [any of ...] | A(all of ...)
+  const EXERCISES = [
+    ['Barbell Bench Press','chest',[A('barbell','bench'),A('smith','bench')]], ['Incline Barbell Press','chest',[A('barbell','inclinebench'),A('smith','inclinebench')]], ['Dumbbell Bench Press','chest',A('dumbbells','bench')], ['Incline Dumbbell Press','chest',A('dumbbells','inclinebench')], ['Dumbbell Floor Press','chest','dumbbells'], ['Dumbbell Fly','chest','dumbbells'], ['Push-Ups','chest','bodyweight'], ['Cable Fly','chest','cable'], ['Chest Press Machine','chest','chestpress'], ['Pec Fly Machine','chest','flymachine'], ['Band Chest Press','chest','bands'], ['Medicine Ball Push-Ups','chest','medball'],
+    ['Barbell Row','back','barbell'], ['T-Bar Row','back',['tbarrow','landmine']], ['One-Arm Dumbbell Row','back','dumbbells'], ['Lat Pulldown','back','cable'], ['Seated Cable Row','back','cable'], ['Seated Row Machine','back','seatedrow'], ['Pull-Ups','back','pullupbar'], ['Band Row','back','bands'], ['Kettlebell Row','back','kettlebell'],
+    ['Overhead Press','shoulders','barbell'], ['Dumbbell Shoulder Press','shoulders','dumbbells'], ['Shoulder Press Machine','shoulders','shoulderpress'], ['Smith Machine Shoulder Press','shoulders','smith'], ['Lateral Raise','shoulders','dumbbells'], ['Rear Delt Machine Fly','shoulders','deltmachine'], ['Face Pulls','shoulders','cable'], ['Landmine Press','shoulders','landmine'], ['Plate Front Raise','shoulders','plates'], ['Band Pull-Apart','shoulders','bands'], ['Pike Push-Ups','shoulders','bodyweight'],
+    ['Barbell Curl','biceps','barbell'], ['EZ-Bar Curl','biceps','ezbar'], ['Dumbbell Curl','biceps','dumbbells'], ['Hammer Curl','biceps','dumbbells'], ['Preacher Curl','biceps',[A('preacherbench','ezbar'),A('preacherbench','dumbbells')]], ['Biceps Machine Curl','biceps','bicepsmachine'], ['Cable Curl','biceps','cable'], ['Band Curl','biceps','bands'], ['Chin-Ups','biceps','pullupbar'],
+    ['Close-Grip Bench Press','triceps',[A('barbell','bench'),A('smith','bench')]], ['EZ-Bar Skull Crushers','triceps',A('ezbar','bench')], ['Overhead Dumbbell Extension','triceps','dumbbells'], ['Triceps Pushdown','triceps','cable'], ['Triceps Dip Machine','triceps','tricepsdip'], ['Bench Dips','triceps','bench'], ['Diamond Push-Ups','triceps','bodyweight'], ['Band Pushdown','triceps','bands'],
+    ['Plank','abs','bodyweight',true], ['Hanging Knee Raises','abs','pullupbar'], ['Cable Crunch','abs','cable'], ['Abs Crunch Machine','abs','absmachine'], ['Decline Crunch','abs','crunchbench'], ['Ab Wheel Rollout','abs','abwheel'], ['Bicycle Crunch','abs','bodyweight'], ['Dead Bug','abs','bodyweight'], ['Russian Twist','abs',['dumbbells','medball','plates']], ['Medicine Ball Slams','abs','medball'], ['Stability Ball Crunch','abs','stabilityball'],
+    ['Superman Hold','lower back','bodyweight',true], ['Bird Dog','lower back','bodyweight'], ['Barbell Deadlift','lower back','barbell'], ['Trap Bar Deadlift','lower back','trapbar'], ['Good Morning','lower back',A('barbell','rack')], ['Kettlebell Swings','lower back','kettlebell'], ['Stability Ball Back Extension','lower back','stabilityball'],
+    ['Barbell Hip Thrust','glutes',A('barbell','bench')], ['Plate Hip Thrust','glutes',A('plates','bench')], ['Glute Bridge','glutes','bodyweight'], ['Dumbbell Glute Bridge','glutes','dumbbells'], ['Cable Kickback','glutes','cable'], ['Hip Abduction Machine','glutes','hipabduction'], ['Hip Adduction Machine','glutes','hipadduction'], ['Bulgarian Split Squat','glutes','dumbbells'], ['Banded Glute Bridge','glutes','bands'], ['Kettlebell Sumo Squat','glutes','kettlebell'],
+    ['Barbell Back Squat','quadriceps',A('barbell','rack')], ['Smith Machine Squat','quadriceps','smith'], ['Dumbbell Goblet Squat','quadriceps','dumbbells'], ['Leg Press','quadriceps',['legpress','legpress45']], ['Leg Extension','quadriceps','legextension'], ['Walking Lunges','quadriceps','bodyweight'], ['Bodyweight Squats','quadriceps','bodyweight'], ['Kettlebell Goblet Squat','quadriceps','kettlebell'], ['Step-Ups','quadriceps','bench'], ['Box Jumps','quadriceps','boxjump'],
+    ['Romanian Deadlift','hamstrings','barbell'], ['Dumbbell Romanian Deadlift','hamstrings','dumbbells'], ['Lying Leg Curl','hamstrings','legcurl'], ['Seated Leg Curl','hamstrings','seatedlegcurl'], ['Cable Pull-Through','hamstrings','cable'], ['Banded Good Morning','hamstrings','bands'], ['Hamstring Walkouts','hamstrings','bodyweight'], ['Kettlebell Deadlift','hamstrings','kettlebell'], ['Stability Ball Hamstring Curl','hamstrings','stabilityball']
+  ];
+  function reqOk(req) {
+    if (req === 'bodyweight') return true;
+    if (typeof req === 'string') return cfg.equip.has(req);
+    if (Array.isArray(req)) return req.some(reqOk);
+    return req.all.every(reqOk);
+  }
   const cfg = { dur: 40, area: 'full', muscles: new Set(), intensity: 'moderate', sup: false, equip: new Set() };
   const cap = (s) => s.replace(/\b\w/g, c => c.toUpperCase());
 
@@ -701,18 +725,59 @@
     mark($('areaRow'), k => k === cfg.area);
     mark($('musRow'), k => cfg.muscles.has(k));
     mark($('intRow'), k => k === cfg.intensity);
-    mark($('eqPanel'), k => cfg.equip.has(k));
+    $('eqPanel').querySelectorAll('.eqchip').forEach(b => b.classList.toggle('active', cfg.equip.has(b.dataset.k)));
+    EQUIP_GROUPS.forEach(g => {
+      const on = g.items.filter(i => cfg.equip.has(i[0])).length;
+      eqCountEls[g.name].textContent = on + '/' + g.items.length;
+      eqAllBtns[g.name].textContent = on === g.items.length ? 'Clear' : 'Select all';
+    });
     $('supSwitch').classList.toggle('on', cfg.sup);
     $('supSwitch').setAttribute('aria-pressed', String(cfg.sup));
     $('eqCount').textContent = cfg.equip.size + ' OF ' + Object.keys(EQUIP).length + ' SELECTED';
   }
   function toggleIn(set, k) { set.has(k) ? set.delete(k) : set.add(k); }
 
+  const eqCountEls = {}, eqAllBtns = {};
+  function buildEquipPanel() {
+    const panel = $('eqPanel');
+    panel.replaceChildren();
+    const presets = el('div', 'eq-presets');
+    [['Full Gym', () => Object.keys(EQUIP)], ['Home Basics', () => ['dumbbells', 'bench', 'bands']], ['Bodyweight Only', () => []]].forEach(([label, fn]) => {
+      const b = el('button', 'preset', label);
+      b.onclick = () => { cfg.equip = new Set(fn()); syncCfg(); };
+      presets.appendChild(b);
+    });
+    panel.appendChild(presets);
+    EQUIP_GROUPS.forEach(g => {
+      const sec = el('div', 'eq-group');
+      const head = el('div', 'eq-ghead');
+      const count = el('span', 'eq-gcount', '');
+      const all = el('button', 'eq-gall', 'Select all');
+      all.onclick = () => {
+        const keys = g.items.map(i => i[0]);
+        const allOn = keys.every(k => cfg.equip.has(k));
+        keys.forEach(k => allOn ? cfg.equip.delete(k) : cfg.equip.add(k));
+        syncCfg();
+      };
+      eqCountEls[g.name] = count; eqAllBtns[g.name] = all;
+      head.append(el('span', 'eq-gname', g.name), count, all);
+      const chips = el('div', 'mus-wrap');
+      g.items.forEach(([k, label]) => {
+        const b = el('button', 'mus eqchip', label);
+        b.dataset.k = k;
+        b.onclick = () => { toggleIn(cfg.equip, k); syncCfg(); };
+        chips.appendChild(b);
+      });
+      sec.append(head, chips);
+      panel.appendChild(sec);
+    });
+  }
+
   buildChips($('durRow'), 'dur', DURS.map(d => [d, String(d)]), k => { cfg.dur = Number(k); syncCfg(); });
   buildChips($('areaRow'), 'area', Object.entries(AREAS).map(([k, a]) => [k, a.label]), k => { cfg.area = k; syncCfg(); });
   buildChips($('musRow'), 'mus', MUSCLES.map(m => [m, m]), k => { toggleIn(cfg.muscles, k); syncCfg(); });
   buildChips($('intRow'), '', Object.entries(INTENSITY).map(([k, v]) => [k, v.label]), k => { cfg.intensity = k; syncCfg(); });
-  buildChips($('eqPanel'), 'mus', Object.entries(EQUIP), k => { toggleIn(cfg.equip, k); syncCfg(); });
+  buildEquipPanel();
   $('supSwitch').onclick = () => { cfg.sup = !cfg.sup; syncCfg(); };
   $('eqRow').onclick = () => {
     const hidden = $('eqPanel').classList.toggle('hidden');
@@ -743,7 +808,7 @@
     if (cfg.sup && n % 2) n += 1;
 
     const r = rng(Math.floor(Math.random() * 4294967296));
-    const avail = EXERCISES.filter(e => groups.includes(e[1]) && (e[2] === 'bodyweight' || cfg.equip.has(e[2])));
+    const avail = EXERCISES.filter(e => groups.includes(e[1]) && reqOk(e[2]));
     if (!avail.length) return say($('cfgMsg'), 'No exercises match. Add more equipment or muscle groups.', 'err');
     say($('cfgMsg'), '');
 
@@ -775,7 +840,7 @@
     head.style.cursor = 'default';
     const info = el('div', 'opt-info');
     info.append(el('span', 'opt-tag', 'YOUR WORKOUT'), el('div', 'opt-title', title),
-      el('div', 'opt-meta', cfg.dur + 'm • ' + items.length + ' Exercises • ' + I.label + ' • ' + LOC_LABEL[planLoc]));
+      el('div', 'opt-meta', cfg.dur + 'm • ' + items.length + (items.length === 1 ? ' Exercise' : ' Exercises') + ' • ' + I.label + ' • ' + LOC_LABEL[planLoc]));
     head.append(el('div', 'opt-ico', '🏋️'), info);
     card.appendChild(head);
 
@@ -783,6 +848,9 @@
     body.appendChild(el('div', 'rest-note', cfg.sup
       ? 'Super sets: alternate the pair back-to-back, rest 30s between exercises and 90s after each pair.'
       : 'Rest ' + I.rest + 's between sets.'));
+    if (picked.length < n) {
+      body.appendChild(el('div', 'rest-note', 'Only ' + picked.length + ' exercise' + (picked.length === 1 ? '' : 's') + ' match your equipment and muscle choices. Add more equipment or muscle groups for a fuller workout.'));
+    }
     const addRow = (m) => {
       const row = el('div', 'mv');
       const left = el('div');
