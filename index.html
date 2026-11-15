@@ -3,37 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f1115">
+<meta name="theme-color" content="#0b0b12">
 <title>Workout Tracker</title>
 <style>
-  :root { --bg:#0f1115; --card:#1a1d24; --line:#2a2f3a; --text:#eef0f4; --muted:#8b93a3; --accent:#4ade80; --danger:#f87171; }
+  :root { --bg:#0b0b12; --card:#171722; --line:#2a2a3d; --text:#f2f2f8; --muted:#8c8ca3; --accent:#5b4bff; --green:#4ade80; --danger:#f87171; --nav-h:76px; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
-  .wrap { max-width: 520px; margin: 0 auto; padding: 16px; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding-top: env(safe-area-inset-top); }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 16px 16px calc(var(--nav-h) + 32px + env(safe-area-inset-bottom)); }
   h1 { font-size: 22px; margin: 8px 0 16px; }
-  h2 { font-size: 15px; color: var(--muted); font-weight: 600; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: .04em; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  h2 { font-size: 13px; color: var(--muted); font-weight: 700; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
   label { display:block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
-  input { width:100%; padding: 14px; font-size: 17px; background:#0f1115; color:var(--text); border:1px solid var(--line); border-radius: 10px; }
+  input { width:100%; padding: 14px; font-size: 17px; background:#0b0b12; color:var(--text); border:1px solid var(--line); border-radius: 12px; }
   input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   .row { display:flex; gap:10px; }
   .row > div { flex:1; }
-  button { width:100%; padding: 15px; font-size: 17px; font-weight: 700; border:0; border-radius: 12px; background: var(--accent); color:#06210f; margin-top: 16px; cursor:pointer; }
+  button { width:100%; padding: 15px; font-size: 17px; font-weight: 700; border:0; border-radius: 14px; background: var(--accent); color:#fff; margin-top: 16px; cursor:pointer; }
   button.secondary { background: transparent; color: var(--text); border:1px solid var(--line); font-weight:600; }
   button.link { background:none; color:var(--muted); border:0; margin-top:10px; font-weight:500; font-size:15px; text-decoration: underline; }
   button:disabled { opacity:.5; }
   .msg { margin-top: 12px; font-size: 14px; min-height: 18px; }
-  .msg.err { color: var(--danger); } .msg.ok { color: var(--accent); }
-  .topbar { display:flex; justify-content:space-between; align-items:center; }
-  .topbar button { width:auto; margin:0; padding: 8px 14px; font-size: 14px; }
+  .msg.err { color: var(--danger); } .msg.ok { color: var(--green); }
+  .hidden { display:none !important; }
+
+  /* Home */
+  .date-label { text-align:center; color:var(--muted); font-size: 12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-top: 12px; }
+  .welcome { text-align:center; font-size: 28px; font-weight: 800; margin: 6px 0 20px; }
+  .stats { display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .stat { border-radius: 18px; padding: 16px 4px; text-align:center; }
+  .stat .num { font-size: 22px; font-weight: 800; }
+  .stat .lbl { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-top: 4px; opacity:.8; }
+  .s1 { background:#ececf5; color:#14141f; } .s2 { background:#3a2cff; color:#fff; }
+  .s3 { background:#3fbf85; color:#06261a; } .s4 { background:#f0931f; color:#2b1600; }
+  .logout { width:auto; margin: 28px auto 0; display:block; padding: 10px 22px; font-size: 14px; }
+
+  /* Workout */
   .day { margin-top: 18px; }
   .day h3 { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
-  .set { display:flex; justify-content:space-between; align-items:center; padding: 12px 14px; background: var(--card); border:1px solid var(--line); border-radius: 12px; margin-bottom: 8px; }
+  .set { display:flex; justify-content:space-between; align-items:center; padding: 12px 14px; background: var(--card); border:1px solid var(--line); border-radius: 14px; margin-bottom: 8px; }
   .set .name { font-weight: 600; }
   .set .detail { color: var(--muted); font-size: 14px; margin-top: 2px; }
   .set .del { background:none; border:0; color: var(--danger); font-size: 22px; width: 44px; height: 44px; padding:0; margin:0; }
-  .hidden { display:none; }
   .empty { color: var(--muted); text-align:center; padding: 24px 0; }
+
+  /* Coming soon tabs */
+  .soon { text-align:center; padding: 56px 16px; }
+  .soon .big { font-size: 48px; }
+  .soon p { color: var(--muted); }
+
+  /* Bottom nav */
+  .nav { position: fixed; left:0; right:0; bottom:0; z-index: 10; background: rgba(15,15,26,.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+  .nav-inner { max-width: 520px; margin: 0 auto; display:flex; }
+  .nav button { flex:1; margin:0; padding: 10px 0 8px; background:none; border:0; border-radius:0; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing:.04em; text-transform: uppercase; display:flex; flex-direction:column; align-items:center; gap: 4px; }
+  .nav button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav button.active { color: #7b6dff; }
 </style>
 </head>
 <body>
@@ -53,34 +76,93 @@
     </div>
   </div>
 
-  <!-- APP SCREEN -->
+  <!-- APP -->
   <div id="app" class="hidden">
-    <div class="topbar">
-      <h1>🏋️ Workout Tracker</h1>
-      <button id="logoutBtn" class="secondary">Log out</button>
-    </div>
 
-    <h2>Log a set</h2>
-    <div class="card">
-      <label for="exercise">Exercise</label>
-      <input id="exercise" list="exerciseList" placeholder="e.g. Bench Press" autocomplete="off">
-      <datalist id="exerciseList"></datalist>
-      <div class="row">
-        <div><label for="weight">Weight</label><input id="weight" type="number" inputmode="decimal" step="any" placeholder="lbs"></div>
-        <div><label for="reps">Reps</label><input id="reps" type="number" inputmode="numeric" placeholder="reps"></div>
+    <!-- HOME -->
+    <section id="view-home" data-view="home">
+      <div class="date-label" id="homeDate"></div>
+      <div class="welcome" id="homeWelcome">Welcome Back</div>
+      <div class="stats">
+        <div class="stat s1"><div class="num" id="stToday">0</div><div class="lbl">Today</div></div>
+        <div class="stat s2"><div class="num" id="stTotal">0</div><div class="lbl">Sets</div></div>
+        <div class="stat s3"><div class="num" id="stLifts">0</div><div class="lbl">Lifts</div></div>
+        <div class="stat s4"><div class="num" id="stStreak">0d</div><div class="lbl">Streak</div></div>
       </div>
-      <label for="date">Date</label>
-      <input id="date" type="date">
-      <button id="addBtn">Add set</button>
-      <div id="appMsg" class="msg"></div>
-    </div>
+      <button id="logoutBtn" class="secondary logout">Log out</button>
+    </section>
 
-    <h2>History</h2>
-    <div id="history"></div>
+    <!-- WORKOUT -->
+    <section id="view-workout" data-view="workout" class="hidden">
+      <h1>Workout</h1>
+      <div class="card">
+        <label for="exercise">Exercise</label>
+        <input id="exercise" list="exerciseList" placeholder="e.g. Bench Press" autocomplete="off">
+        <datalist id="exerciseList"></datalist>
+        <div class="row">
+          <div><label for="weight">Weight</label><input id="weight" type="number" inputmode="decimal" step="any" placeholder="lbs"></div>
+          <div><label for="reps">Reps</label><input id="reps" type="number" inputmode="numeric" placeholder="reps"></div>
+        </div>
+        <label for="date">Date</label>
+        <input id="date" type="date">
+        <button id="addBtn">Add set</button>
+        <div id="appMsg" class="msg"></div>
+      </div>
 
-    <button id="exportBtn" class="secondary">Export backup (CSV)</button>
+      <h2>History</h2>
+      <div id="history"></div>
+      <button id="exportBtn" class="secondary">Export backup (CSV)</button>
+    </section>
+
+    <!-- AI COACH -->
+    <section id="view-coach" data-view="coach" class="hidden">
+      <h1>AI Coach</h1>
+      <div class="soon"><div class="big">✨</div><h2 style="margin-top:12px">Coming soon</h2><p>Your AI coach will live here.</p></div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section id="view-progress" data-view="progress" class="hidden">
+      <h1>Progress</h1>
+      <div class="soon"><div class="big">📈</div><h2 style="margin-top:12px">Coming soon</h2><p>Charts and personal records will live here.</p></div>
+    </section>
+
+    <!-- GOALS -->
+    <section id="view-goals" data-view="goals" class="hidden">
+      <h1>Goals</h1>
+      <div class="soon"><div class="big">🎯</div><h2 style="margin-top:12px">Coming soon</h2><p>Set and track your goals here.</p></div>
+    </section>
+
+    <!-- SOCIAL -->
+    <section id="view-social" data-view="social" class="hidden">
+      <h1>Social</h1>
+      <div class="soon"><div class="big">👥</div><h2 style="margin-top:12px">Coming soon</h2><p>Friends and sharing will live here.</p></div>
+    </section>
+
+    <!-- BOTTOM NAV -->
+    <nav class="nav" aria-label="Main">
+      <div class="nav-inner">
+        <button data-tab="home" class="active">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Home
+        </button>
+        <button data-tab="workout">
+          <svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>Workout
+        </button>
+        <button data-tab="coach">
+          <svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>AI Coach
+        </button>
+        <button data-tab="progress">
+          <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Progress
+        </button>
+        <button data-tab="goals">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Goals
+        </button>
+        <button data-tab="social">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.8 0 4.5 1.9 4.5 4.5"/></svg>Social
+        </button>
+      </div>
+    </nav>
+
   </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -93,6 +175,7 @@
   const $ = (id) => document.getElementById(id);
   let signupMode = false;
   let sets = [];
+  let currentUser = null;
 
   function todayLocal() {
     const d = new Date();
@@ -100,6 +183,14 @@
     return d.toISOString().slice(0, 10);
   }
   function say(el, text, kind) { el.textContent = text || ''; el.className = 'msg ' + (kind || ''); }
+
+  // ---------- TABS ----------
+  function showTab(name) {
+    document.querySelectorAll('[data-view]').forEach(v => v.classList.toggle('hidden', v.dataset.view !== name));
+    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll('.nav button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
 
   // ---------- AUTH ----------
   $('toggleBtn').onclick = () => {
@@ -137,11 +228,15 @@
 
   function showScreen(session) {
     if (session) {
+      const firstLoad = !currentUser;
+      currentUser = session.user;
       $('auth').classList.add('hidden');
       $('app').classList.remove('hidden');
       if (!$('date').value) $('date').value = todayLocal();
+      if (firstLoad) showTab('home');
       loadSets();
     } else {
+      currentUser = null;
       $('app').classList.add('hidden');
       $('auth').classList.remove('hidden');
       sets = [];
@@ -171,7 +266,7 @@
     if (error) return say($('appMsg'), error.message, 'err');
     say($('appMsg'), 'Saved ✓', 'ok');
     setTimeout(() => say($('appMsg'), ''), 1500);
-    $('reps').value = '';   // keep exercise + weight for quick next set
+    $('reps').value = '';
     $('reps').focus();
     loadSets();
   };
@@ -184,8 +279,31 @@
   }
 
   // ---------- RENDER ----------
+  function calcStreak() {
+    const days = new Set(sets.map(s => s.performed_on));
+    const d = new Date();
+    const fmt = (x) => { const t = new Date(x); t.setMinutes(t.getMinutes() - t.getTimezoneOffset()); return t.toISOString().slice(0, 10); };
+    if (!days.has(fmt(d))) d.setDate(d.getDate() - 1);
+    let n = 0;
+    while (days.has(fmt(d))) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+
+  function renderHome() {
+    const now = new Date();
+    $('homeDate').textContent = now.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+    const name = currentUser && currentUser.email ? currentUser.email.split('@')[0] : '';
+    const pretty = name ? name.charAt(0).toUpperCase() + name.slice(1) : '';
+    $('homeWelcome').textContent = pretty ? 'Welcome Back, ' + pretty : 'Welcome Back';
+    $('stToday').textContent = sets.filter(s => s.performed_on === todayLocal()).length;
+    $('stTotal').textContent = sets.length;
+    $('stLifts').textContent = new Set(sets.map(s => s.exercise.toLowerCase())).size;
+    $('stStreak').textContent = calcStreak() + 'd';
+  }
+
   function render() {
-    // exercise suggestions
+    renderHome();
+
     const names = [...new Set(sets.map(s => s.exercise))].sort();
     $('exerciseList').replaceChildren(...names.map(n => { const o = document.createElement('option'); o.value = n; return o; }));
 
