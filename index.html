@@ -46,6 +46,33 @@
   .set .del { background:none; border:0; color: var(--danger); font-size: 22px; width: 44px; height: 44px; padding:0; margin:0; }
   .empty { color: var(--muted); text-align:center; padding: 24px 0; }
 
+  /* Workout library */
+  .subtitle { color: var(--muted); margin: -8px 0 18px; font-size: 16px; }
+  .seg { display:flex; background: var(--card); border:1px solid var(--line); border-radius: 999px; padding: 5px; gap:4px; }
+  .seg button { margin:0; padding: 13px 0; font-size: 15px; border-radius: 999px; background: transparent; color: var(--muted); }
+  .seg button.active { background: #34344d; color: var(--text); }
+  .chips { display:flex; gap:10px; overflow-x:auto; padding-bottom: 6px; scrollbar-width:none; }
+  .chips::-webkit-scrollbar { display:none; }
+  .chips .chip { flex:none; width:auto; margin:0; padding: 12px 20px; font-size: 15px; font-weight: 600; border-radius: 999px; background:#262638; color: var(--muted); }
+  .chips .chip.active { background:#f2f2f8; color:#14141f; }
+  .section-row { display:flex; justify-content:space-between; align-items:center; margin: 26px 0 12px; }
+  .section-row h3 { margin:0; font-size: 20px; }
+  .badge { font-size:10px; font-weight:800; letter-spacing:.08em; color:#8f85ff; background:rgba(91,75,255,.18); border:1px solid rgba(91,75,255,.4); padding:5px 10px; border-radius:999px; }
+  .opt { background: var(--card); border:1px solid var(--line); border-radius: 22px; margin-bottom: 12px; overflow:hidden; }
+  .opt-head { display:flex; align-items:center; gap:14px; padding:16px; cursor:pointer; }
+  .opt-ico { width:56px; height:56px; border-radius:16px; background:rgba(91,75,255,.25); display:flex; align-items:center; justify-content:center; font-size:26px; flex:none; }
+  .opt-info { flex:1; min-width:0; }
+  .opt-tag { font-size:10px; font-weight:800; letter-spacing:.1em; color:#8f85ff; background:rgba(91,75,255,.18); padding:3px 8px; border-radius:6px; }
+  .opt-title { font-size:18px; font-weight:800; margin-top:6px; }
+  .opt-meta { font-size:13px; color:var(--muted); margin-top:2px; }
+  .opt-chev { font-size:26px; color:var(--text); flex:none; }
+  .opt-body { border-top:1px solid var(--line); padding:6px 16px 12px; }
+  .mv { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .mv:last-child { border-bottom:0; }
+  .mv .mn { font-weight:600; }
+  .mv .mr { font-size:13px; color:var(--muted); margin-top:2px; }
+  .logbtn { width:auto; margin:0; padding:8px 14px; font-size:13px; border-radius:10px; }
+
   /* Coming soon tabs */
   .soon { text-align:center; padding: 56px 16px; }
   .soon .big { font-size: 48px; }
@@ -94,8 +121,25 @@
 
     <!-- WORKOUT -->
     <section id="view-workout" data-view="workout" class="hidden">
-      <h1>Workout</h1>
-      <div class="card">
+      <h1>Workouts</h1>
+      <p class="subtitle">Ready for your next session?</p>
+
+      <div class="seg">
+        <button id="segBrowse" class="active">Browse Library</button>
+        <button id="segCustom">Custom Plan</button>
+      </div>
+
+      <!-- BROWSE LIBRARY -->
+      <div id="panelBrowse">
+        <div class="section-row"><h3>Quick Search</h3></div>
+        <div id="chips" class="chips"></div>
+        <div class="section-row"><h3 id="dailyTitle">Daily Strength Options</h3><span class="badge">NEW EVERY DAY</span></div>
+        <div id="options"></div>
+      </div>
+
+      <!-- CUSTOM PLAN (manual logging + history) -->
+      <div id="panelCustom" class="hidden">
+      <div class="card" style="margin-top:20px">
         <label for="exercise">Exercise</label>
         <input id="exercise" list="exerciseList" placeholder="e.g. Bench Press" autocomplete="off">
         <datalist id="exerciseList"></datalist>
@@ -112,6 +156,7 @@
       <h2>History</h2>
       <div id="history"></div>
       <button id="exportBtn" class="secondary">Export backup (CSV)</button>
+      </div>
     </section>
 
     <!-- AI COACH -->
@@ -188,6 +233,7 @@
   function showTab(name) {
     document.querySelectorAll('[data-view]').forEach(v => v.classList.toggle('hidden', v.dataset.view !== name));
     document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    if (name === 'workout' && typeof renderLibrary === 'function') renderLibrary();
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('.nav button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
@@ -339,6 +385,111 @@
       box.appendChild(wrap);
     });
   }
+
+  // ---------- WORKOUT LIBRARY ----------
+  const LIB = {
+    strength: { label:'Strength', icon:'🏋️', mins:11, count:[4,5],
+      rx:['3 × 8-10','4 × 6-8','3 × 10-12','4 × 8-10','5 × 5'],
+      moves:['Barbell Back Squat','Bench Press','Deadlift','Overhead Press','Barbell Row','Pull-Ups','Romanian Deadlift','Incline Dumbbell Press','Walking Lunges','Lat Pulldown','Dips','Hip Thrust','Dumbbell Curl','Triceps Pushdown','Leg Press','Face Pulls'],
+      titles:['Power Builder Classic','Iron Foundation','Heavy Day Blueprint','Full Body Forge','Push Pull Priority','Barbell Basics','Muscle Matrix','Steel Session'] },
+    cardio: { label:'Cardio', icon:'🏃', mins:8, count:[3,4],
+      rx:['10 min easy','8 min steady','5 × 2 min hard','15 min steady','6 × 1 min fast'],
+      moves:['Easy Run','Tempo Run','Interval Run','Cycling','Rowing Machine','Jump Rope','Stair Climber','Brisk Walk','Elliptical','Swim Laps'],
+      titles:['Steady State Cruise','Heart Starter','Endurance Engine','Tempo Tuesday','Zone 2 Flow','Cardio Mix Tape','Distance Builder','Pulse Raiser'] },
+    yoga: { label:'Yoga', icon:'🧘', mins:6, count:[5,7],
+      rx:['5 breaths','30 sec hold','45 sec hold','1 min hold','8 slow reps'],
+      moves:['Sun Salutation','Downward Dog','Warrior I','Warrior II','Triangle Pose','Child\'s Pose','Pigeon Pose','Cat-Cow','Cobra Pose','Chair Pose','Tree Pose','Bridge Pose'],
+      titles:['Morning Flow','Gentle Reset','Strong Foundations','Balance & Breathe','Hip Opener Flow','Sunset Stretch','Core Calm','Full Body Unwind'] },
+    hiit: { label:'HIIT', icon:'⚡', mins:5, count:[5,6],
+      rx:['40s on / 20s off','30s on / 30s off','45s on / 15s off','20s on / 10s off × 8'],
+      moves:['Burpees','Mountain Climbers','Jump Squats','High Knees','Kettlebell Swings','Skater Jumps','Plank Jacks','Box Jumps','Battle Ropes','Sprint Intervals'],
+      titles:['Fat Burner 20','Tabata Blast','Sweat Storm','Quick Fire Circuit','Max Effort Mix','Burnout Builder','Power Pulse','Engine Revver'] },
+    pilates: { label:'Pilates', icon:'🤸', mins:5, count:[5,7],
+      rx:['10 reps','12 reps','8 each side','30 sec hold','15 reps'],
+      moves:['The Hundred','Roll-Up','Single Leg Circles','Rolling Like a Ball','Single Leg Stretch','Double Leg Stretch','Criss-Cross','Swimming','Plank Hold','Side Leg Series','Teaser','Glute Bridge'],
+      titles:['Core Control','Mat Essentials','Long & Lean','Powerhouse Flow','Posture Perfect','Deep Core Burn','Balanced Body','Smooth Strength'] },
+    recovery: { label:'Recovery', icon:'🛌', mins:4, count:[5,7],
+      rx:['60 sec','45 sec each side','90 sec','2 min','10 slow breaths'],
+      moves:['Foam Roll Quads','Foam Roll Upper Back','Hip Flexor Stretch','Hamstring Stretch','Chest Opener','Thread the Needle','90/90 Hip Stretch','Neck Rolls','Easy Walk','Box Breathing','Lat Stretch','Calf Stretch'],
+      titles:['Rest Day Reset','Foam Roll Fix','Loosen Up','Sore Muscle Soother','Mobility Minutes','Cooldown Classic','Deep Stretch','Recharge Routine'] }
+  };
+  let activeCat = 'strength';
+  let openOpt = null;
+
+  function hashStr(s) { let h = 1779033703 ^ s.length; for (let i = 0; i < s.length; i++) { h = Math.imul(h ^ s.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); } return h >>> 0; }
+  function rng(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function pickN(r, arr, n) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, n); }
+
+  // Same 3 options all day, new ones tomorrow (seeded by today's date)
+  function genOptions(key) {
+    const cat = LIB[key];
+    const r = rng(hashStr(todayLocal() + '|' + key));
+    return pickN(r, cat.titles, 3).map(title => {
+      const n = cat.count[0] + Math.floor(r() * (cat.count[1] - cat.count[0] + 1));
+      const moves = pickN(r, cat.moves, n).map(name => ({ name, rx: cat.rx[Math.floor(r() * cat.rx.length)] }));
+      const mins = Math.max(10, Math.round(n * cat.mins / 5) * 5);
+      return { title, moves, mins };
+    });
+  }
+
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function renderLibrary() {
+    const chips = $('chips');
+    chips.replaceChildren();
+    Object.entries(LIB).forEach(([key, c]) => {
+      const b = el('button', 'chip' + (key === activeCat ? ' active' : ''), c.label);
+      b.onclick = () => { activeCat = key; openOpt = null; renderLibrary(); };
+      chips.appendChild(b);
+    });
+
+    const cat = LIB[activeCat];
+    $('dailyTitle').textContent = 'Daily ' + cat.label + ' Options';
+    const list = $('options');
+    list.replaceChildren();
+    genOptions(activeCat).forEach((o, i) => {
+      const card = el('div', 'opt');
+      const head = el('div', 'opt-head');
+      const info = el('div', 'opt-info');
+      info.append(el('span', 'opt-tag', 'OPTION ' + (i + 1)), el('div', 'opt-title', o.title),
+        el('div', 'opt-meta', o.mins + 'm • ' + o.moves.length + ' Exercises • ' + cat.label));
+      head.append(el('div', 'opt-ico', cat.icon), info, el('div', 'opt-chev', openOpt === i ? '⌄' : '›'));
+      head.onclick = () => { openOpt = openOpt === i ? null : i; renderLibrary(); };
+      card.appendChild(head);
+      if (openOpt === i) {
+        const body = el('div', 'opt-body');
+        o.moves.forEach(m => {
+          const row = el('div', 'mv');
+          const left = el('div');
+          left.append(el('div', 'mn', m.name), el('div', 'mr', m.rx));
+          const btn = el('button', 'logbtn', 'Log');
+          btn.onclick = () => logExercise(m.name);
+          row.append(left, btn);
+          body.appendChild(row);
+        });
+        card.appendChild(body);
+      }
+      list.appendChild(card);
+    });
+  }
+
+  function setMode(mode) {
+    $('panelBrowse').classList.toggle('hidden', mode !== 'browse');
+    $('panelCustom').classList.toggle('hidden', mode !== 'custom');
+    $('segBrowse').classList.toggle('active', mode === 'browse');
+    $('segCustom').classList.toggle('active', mode === 'custom');
+  }
+  $('segBrowse').onclick = () => setMode('browse');
+  $('segCustom').onclick = () => setMode('custom');
+
+  function logExercise(name) {
+    $('exercise').value = name;
+    setMode('custom');
+    window.scrollTo(0, 0);
+    $('weight').focus();
+  }
+
+  renderLibrary();
 
   // ---------- EXPORT ----------
   $('exportBtn').onclick = () => {
