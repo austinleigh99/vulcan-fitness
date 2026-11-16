@@ -251,6 +251,52 @@
   #recoveryCfg .opt-ico { background: rgba(53,215,230,.2); }
   #recoveryCfg .ss-label { color: var(--accent); }
 
+  /* Yoga configuration */
+  #yogaCfg { --accent: #f5b021; }
+  #yogaCfg .cfg-title .s { color: var(--accent); }
+  #yogaCfg .dur.active { background: var(--accent); color:#2b1d00; border-color: var(--accent); }
+  .ygrid3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .ygrid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .ybtn { margin:0; padding:20px 10px; border-radius:18px; background:#2a2a40; border:2px solid transparent; color:var(--text); font-size:15px; font-weight:800; text-align:center; }
+  .ygrid2 .ybtn { text-align:left; padding:20px 18px; }
+  .ybtn.active { border-color: var(--accent); background: rgba(245,176,33,.14); color:#ffd166; }
+  #yBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; color:#2b1d00; box-shadow: 0 10px 30px rgba(245,176,33,.4); margin-top: 26px; }
+  #yOut { margin-top: 18px; }
+  #yogaCfg .opt-tag { color: var(--accent); background: rgba(245,176,33,.15); }
+  #yogaCfg .opt-ico { background: rgba(245,176,33,.2); }
+  #yogaCfg .ss-label { color: var(--accent); }
+  .ypick { margin-top:12px; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:16px; }
+  .ypick-top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .ypick-t { font-size:16px; font-weight:800; }
+  .ypick-s { font-size:12px; color:var(--muted); margin-top:3px; font-weight:600; }
+  .ypick-btn { width:auto; margin:0; padding:11px 18px; border-radius:999px; font-size:14px; color:#2b1d00; flex:none; }
+  .ypick-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; max-height:132px; overflow-y:auto; }
+  .ypick-chips:empty { display:none; }
+  .ychip { width:auto; margin:0; padding:8px 12px; border-radius:999px; background:rgba(245,176,33,.14); border:1px solid rgba(245,176,33,.5); color:#ffd166; font-size:12px; font-weight:700; }
+  .ypick-fill { display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-size:14px; font-weight:700; }
+  .ypick-fill .switch { margin:0; }
+  .ysheet { padding-top:0; }
+  .ysticky { position:sticky; top:0; z-index:3; background:#171726; padding:20px 0 10px; }
+  .ysticky .hclose { top:18px; right:0; }
+  .ysearch { margin-top:12px; padding:12px 14px; font-size:15px; border-radius:14px; }
+  .ytabs { display:flex; gap:6px; margin-top:10px; background:#0b0b12; border-radius:14px; padding:4px; }
+  .ytab { flex:1; margin:0; padding:10px 4px; border-radius:11px; background:transparent; color:var(--muted); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .ytab.active { background:#2a2a40; color:var(--text); }
+  .ydot { width:8px; height:8px; border-radius:50%; flex:none; }
+  .ydot.y1 { background:#4cd37b; } .ydot.y2 { background:#f5c542; } .ydot.y3 { background:#ff5a5a; }
+  .ybadge { min-width:18px; padding:1px 5px; border-radius:9px; background:var(--accent); color:#2b1d00; font-size:11px; font-weight:900; }
+  .ybadge:empty { display:none; }
+  .yghead { display:flex; align-items:center; justify-content:space-between; margin:18px 0 8px; }
+  .ygname { font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+  .ygall { width:auto; margin:0; padding:4px 2px; background:none; color:var(--muted); font-size:12px; font-weight:700; text-decoration:underline; }
+  .ygrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .ytile { position:relative; margin:0; padding:12px 34px 12px 12px; border-radius:14px; background:var(--card); border:1px solid var(--line); color:var(--text); text-align:left; display:flex; flex-direction:column; gap:3px; }
+  .ytn { font-size:14px; font-weight:700; line-height:1.2; }
+  .yts { font-size:11px; color:var(--muted); font-style:italic; font-weight:500; min-height:13px; }
+  .ytile::after { content:''; position:absolute; top:12px; right:12px; width:18px; height:18px; border-radius:50%; border:2px solid var(--muted); }
+  .ytile.active { border-color: var(--accent); background: rgba(245,176,33,.14); }
+  .ytile.active::after { content:'✓'; background:var(--accent); border-color:var(--accent); color:#2b1d00; font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center; }
+
   /* Coming soon tabs */
   .soon { text-align:center; padding: 56px 16px; }
   .soon .big { font-size: 48px; }
@@ -575,6 +621,57 @@
         <button id="recBuild">✨ Build Recovery</button>
         <div id="recMsg" class="msg"></div>
         <div id="recOut"></div>
+      </div>
+
+      <!-- YOGA CONFIGURATION -->
+      <div id="yogaCfg" class="hidden">
+        <div class="cfg-top">
+          <button id="yBack" class="backbtn" aria-label="Back">←</button>
+          <div class="cfg-title"><div class="t">YOGA</div><div class="s">CONFIGURATION</div></div>
+        </div>
+
+        <h2>Duration (minutes)</h2>
+        <div id="yDurRow" class="dur-row"></div>
+
+        <h2>Experience Level</h2>
+        <div id="yLevelRow" class="ygrid3"></div>
+
+        <h2>Focus Areas</h2>
+        <div class="sub">SELECT ONE OR MORE</div>
+        <div id="yFocusRow" class="ygrid2"></div>
+
+        <div class="toggle-card">
+          <div><div class="tt">Pose Picker</div><div class="ts" style="text-transform:none;letter-spacing:0;font-size:12px">Toggle on to pick specific poses for your flow</div></div>
+          <button id="yPickSwitch" class="switch" aria-pressed="false" aria-label="Pose picker"></button>
+        </div>
+
+        <div id="yPickCard" class="ypick hidden">
+          <div class="ypick-top">
+            <div><div class="ypick-t">Your poses</div><div class="ypick-s" id="yPickSummary">None chosen yet</div></div>
+            <button id="yPickOpen" class="ypick-btn">Choose poses</button>
+          </div>
+          <div id="yPickChips" class="ypick-chips"></div>
+          <div class="ypick-fill"><span>Fill in the rest for me</span><button id="yFillSwitch" class="switch on" aria-pressed="true" aria-label="Fill in the rest"></button></div>
+        </div>
+
+        <button id="yBuild">🧘 Build Flow</button>
+        <div id="yMsg" class="msg"></div>
+        <div id="yOut"></div>
+
+        <!-- Pose picker sheet -->
+        <div id="yPickModal" class="hmodal hidden">
+          <div class="hsheet ysheet">
+            <div class="ysticky">
+              <button id="yPickClose" class="hclose" aria-label="Close">✕</button>
+              <div class="hsheet-t">Pose Picker</div>
+              <div class="hsheet-s" id="yCount">0 poses selected</div>
+              <input id="ySearch" class="ysearch" type="search" placeholder="Search poses" autocomplete="off" aria-label="Search poses">
+              <div id="yTabRow" class="ytabs"></div>
+            </div>
+            <div id="yPickList"></div>
+            <div class="hsheet-actions"><button id="yClear" class="secondary">Clear all</button><button id="yDone">Done</button></div>
+          </div>
+        </div>
       </div>
       </div>
     </section>
@@ -939,6 +1036,7 @@
     if (planType === 'calisthenics') return openCalisConfig();
     if (planType === 'hiit') return openHiitConfig();
     if (planType === 'recovery') return openRecoveryConfig();
+    if (planType === 'yoga') return openYogaConfig();
     const p = PLAN[planType];
     const pool = p.both.concat(p[planLoc]);
     const r = rng(Math.floor(Math.random() * 4294967296));
@@ -2074,6 +2172,297 @@
     actions.append(shuffle, edit);
     card.appendChild(actions);
     $('recOut').replaceChildren(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- YOGA CONFIGURATION ----------
+  const YOGA_DURS = [15, 30, 45, 60, 75, 90];
+  const YOGA_LEVELS = [['beginner', 'Beginner'], ['moderate', 'Moderate'], ['advanced', 'Advanced']];
+  const YOGA_FOCUS = [['flex', 'Flexibility'], ['balance', 'Balance'], ['core', 'Core strength'], ['mind', 'Mindfulness'], ['stress', 'Stress relief']];
+  const YF_KEY = { flex:'f', balance:'b', core:'c', mind:'m', stress:'s' };
+  const YLEVEL_NAME = { 1:'Beginner', 2:'Intermediate', 3:'Advanced' };
+  const YPHASE = { 1:'WARM UP', 2:'STANDING', 3:'BALANCE', 4:'CORE & STRENGTH', 5:'BACKBENDS', 6:'INVERSIONS', 7:'HIPS & SEATED', 8:'COOL DOWN' };
+  const YQUOTA = { 1:.12, 2:.26, 3:.12, 4:.14, 5:.12, 6:.04, 7:.12, 8:.08 };
+  // [name, sanskrit, level, picker group, flow phase, sides, tags (f flexibility, b balance, c core, m mindfulness, s stress relief)]
+  const YOGA = [
+    ['Mountain Pose','Tadasana',1,'Standing',1,1,'bm'], ['Standing Forward Fold','Uttanasana',1,'Standing',1,1,'fs'], ['Warrior I','Virabhadrasana I',1,'Standing',2,2,'fc'], ['Warrior II','Virabhadrasana II',1,'Standing',2,2,'fc'], ['Tree Pose','Vrksasana',1,'Standing',3,2,'bm'], ['Chair Pose','Utkatasana',1,'Standing',2,1,'cb'], ['Low Lunge','Anjaneyasana',1,'Standing',2,2,'f'],
+    ['Easy Pose','Sukhasana',1,'Seated',7,1,'ms'], ['Staff Pose','Dandasana',1,'Seated',7,1,'cm'], ['Seated Forward Fold','Paschimottanasana',1,'Seated',7,1,'fs'], ['Butterfly Pose','Baddha Konasana',1,'Seated',7,1,'fs'], ["Child's Pose",'Balasana',1,'Seated',8,1,'sm'],
+    ['Corpse Pose','Savasana',1,'Supine (Lying Down)',9,1,'sm'], ['Knees to Chest','Apanasana',1,'Supine (Lying Down)',8,1,'fs'], ['Supine Twist','Supta Matsyendrasana',1,'Supine (Lying Down)',8,2,'fs'], ['Bridge Pose','Setu Bandha Sarvangasana',1,'Supine (Lying Down)',5,1,'fc'], ['Happy Baby','Ananda Balasana',1,'Supine (Lying Down)',8,1,'fs'], ['Legs Up the Wall','Viparita Karani',1,'Supine (Lying Down)',8,1,'sm'],
+    ['Cobra Pose','Bhujangasana',1,'Backbends',5,1,'fc'], ['Sphinx Pose','Salamba Bhujangasana',1,'Backbends',5,1,'fs'], ['Cat-Cow','Marjaryasana-Bitilasana',1,'Backbends',1,1,'fm'],
+    ['Boat Pose (modified)','Navasana',1,'Core',4,1,'cb'], ['Plank Pose','',1,'Core',4,1,'c'], ['Downward Dog','Adho Mukha Svanasana',1,'Core',1,1,'fc'],
+    ['Warrior III','Virabhadrasana III',2,'Standing',3,2,'bc'], ['Reverse Warrior','Viparita Virabhadrasana',2,'Standing',2,2,'f'], ['Extended Side Angle','Utthita Parsvakonasana',2,'Standing',2,2,'fc'], ['Half Moon Pose','Ardha Chandrasana',2,'Standing',3,2,'bf'], ['Eagle Pose','Garudasana',2,'Standing',3,2,'bm'], ['Crescent Lunge','',2,'Standing',2,2,'fc'], ['Triangle Pose','Trikonasana',2,'Standing',2,2,'f'], ['Goddess Pose','Utkata Konasana',2,'Standing',2,1,'cf'], ['Standing Split','Urdhva Prasarita Eka Padasana',2,'Standing',2,2,'fb'],
+    ['Pigeon Pose (resting)','Eka Pada Rajakapotasana',2,'Seated & Hip Openers',7,2,'fs'], ['Fire Log Pose','Agnistambhasana',2,'Seated & Hip Openers',7,2,'f'], ['Cow Face Pose','Gomukhasana',2,'Seated & Hip Openers',7,2,'fs'], ['Head to Knee Pose','Janu Sirsasana',2,'Seated & Hip Openers',7,2,'fs'], ['Half Lord of the Fishes','Ardha Matsyendrasana',2,'Seated & Hip Openers',7,2,'fm'], ['Wide-Angle Seated Forward Fold','Upavistha Konasana',2,'Seated & Hip Openers',7,1,'fs'],
+    ['Camel Pose','Ustrasana',2,'Backbends',5,1,'f'], ['Upward Dog','Urdhva Mukha Svanasana',2,'Backbends',5,1,'fc'], ['Bow Pose','Dhanurasana',2,'Backbends',5,1,'f'], ['Locust Pose','Salabhasana',2,'Backbends',5,1,'c'],
+    ['Dolphin Pose','',2,'Inversions & Balances',6,1,'cf'], ['Supported Shoulderstand','Salamba Sarvangasana',2,'Inversions & Balances',6,1,'sm'], ['Crow Pose','Bakasana',2,'Inversions & Balances',4,1,'cb'], ['Side Plank','Vasisthasana',2,'Inversions & Balances',4,2,'cb'],
+    ['Full Boat Pose','Paripurna Navasana',2,'Core',4,1,'c'], ['Chaturanga Dandasana','',2,'Core',4,1,'c'], ['Forearm Plank','',2,'Core',4,1,'c'],
+    ['Dancer Pose','Natarajasana',3,'Standing & Balances',3,2,'bf'], ['Revolved Half Moon','Parivrtta Ardha Chandrasana',3,'Standing & Balances',3,2,'bf'], ['Extended Hand to Big Toe','Utthita Hasta Padangusthasana',3,'Standing & Balances',3,2,'bf'], ['Revolved Triangle','Parivrtta Trikonasana',3,'Standing & Balances',2,2,'fb'],
+    ['Crane Pose','Kakasana',3,'Arm Balances',4,1,'cb'], ['Side Crow','Parsva Bakasana',3,'Arm Balances',4,2,'cb'], ['Eight Angle Pose','Astavakrasana',3,'Arm Balances',4,2,'c'], ['Flying Pigeon','Eka Pada Galavasana',3,'Arm Balances',4,2,'cb'], ['Firefly Pose','Tittibhasana',3,'Arm Balances',4,1,'c'], ['Peacock Pose','Mayurasana',3,'Arm Balances',4,1,'c'],
+    ['Wheel Pose','Urdhva Dhanurasana',3,'Deep Backbends',5,1,'f'], ['King Pigeon','Raja Kapotasana',3,'Deep Backbends',5,2,'f'],
+    ['Scorpion Pose','Vrschikasana',3,'Full Camel & Deep Balances',6,1,'bf'], ['One-Legged King Pigeon','',3,'Full Camel & Deep Balances',5,2,'f'],
+    ['Headstand','Sirsasana',3,'Inversions',6,1,'bc'], ['Handstand','Adho Mukha Vrksasana',3,'Inversions',6,1,'bc'], ['Forearm Stand','Pincha Mayurasana',3,'Inversions',6,1,'bc'], ['Plow Pose','Halasana',3,'Inversions',6,1,'fs'],
+    ['Full Splits','Hanumanasana',3,'Deep Flexibility',7,2,'f'], ['Side Splits','Samakonasana',3,'Deep Flexibility',7,1,'f'], ['Standing Backbend','Anuvittasana',3,'Deep Flexibility',5,1,'f'], ['Lotus Pose','Padmasana',3,'Deep Flexibility',7,1,'m'], ['Sleeping Yogi','Yoganidrasana',3,'Deep Flexibility',8,1,'f']
+  ].map(a => ({ name:a[0], sk:a[1], level:a[2], group:a[3], phase:a[4], sides:a[5], tags:a[6], cap:[3, 4, 6].includes(a[4]) ? 45 : 90 }));
+  const ycfg = { dur: 30, level: 'beginner', focus: new Set(['flex']), picker: false, picks: new Set(), fill: true };
+  let yTab = 1, ySearchQ = '', lastYoga = null;
+
+  const ySw = (id, on) => { $(id).classList.toggle('on', on); $(id).setAttribute('aria-pressed', String(on)); };
+  function syncYoga() {
+    mark($('yDurRow'), k => k === String(ycfg.dur));
+    mark($('yLevelRow'), k => k === ycfg.level);
+    mark($('yFocusRow'), k => ycfg.focus.has(k));
+    ySw('yPickSwitch', ycfg.picker);
+    ySw('yFillSwitch', ycfg.fill);
+    $('yPickCard').classList.toggle('hidden', !ycfg.picker);
+    const n = ycfg.picks.size;
+    $('yPickSummary').textContent = n ? n + (n === 1 ? ' pose chosen' : ' poses chosen') : 'None chosen yet';
+    $('yPickOpen').textContent = n ? 'Edit poses' : 'Choose poses';
+    $('yPickChips').replaceChildren(...YOGA.filter(p => ycfg.picks.has(p.name)).map(p => {
+      const c = el('button', 'ychip', p.name + ' ✕');
+      c.onclick = () => { ycfg.picks.delete(p.name); syncYoga(); };
+      return c;
+    }));
+    $('yCount').textContent = n + (n === 1 ? ' pose selected' : ' poses selected');
+    $('yDone').textContent = n ? 'Done (' + n + ')' : 'Done';
+    $('yTabRow').querySelectorAll('button').forEach(b => {
+      const lv = Number(b.dataset.k);
+      const c = YOGA.filter(p => p.level === lv && ycfg.picks.has(p.name)).length;
+      b.children[2].textContent = c ? String(c) : '';
+    });
+    $('yPickList').querySelectorAll('button').forEach(b => { if (b.dataset.k) b.classList.toggle('active', ycfg.picks.has(b.dataset.k)); });
+  }
+
+  buildChips($('yDurRow'), 'dur', YOGA_DURS.map(d => [d, String(d)]), k => { ycfg.dur = Number(k); syncYoga(); });
+  buildChips($('yLevelRow'), 'ybtn', YOGA_LEVELS, k => { ycfg.level = k; syncYoga(); });
+  buildChips($('yFocusRow'), 'ybtn', YOGA_FOCUS, k => { toggleIn(ycfg.focus, k); syncYoga(); });
+  $('yPickSwitch').onclick = () => { ycfg.picker = !ycfg.picker; syncYoga(); };
+  $('yFillSwitch').onclick = () => { ycfg.fill = !ycfg.fill; syncYoga(); };
+  $('yBuild').onclick = buildYoga;
+  $('yBack').onclick = () => {
+    $('yPickModal').classList.add('hidden');
+    $('yogaCfg').classList.add('hidden');
+    $('builderMain').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  };
+  function openYogaConfig() {
+    syncYoga();
+    $('yOut').replaceChildren();
+    say($('yMsg'), '');
+    $('builderMain').classList.add('hidden');
+    $('yogaCfg').classList.remove('hidden');
+    window.scrollTo(0, 0);
+    const row = $('yDurRow');
+    const sel = row.querySelectorAll('.active')[0];
+    if (sel && typeof sel.offsetLeft === 'number') row.scrollLeft = sel.offsetLeft - (row.clientWidth - sel.offsetWidth) / 2;
+  }
+
+  // ----- pose picker sheet -----
+  const yTabBtns = [1, 2, 3].map(lv => {
+    const b = el('button', 'ytab');
+    b.dataset.k = String(lv);
+    b.append(el('span', 'ydot y' + lv), el('span', '', YLEVEL_NAME[lv]), el('span', 'ybadge', ''));
+    b.onclick = () => { yTab = lv; ySearchQ = ''; $('ySearch').value = ''; renderYList(); };
+    return b;
+  });
+  $('yTabRow').replaceChildren(...yTabBtns);
+
+  function renderYList() {
+    const list = $('yPickList');
+    list.replaceChildren();
+    const q = ySearchQ.trim().toLowerCase();
+    $('yTabRow').querySelectorAll('button').forEach(b => b.classList.toggle('active', !q && Number(b.dataset.k) === yTab));
+    (q ? [1, 2, 3] : [yTab]).forEach(lv => {
+      [...new Set(YOGA.filter(p => p.level === lv).map(p => p.group))].forEach(g => {
+        const items = YOGA.filter(p => p.level === lv && p.group === g && (!q || (p.name + ' ' + p.sk).toLowerCase().includes(q)));
+        if (!items.length) return;
+        const head = el('div', 'yghead');
+        head.appendChild(el('span', 'ygname', (q ? YLEVEL_NAME[lv] + ' · ' : '') + g));
+        const all = el('button', 'ygall', items.every(p => ycfg.picks.has(p.name)) ? 'Clear' : 'Select all');
+        all.onclick = () => {
+          const on = items.every(p => ycfg.picks.has(p.name));
+          items.forEach(p => on ? ycfg.picks.delete(p.name) : ycfg.picks.add(p.name));
+          renderYList(); syncYoga();
+        };
+        head.appendChild(all);
+        list.appendChild(head);
+        const grid = el('div', 'ygrid');
+        items.forEach(p => {
+          const b = el('button', 'ytile' + (ycfg.picks.has(p.name) ? ' active' : ''));
+          b.dataset.k = p.name;
+          b.append(el('span', 'ytn', p.name), el('span', 'yts', p.sk));
+          b.onclick = () => {
+            ycfg.picks.has(p.name) ? ycfg.picks.delete(p.name) : ycfg.picks.add(p.name);
+            syncYoga();
+            renderYAllLabels();
+          };
+          grid.appendChild(b);
+        });
+        list.appendChild(grid);
+      });
+    });
+    if (!list.children.length) list.appendChild(el('div', 'rest-note', 'No poses match your search.'));
+  }
+  // keep "Select all / Clear" labels right after single taps
+  function renderYAllLabels() {
+    const list = $('yPickList');
+    const kids = list.children;
+    for (let i = 0; i < kids.length; i++) {
+      if (kids[i].className !== 'yghead') continue;
+      const grid = kids[i + 1];
+      if (!grid) continue;
+      const tiles = grid.children;
+      let every = tiles.length > 0;
+      for (let j = 0; j < tiles.length; j++) if (!ycfg.picks.has(tiles[j].dataset.k)) every = false;
+      kids[i].children[1].textContent = every ? 'Clear' : 'Select all';
+    }
+  }
+  $('ySearch').oninput = (e) => { ySearchQ = e.target.value || ''; renderYList(); };
+  $('yPickOpen').onclick = () => { ySearchQ = ''; $('ySearch').value = ''; renderYList(); syncYoga(); $('yPickModal').classList.remove('hidden'); };
+  const yCloseSheet = () => $('yPickModal').classList.add('hidden');
+  $('yPickClose').onclick = yCloseSheet;
+  $('yDone').onclick = yCloseSheet;
+  $('yPickModal').onclick = (e) => { if (e.target === $('yPickModal')) yCloseSheet(); };
+  $('yClear').onclick = () => { ycfg.picks.clear(); renderYList(); syncYoga(); };
+
+  // ----- building -----
+  const yHold = (p, h) => Math.min(h, p.cap);
+  const yTotal = (poses, h) => poses.reduce((s, p) => s + yHold(p, h) * p.sides + 10, 0);
+  function yFit(poses, budget) {
+    for (let h = 90; h >= 20; h -= 5) if (yTotal(poses, h) <= budget) return h;
+    return 0;
+  }
+  // choose n poses, spreading across the flow and leaning toward the chosen focus areas
+  function yPickPoses(pool, n, focus, level, r, avoid, base) {
+    const chosen = [];
+    const cnt = {};
+    (base || []).forEach(p => { cnt[p.phase] = (cnt[p.phase] || 0) + 1; });
+    const total = n + (base ? base.length : 0);
+    const taken = new Set((base || []).map(p => p.name));
+    const lp = (p) => level === 'beginner' ? 0 : level === 'moderate' ? (p.level === 2 ? 1 : p.level === 1 ? 0.3 : 0) : (p.level === 3 ? 1.2 : p.level === 2 ? 0.8 : 0);
+    while (chosen.length < n) {
+      let cands = pool.filter(p => !taken.has(p.name) && !(avoid && avoid.has(p.name)));
+      if (!cands.length) cands = pool.filter(p => !taken.has(p.name));
+      if (!cands.length) break;
+      let best = null, bv = -1e9;
+      cands.forEach(p => {
+        const ts = focus.split('').filter(f => p.tags.includes(f)).length;
+        const v = ts * 1.2 + r() * 1.5 + lp(p) + 2 * Math.max(0, (YQUOTA[p.phase] || 0) * total - (cnt[p.phase] || 0));
+        if (v > bv) { bv = v; best = p; }
+      });
+      chosen.push(best); taken.add(best.name); cnt[best.phase] = (cnt[best.phase] || 0) + 1;
+    }
+    return chosen;
+  }
+
+  function buildYoga() {
+    const fail = (m) => { $('yOut').replaceChildren(); lastYoga = null; return say($('yMsg'), m, 'err'); };
+    say($('yMsg'), '');
+    if (!ycfg.focus.size) return fail('Pick at least one focus area.');
+    const D = ycfg.dur;
+    const r = hiitSeed();
+    const openSec = D <= 15 ? 60 : 90;
+    const closeBase = D <= 15 ? 120 : D <= 30 ? 180 : D <= 60 ? 240 : 300;
+    const budget = D * 60 - openSec - closeBase;
+    const maxLv = { beginner:1, moderate:2, advanced:3 }[ycfg.level];
+    const pool = YOGA.filter(p => p.level <= maxLv && p.name !== 'Corpse Pose');
+    const focus = [...ycfg.focus].map(k => YF_KEY[k]).join('');
+    const h0 = { beginner:35, moderate:40, advanced:45 }[ycfg.level] + (/[sm]/.test(focus) ? 5 : 0);
+    const per = h0 * 1.35 + 10;
+    const sel = ycfg.picker ? YOGA.filter(p => ycfg.picks.has(p.name) && p.name !== 'Corpse Pose') : [];
+    const passes = [];
+    const notes = [];
+    const added = new Set();
+
+    if (sel.length) {
+      let poses = sel.slice();
+      if (ycfg.fill) {
+        const extra = Math.min(24, Math.round(budget / per)) - poses.length;
+        if (extra > 0) {
+          const more = yPickPoses(pool.filter(p => !ycfg.picks.has(p.name)), extra, focus, ycfg.level, r, null, poses);
+          while (more.length && !yFit(poses.concat(more), budget)) more.pop();
+          more.forEach(p => added.add(p.name));
+          poses = poses.concat(more);
+        }
+      }
+      const h = yFit(poses, budget);
+      if (!h) {
+        const need = Math.ceil(yTotal(poses, 20) / 60);
+        return fail('Your ' + poses.length + ' poses need at least ' + need + ' minutes. Pick a longer duration or remove a few poses.');
+      }
+      passes.push({ poses, h });
+    } else {
+      const P = D >= 90 ? 3 : D >= 60 ? 2 : 1;
+      const pb = budget / P;
+      const used = new Set();
+      for (let i = 0; i < P; i++) {
+        let n = Math.max(5, Math.min(18, Math.round(pb / per)));
+        let chosen = yPickPoses(pool, n, focus, ycfg.level, r, used, null);
+        let h = yFit(chosen, pb);
+        while (!h && n > 3) { n--; chosen = yPickPoses(pool, n, focus, ycfg.level, r, used, null); h = yFit(chosen, pb); }
+        chosen.forEach(p => used.add(p.name));
+        passes.push({ poses: chosen, h });
+      }
+      if (ycfg.picker) notes.push('You have not chosen any poses yet, so this flow was built for you.');
+    }
+    passes.forEach(ps => ps.poses.sort((a, b) => a.phase - b.phase));
+    const used = passes.reduce((s, ps) => s + yTotal(ps.poses, ps.h), 0);
+    const leftover = budget - used;
+    const closeSec = closeBase + (leftover >= 30 ? Math.min(300, Math.floor(leftover / 30) * 30) : 0);
+    if (sel.length && !ycfg.fill && leftover >= 120) notes.push('Your poses fill about ' + Math.round(used / 60) + ' of the ' + Math.round(budget / 60) + ' minutes. Add more poses or turn on "Fill in the rest for me".');
+    if (added.size) notes.push(added.size + (added.size === 1 ? ' pose was' : ' poses were') + ' added to round out your flow.');
+
+    const rows = [];
+    rows.push({ k:'label', t:'CENTER • ' + fmtT(openSec) });
+    rows.push({ k:'mv', n:'Centering Breath', r:fmtT(openSec), c:'Sit tall, inhale for 4 and exhale for 6, and set an intention for your practice.' });
+    passes.forEach((ps, i) => {
+      if (passes.length > 1) rows.push({ k:'label', t:'FLOW ' + (i + 1) + ' OF ' + passes.length });
+      let phase = 0;
+      ps.poses.forEach(p => {
+        if (p.phase !== phase) { phase = p.phase; rows.push({ k:'label', t:YPHASE[phase] }); }
+        const hold = yHold(p, ps.h);
+        rows.push({ k:'mv', n:p.name + (p.sk ? ' (' + p.sk + ')' : ''), r:'Hold ' + hold + 's' + (p.sides === 2 ? ' each side' : ''), c:added.size && !added.has(p.name) ? '★ Your pick' : '' });
+      });
+    });
+    rows.push({ k:'label', t:'CLOSING • ' + fmtT(closeSec) });
+    rows.push({ k:'mv', n:'Corpse Pose (Savasana)', r:fmtT(closeSec), c:'Lie flat, let your body feel heavy and breathe naturally.' });
+    notes.forEach(t => rows.push({ k:'note', t }));
+
+    const count = passes.reduce((s, ps) => s + ps.poses.length, 0);
+    const total = openSec + used + closeSec;
+    lastYoga = { passes: passes.map(ps => ({ names: ps.poses.map(p => p.name), h: ps.h })), added: [...added], total, count, rows };
+    const lvName = Object.fromEntries(YOGA_LEVELS)[ycfg.level];
+    const fnames = YOGA_FOCUS.filter(f => ycfg.focus.has(f[0])).map(f => f[1]);
+    const title = sel.length ? 'Custom Pose Flow' : (fnames.length <= 2 ? fnames.join(' + ') : 'Custom') + ' Flow';
+
+    const card = el('div', 'opt');
+    const head = el('div', 'opt-head');
+    head.style.cursor = 'default';
+    const info = el('div', 'opt-info');
+    info.append(el('span', 'opt-tag', 'YOUR FLOW'), el('div', 'opt-title', title),
+      el('div', 'opt-meta', Math.round(total / 60) + 'm • ' + count + (count === 1 ? ' pose' : ' poses') + ' • ' + lvName));
+    head.append(el('div', 'opt-ico', '🧘'), info);
+    card.appendChild(head);
+    const body = el('div', 'opt-body');
+    rows.forEach(x => {
+      if (x.k === 'label') body.appendChild(el('div', 'ss-label', x.t));
+      else if (x.k === 'note') body.appendChild(el('div', 'rest-note', x.t));
+      else {
+        const row = el('div', 'mv');
+        const left = el('div');
+        left.append(el('div', 'mn', x.n), el('div', 'mr', x.r));
+        if (x.c) left.appendChild(el('div', 'mnote', x.c));
+        row.appendChild(left);
+        body.appendChild(row);
+      }
+    });
+    card.appendChild(body);
+    const actions = el('div', 'plan-actions');
+    const shuffle = el('button', 'secondary', 'Shuffle');
+    shuffle.onclick = buildYoga;
+    const edit = el('button', 'secondary', 'Edit settings');
+    edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    actions.append(shuffle, edit);
+    card.appendChild(actions);
+    $('yOut').replaceChildren(card);
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
