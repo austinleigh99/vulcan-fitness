@@ -177,6 +177,65 @@
   #calisCfg .opt-tag { color: var(--accent); background: rgba(79,227,167,.15); }
   #calisCfg .opt-ico { background: rgba(79,227,167,.2); }
 
+  /* HIIT configuration */
+  #hiitCfg { --accent: #a21cff; }
+  #hiitCfg .cfg-title .s { color: #b45cff; }
+  #hiitCfg .dur.active { background: var(--accent); color:#fff; border-color: var(--accent); }
+  #hiitCfg .ctype.active { background: rgba(162,28,255,.15); }
+  #hiitCfg .mus.active { background: rgba(162,28,255,.3); }
+  #hiitCfg .seg3 button { font-size:11px; letter-spacing:.04em; padding:14px 0; }
+  #hiitCfg .opt-tag { color:#c27dff; background: rgba(162,28,255,.18); }
+  #hiitCfg .opt-ico { background: rgba(162,28,255,.22); }
+  #hiitCfg .ss-label { color:#c27dff; }
+  .hwc-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px; }
+  .hwc { margin:0; padding:22px 8px; border-radius:22px; background:var(--card); border:1px solid var(--line); color:var(--text); font-size:13px; font-weight:800; letter-spacing:.1em; }
+  .hwc.on { border-color: var(--accent); background: rgba(162,28,255,.2); }
+  .hlow { display:flex; align-items:center; gap:14px; }
+  .hlow .ico { width:44px; height:44px; border-radius:14px; background:#2a2a40; display:flex; align-items:center; justify-content:center; font-size:20px; flex:none; }
+  .hcard { margin-top:22px; background:var(--card); border:1px solid var(--line); border-radius:26px; padding:20px; }
+  .hcard-t { text-align:center; font-size:12px; font-weight:800; letter-spacing:.14em; }
+  .hsl { margin-top:16px; }
+  .hsl-h { display:flex; justify-content:space-between; align-items:baseline; }
+  .hsl-l { font-size:11px; font-weight:800; letter-spacing:.12em; color:#b45cff; }
+  .hsl-v { font-size:22px; font-weight:900; }
+  .hrange { width:100%; padding:0; margin:10px 0 0; border:0; background:transparent; accent-color: var(--accent); height:28px; }
+  .hcard-two { display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:16px; }
+  .hstep-l { text-align:center; font-size:11px; font-weight:800; letter-spacing:.12em; margin-bottom:10px; }
+  .hstep-c { display:flex; align-items:center; justify-content:space-between; background:#0b0b12; border-radius:16px; padding:6px; }
+  .hstep-c button { width:38px; height:38px; margin:0; padding:0; border-radius:12px; background:#2a2a40; font-size:22px; font-weight:800; }
+  .hstep-c span { font-size:20px; font-weight:900; }
+  .heq-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .heq { margin:0; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:16px; border-radius:18px; background:var(--card); border:1px solid var(--line); color:var(--text); font-size:15px; font-weight:700; text-align:left; }
+  .heq::after { content:''; width:18px; height:18px; border-radius:6px; border:2px solid var(--muted); flex:none; }
+  .heq.active { border-color: var(--accent); background: rgba(162,28,255,.15); }
+  .heq.active::after { background: var(--accent); border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--card); }
+  .hmode { display:flex; align-items:center; gap:12px; width:100%; margin:10px 0 0; padding:16px 18px; border-radius:18px; background:var(--card); border:1px solid var(--line); color:var(--text); text-align:left; font-size:14px; }
+  .hmode.on { border-color: var(--accent); background: rgba(162,28,255,.15); }
+  .hmi { font-size:18px; flex:none; }
+  .hmt { flex:1; font-weight:800; letter-spacing:.08em; }
+  .hmv { font-size:12px; color:var(--muted); font-weight:700; }
+  .hmode .switch { margin:0; }
+  .locked { opacity:.35; pointer-events:none; }
+  #hBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(162,28,255,.5); margin-top: 26px; }
+  #hOut { margin-top: 18px; }
+  .hmodal { position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.65); display:flex; align-items:flex-end; justify-content:center; }
+  .hsheet { position:relative; width:100%; max-width:520px; max-height:88vh; overflow-y:auto; background:#171726; border:1px solid var(--line); border-radius:26px 26px 0 0; padding:22px 18px 0; }
+  .hsheet-t { font-size:22px; font-weight:900; }
+  .hsheet-s { font-size:13px; color:var(--muted); margin-top:6px; line-height:1.4; }
+  .hclose { position:absolute; top:14px; right:14px; width:36px; height:36px; margin:0; padding:0; border-radius:12px; background:#2a2a40; font-size:16px; }
+  .hsheet-actions { position:sticky; bottom:0; display:flex; gap:10px; background:#171726; padding:12px 0 18px; margin-top:14px; }
+  .hsheet-actions button { margin:0; padding:14px 0; font-size:15px; }
+  .hsheet .mus-wrap { margin-top:4px; }
+  .xrow { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; margin:8px 0 0; padding:13px 16px; border-radius:14px; background:var(--card); border:1px solid var(--line); color:var(--text); font-size:15px; font-weight:700; text-align:left; }
+  .xrow::after { content:''; flex:none; width:18px; height:18px; border-radius:50%; border:2px solid var(--muted); }
+  .xrow.active { border-color: var(--accent); background: rgba(162,28,255,.15); }
+  .xrow.active::after { background: var(--accent); border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--card); }
+  .xn { flex:1; }
+  .xtag { font-size:11px; color:var(--muted); font-weight:700; }
+  .arow { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .arow .hstep-c { width:150px; }
+  .rndbtn { width:100%; margin:12px 0 0; padding:13px; font-size:14px; border-radius:14px; background:transparent; border:1px solid var(--accent); color:#d9a6ff; }
+
   /* Coming soon tabs */
   .soon { text-align:center; padding: 56px 16px; }
   .soon .big { font-size: 48px; }
@@ -377,6 +436,109 @@
         <button id="calBuild">Build Workout</button>
         <div id="calMsg" class="msg"></div>
         <div id="calOut"></div>
+      </div>
+
+      <!-- HIIT CONFIGURATION -->
+      <div id="hiitCfg" class="hidden">
+        <div class="cfg-top">
+          <button id="hBack" class="backbtn" aria-label="Back">←</button>
+          <div class="cfg-title"><div class="t">HIGH INTENSITY</div><div class="s">HIIT PROTOCOL</div></div>
+        </div>
+
+        <div class="hwc-row">
+          <button id="hWarm" class="hwc">WARM UP</button>
+          <button id="hCool" class="hwc">COOL DOWN</button>
+        </div>
+
+        <div class="toggle-card">
+          <div class="hlow"><span class="ico">🌬️</span><div><div class="tt">Low Impact Mode</div><div class="ts">JOINT FRIENDLY MOVEMENTS</div></div></div>
+          <button id="hLowSwitch" class="switch" aria-pressed="false" aria-label="Low impact mode"></button>
+        </div>
+
+        <div id="hDurWrap">
+          <div class="dur-head"><h2>Total Duration</h2><span class="durval" id="hDurVal">20 min</span></div>
+          <div id="hDurRow" class="dur-row"></div>
+        </div>
+
+        <h2>Intensity Level</h2>
+        <div id="hIntRow" class="seg3"></div>
+
+        <div id="hProtoWrap" class="hcard">
+          <div class="hcard-t">PROTOCOL STRUCTURE</div>
+          <div class="hsl">
+            <div class="hsl-h"><span class="hsl-l">WORK</span><span class="hsl-v" id="hWorkVal">40s</span></div>
+            <input type="range" id="hWork" class="hrange" min="20" max="90" step="5" value="40" aria-label="Work seconds">
+          </div>
+          <div class="hsl">
+            <div class="hsl-h"><span class="hsl-l">REST</span><span class="hsl-v" id="hRestVal">20s</span></div>
+            <input type="range" id="hRest" class="hrange" min="10" max="90" step="5" value="20" aria-label="Rest seconds">
+          </div>
+        </div>
+
+        <div id="hRoundWrap" class="hcard hcard-two">
+          <div>
+            <div class="hstep-l">ROUNDS</div>
+            <div class="hstep-c"><button id="hRoundsMinus" aria-label="Fewer rounds">−</button><span id="hRoundsVal">3</span><button id="hRoundsPlus" aria-label="More rounds">+</button></div>
+          </div>
+          <div>
+            <div class="hstep-l">ROUND REST</div>
+            <div class="hstep-c"><button id="hRRMinus" aria-label="Less round rest">−</button><span id="hRRVal">30s</span><button id="hRRPlus" aria-label="More round rest">+</button></div>
+          </div>
+        </div>
+
+        <h2>Muscle Group Focus</h2>
+        <div id="hFocusRow" class="ctype-grid"></div>
+
+        <h2>Available Equipment</h2>
+        <div id="hEqRow" class="heq-grid"></div>
+
+        <div class="toggle-card">
+          <div><div class="tt">Advanced Settings</div><div class="ts">CUSTOMIZE ROUNDS &amp; RECOVERY</div></div>
+          <button id="hAdvSwitch" class="switch" aria-pressed="false" aria-label="Advanced settings"></button>
+        </div>
+        <div id="hAdv" class="hidden">
+          <button id="hTabataRow" class="hmode"><span class="hmi">⚡</span><span class="hmt">TABATA MODE</span><span class="hmv" id="hTabataVal">Off</span></button>
+          <button id="hAmrapRow" class="hmode"><span class="hmi">⏱️</span><span class="hmt">AMRAP MODE</span><span class="hmv" id="hAmrapVal">Off</span></button>
+          <div class="hmode"><span class="hmi">✨</span><span class="hmt">UNIQUE MOVEMENTS</span><button id="hUniqueSwitch" class="switch" aria-pressed="false" aria-label="Unique movements"></button></div>
+        </div>
+        <div id="hLockNote" class="rest-note hidden"></div>
+
+        <button id="hBuild">Build Workout</button>
+        <div id="hMsg" class="msg"></div>
+        <div id="hOut"></div>
+
+        <!-- Tabata pop-up -->
+        <div id="tabataModal" class="hmodal hidden">
+          <div class="hsheet">
+            <button id="tabClose" class="hclose" aria-label="Close">✕</button>
+            <div class="hsheet-t">Tabata Mode</div>
+            <div class="hsheet-s">Traditional Tabata: 20 seconds all-out work, 10 seconds rest, 8 rounds = 4 minutes per exercise, with 1 minute of rest between exercises. Warm up and cool down are added on top.</div>
+            <h2>Workout duration</h2>
+            <div id="tabDurRow" class="mus-wrap"></div>
+            <div id="tabSummary" class="rest-note"></div>
+            <div class="hsheet-actions"><button id="tabOff" class="secondary">Turn off</button><button id="tabApply">Apply</button></div>
+          </div>
+        </div>
+
+        <!-- AMRAP pop-up -->
+        <div id="amrapModal" class="hmodal hidden">
+          <div class="hsheet">
+            <button id="aClose" class="hclose" aria-label="Close">✕</button>
+            <div class="hsheet-t">AMRAP Mode</div>
+            <div class="hsheet-s">As many rounds as possible. Pick how many exercises and how long to go, then choose your moves or let the app pick. Warm up and cool down are added on top.</div>
+            <h2>Time</h2>
+            <div id="aTimeRow" class="mus-wrap"></div>
+            <h2>Exercise count</h2>
+            <div class="arow"><span class="hsheet-s" style="margin:0">Moves per round</span>
+              <div class="hstep-c"><button id="aCountMinus" aria-label="Fewer exercises">−</button><span id="aCountVal">4</span><button id="aCountPlus" aria-label="More exercises">+</button></div>
+            </div>
+            <button id="aRandom" class="rndbtn">🎲 Randomly choose exercises</button>
+            <div id="aCounter" class="rest-note"></div>
+            <div id="aMsg" class="msg"></div>
+            <div id="aList"></div>
+            <div class="hsheet-actions"><button id="aOff" class="secondary">Turn off</button><button id="aApply">Apply</button></div>
+          </div>
+        </div>
       </div>
       </div>
     </section>
@@ -739,6 +901,7 @@
     if (planType === 'strength') return openStrengthConfig();
     if (planType === 'cardio') return openCardioConfig();
     if (planType === 'calisthenics') return openCalisConfig();
+    if (planType === 'hiit') return openHiitConfig();
     const p = PLAN[planType];
     const pool = p.both.concat(p[planLoc]);
     const r = rng(Math.floor(Math.random() * 4294967296));
@@ -1324,6 +1487,355 @@
 
     $('calOut').replaceChildren(card);
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- HIIT CONFIGURATION ----------
+  const HIIT_DURS = []; for (let d = 10; d <= 60; d += 5) HIIT_DURS.push(d);
+  const HIIT_INT = {
+    light:    { label:'Light',    work:30, rest:30, tier:1, rep:0.8 },
+    moderate: { label:'Moderate', work:40, rest:20, tier:2, rep:1 },
+    hard:     { label:'Hard',     work:45, rest:15, tier:2, rep:1.2 },
+    max:      { label:'Max',      work:50, rest:10, tier:3, rep:1.4 }
+  };
+  const HIIT_FOCUS = [['upper', 'Upper Body'], ['lower', 'Lower Body'], ['core', 'Core'], ['full', 'Full Body']];
+  const HIIT_GROUP_LABEL = Object.fromEntries(HIIT_FOCUS);
+  const HIIT_EQUIP = [['plyo', 'Plyo Box'], ['rope', 'Jump Rope'], ['db', 'Dumbbells'], ['kb', 'Kettlebells'], ['bar', 'Pull-up Bar'], ['wheel', 'Ab Wheel']];
+  const HIIT_EQ_LABEL = Object.fromEntries(HIIT_EQUIP);
+  // [name, group, equipment, lowImpact, tier 1-3, popular, base reps (moderate)]
+  const HIIT_EX = [
+    ['Push-Ups','upper',null,1,1,1,12], ['Plank Shoulder Taps','upper',null,1,1,0,20], ['Pike Push-Ups','upper',null,1,2,0,10], ['Diamond Push-Ups','upper',null,1,2,0,10], ['Decline Push-Ups','upper',null,1,2,0,10], ['Plank Up-Downs','upper',null,1,2,0,12], ['Explosive Push-Ups','upper',null,0,3,0,8], ['Clap Push-Ups','upper',null,0,3,0,6], ['Chair Dips','upper',null,1,1,0,12],
+    ['Dumbbell Renegade Rows','upper','db',1,2,0,10], ['Dumbbell Push Press','upper','db',1,2,0,10], ['Dumbbell Floor Press','upper','db',1,1,0,12], ['Dumbbell Bent-Over Rows','upper','db',1,1,0,12],
+    ['Kettlebell Clean & Press','upper','kb',1,2,0,8], ['Kettlebell High Pulls','upper','kb',1,2,0,10],
+    ['Pull-Ups','upper','bar',1,2,1,8], ['Chin-Ups','upper','bar',1,2,0,8], ['Box Push-Ups','upper','plyo',1,1,0,12], ['Box Dips','upper','plyo',1,1,0,12],
+    ['Jump Squats','lower',null,0,2,1,15], ['Squat Pulses','lower',null,1,1,0,20], ['Bodyweight Squats','lower',null,1,1,0,20], ['Reverse Lunges','lower',null,1,1,0,16], ['Curtsy Lunges','lower',null,1,1,0,16], ['Jumping Lunges','lower',null,0,3,0,16], ['Skater Jumps','lower',null,0,2,0,20], ['Lateral Shuffles','lower',null,1,1,0,20], ['Glute Bridges','lower',null,1,1,0,20], ['Broad Jumps','lower',null,0,2,0,8], ['Tuck Jumps','lower',null,0,3,0,8],
+    ['Dumbbell Goblet Squats','lower','db',1,1,0,12], ['Dumbbell Reverse Lunges','lower','db',1,2,0,12], ['Dumbbell Romanian Deadlifts','lower','db',1,1,0,12],
+    ['Kettlebell Swings','lower','kb',1,2,1,15], ['Kettlebell Goblet Squats','lower','kb',1,1,0,12],
+    ['Box Jumps','lower','plyo',0,2,1,10], ['Box Step-Ups','lower','plyo',1,1,0,16], ['Box Jump Overs','lower','plyo',0,3,0,10],
+    ['Mountain Climbers','core',null,0,2,1,30], ['Plank Jacks','core',null,0,2,1,20], ['Bicycle Crunches','core',null,1,1,1,24], ['Russian Twists','core',null,1,1,0,24], ['Flutter Kicks','core',null,1,1,0,30], ['V-Ups','core',null,1,2,0,12], ['Dead Bugs','core',null,1,1,0,16], ['Lying Leg Raises','core',null,1,2,0,12], ['Sit-Ups','core',null,1,1,0,15], ['Hollow Body Rocks','core',null,1,2,0,15],
+    ['Kettlebell Russian Twists','core','kb',1,1,0,20], ['Hanging Knee Raises','core','bar',1,2,0,12], ['Toes to Bar','core','bar',1,3,0,8], ['Ab Wheel Rollouts','core','wheel',1,2,0,10], ['Ab Wheel Knee Rollouts','core','wheel',1,1,0,10],
+    ['Burpees','full',null,0,2,1,10], ['Low-Impact Burpees','full',null,1,2,0,10], ['Jumping Jacks','full',null,0,1,1,30], ['High Knees','full',null,0,1,1,40], ['Star Jumps','full',null,0,2,0,15], ['Squat Thrusts','full',null,0,2,0,12], ['Sprawls','full',null,0,2,0,12], ['Bear Crawls','full',null,1,1,0,16], ['Inchworm Push-Ups','full',null,1,2,0,8], ['Shadow Boxing','full',null,1,1,0,40], ['Fast Feet','full',null,0,1,0,40],
+    ['Dumbbell Thrusters','full','db',1,2,1,12], ['Dumbbell Devil Press','full','db',0,3,0,8], ['Dumbbell Snatch','full','db',1,2,0,10], ['Dumbbell Swings','full','db',1,1,0,15],
+    ['Kettlebell Snatch','full','kb',1,3,0,10], ['Kettlebell Clean & Squat','full','kb',1,2,0,10],
+    ['Jump Rope','full','rope',0,1,1,50], ['Boxer Skip','full','rope',0,2,0,50], ['Double Unders','full','rope',0,3,0,30],
+    ['Burpee Pull-Ups','full','bar',0,3,0,8], ['Box Burpees','full','plyo',0,3,0,8]
+  ];
+  const hx = HIIT_EX.map(a => ({ name:a[0], group:a[1], equip:a[2], low:!!a[3], tier:a[4], pop:!!a[5], reps:a[6] }));
+  const hxByName = Object.fromEntries(hx.map(e => [e.name, e]));
+  const TAB_MINS = [4, 8, 12, 16, 20, 24, 28, 32];
+  const AM_MINS = [5, 8, 10, 12, 15, 20, 25, 30];
+  const hcfg = {
+    warm:false, cool:false, low:false, dur:20, intensity:'moderate', work:40, rest:20, rounds:3, roundRest:30,
+    focus:'full', equip:new Set(), adv:false, unique:false,
+    tabata:{ on:false, mins:16 }, amrap:{ on:false, count:4, mins:10, picks:new Set() }
+  };
+  let lastHiit = null;
+  let tabDraft = 16;
+  let amDraft = { count:4, mins:10, picks:new Set() };
+
+  const fmtS = (s) => s < 60 ? s + 's' : (s % 60 ? Math.floor(s / 60) + 'm ' + (s % 60) + 's' : (s / 60) + 'm');
+
+  function syncHiit() {
+    mark($('hDurRow'), k => k === String(hcfg.dur));
+    $('hDurVal').textContent = hcfg.dur + ' min';
+    mark($('hIntRow'), k => k === hcfg.intensity);
+    mark($('hFocusRow'), k => k === hcfg.focus);
+    mark($('hEqRow'), k => hcfg.equip.has(k));
+    $('hWarm').classList.toggle('on', hcfg.warm);
+    $('hCool').classList.toggle('on', hcfg.cool);
+    const sw = (id, on) => { $(id).classList.toggle('on', on); $(id).setAttribute('aria-pressed', String(on)); };
+    sw('hLowSwitch', hcfg.low); sw('hAdvSwitch', hcfg.adv); sw('hUniqueSwitch', hcfg.unique);
+    $('hWork').value = hcfg.work; $('hWorkVal').textContent = hcfg.work + 's';
+    $('hRest').value = hcfg.rest; $('hRestVal').textContent = hcfg.rest + 's';
+    $('hRoundsVal').textContent = hcfg.rounds;
+    $('hRRVal').textContent = fmtS(hcfg.roundRest);
+    $('hAdv').classList.toggle('hidden', !hcfg.adv);
+    const tOn = hcfg.tabata.on, aOn = hcfg.amrap.on;
+    $('hTabataRow').classList.toggle('on', tOn);
+    $('hAmrapRow').classList.toggle('on', aOn);
+    $('hTabataVal').textContent = tOn ? hcfg.tabata.mins + ' min' : 'Off';
+    $('hAmrapVal').textContent = aOn ? hcfg.amrap.count + ' moves • ' + hcfg.amrap.mins + ' min' : 'Off';
+    const lock = tOn || aOn;
+    ['hDurWrap', 'hProtoWrap', 'hRoundWrap'].forEach(id => $(id).classList.toggle('locked', lock));
+    $('hLockNote').classList.toggle('hidden', !lock);
+    $('hLockNote').textContent = tOn ? 'Tabata mode sets the duration, work, rest and rounds for you.' : (aOn ? 'AMRAP mode sets the time and moves for you.' : '');
+  }
+
+  buildChips($('hDurRow'), 'dur', HIIT_DURS.map(d => [d, String(d)]), k => { hcfg.dur = Number(k); syncHiit(); });
+  buildChips($('hIntRow'), '', Object.entries(HIIT_INT).map(([k, v]) => [k, v.label]), k => {
+    hcfg.intensity = k; hcfg.work = HIIT_INT[k].work; hcfg.rest = HIIT_INT[k].rest; syncHiit();
+  });
+  buildChips($('hFocusRow'), 'ctype', HIIT_FOCUS, k => { hcfg.focus = k; syncHiit(); });
+  buildChips($('hEqRow'), 'heq', HIIT_EQUIP, k => { toggleIn(hcfg.equip, k); syncHiit(); });
+  $('hWarm').onclick = () => { hcfg.warm = !hcfg.warm; syncHiit(); };
+  $('hCool').onclick = () => { hcfg.cool = !hcfg.cool; syncHiit(); };
+  $('hLowSwitch').onclick = () => { hcfg.low = !hcfg.low; syncHiit(); };
+  $('hUniqueSwitch').onclick = () => { hcfg.unique = !hcfg.unique; syncHiit(); };
+  $('hAdvSwitch').onclick = () => {
+    hcfg.adv = !hcfg.adv;
+    if (!hcfg.adv) { hcfg.tabata.on = false; hcfg.amrap.on = false; hcfg.unique = false; }
+    syncHiit();
+  };
+  $('hWork').oninput = (e) => { hcfg.work = Number(e.target.value); syncHiit(); };
+  $('hRest').oninput = (e) => { hcfg.rest = Number(e.target.value); syncHiit(); };
+  $('hRoundsMinus').onclick = () => { hcfg.rounds = Math.max(1, hcfg.rounds - 1); syncHiit(); };
+  $('hRoundsPlus').onclick = () => { hcfg.rounds = Math.min(10, hcfg.rounds + 1); syncHiit(); };
+  $('hRRMinus').onclick = () => { hcfg.roundRest = Math.max(10, hcfg.roundRest - 10); syncHiit(); };
+  $('hRRPlus').onclick = () => { hcfg.roundRest = Math.min(300, hcfg.roundRest + 10); syncHiit(); };
+  $('hBuild').onclick = buildHiit;
+  $('hBack').onclick = () => {
+    closeHiitModals();
+    $('hiitCfg').classList.add('hidden');
+    $('builderMain').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  };
+
+  function openHiitConfig() {
+    syncHiit();
+    $('hOut').replaceChildren();
+    say($('hMsg'), '');
+    $('builderMain').classList.add('hidden');
+    $('hiitCfg').classList.remove('hidden');
+    window.scrollTo(0, 0);
+    const row = $('hDurRow');
+    const sel = row.querySelectorAll('.active')[0];
+    if (sel && typeof sel.offsetLeft === 'number') row.scrollLeft = sel.offsetLeft - (row.clientWidth - sel.offsetWidth) / 2;
+  }
+
+  // ----- pop-ups -----
+  function closeHiitModals() { $('tabataModal').classList.add('hidden'); $('amrapModal').classList.add('hidden'); }
+  $('tabataModal').onclick = (e) => { if (e.target === $('tabataModal')) closeHiitModals(); };
+  $('amrapModal').onclick = (e) => { if (e.target === $('amrapModal')) closeHiitModals(); };
+  $('tabClose').onclick = closeHiitModals;
+  $('aClose').onclick = closeHiitModals;
+
+  function renderTab() {
+    mark($('tabDurRow'), k => k === String(tabDraft));
+    const b = tabDraft / 4;
+    $('tabSummary').textContent = b + (b === 1 ? ' exercise' : ' exercises') + ' × 4 min (8 rounds of 20s on / 10s off)' +
+      (b > 1 ? ' • 1 min rest between exercises' : '') + ' • ' + (tabDraft + b - 1) + ' min total';
+  }
+  buildChips($('tabDurRow'), 'mus', TAB_MINS.map(m => [m, m + ' min']), k => { tabDraft = Number(k); renderTab(); });
+  function openTabata() { tabDraft = hcfg.tabata.mins; renderTab(); $('tabataModal').classList.remove('hidden'); }
+  $('hTabataRow').onclick = openTabata;
+  $('tabApply').onclick = () => { hcfg.tabata.mins = tabDraft; hcfg.tabata.on = true; hcfg.amrap.on = false; closeHiitModals(); syncHiit(); };
+  $('tabOff').onclick = () => { hcfg.tabata.on = false; closeHiitModals(); syncHiit(); };
+
+  function hiitPool() {
+    return hx.filter(e => (!e.equip || hcfg.equip.has(e.equip)) && (!hcfg.low || e.low) && (hcfg.focus === 'full' || e.group === hcfg.focus));
+  }
+  // Pick n exercises, rotating through muscle groups and leaning toward the intensity's difficulty tier.
+  function hiitPick(pool, n, r, target, avoid) {
+    let p = pool.filter(e => !avoid || !avoid.has(e.name));
+    const capped = p.filter(e => e.tier <= target + 1);
+    if (capped.length >= Math.min(n, p.length)) p = capped;
+    const groups = {};
+    pickN(r, p, p.length).sort((a, b) => Math.abs(a.tier - target) - Math.abs(b.tier - target)).forEach(e => { (groups[e.group] = groups[e.group] || []).push(e); });
+    const keys = pickN(r, Object.keys(groups), Object.keys(groups).length);
+    const out = [];
+    while (out.length < n && keys.some(k => groups[k].length)) {
+      for (const k of keys) {
+        if (out.length >= n) break;
+        if (groups[k].length) out.push(groups[k].shift());
+      }
+    }
+    return out;
+  }
+  const hiitSeed = () => rng(Math.floor(Math.random() * 4294967296));
+
+  function renderAmrap() {
+    $('aCountVal').textContent = amDraft.count;
+    mark($('aTimeRow'), k => k === String(amDraft.mins));
+    $('aCounter').textContent = amDraft.picks.size + ' of ' + amDraft.count + ' chosen' + (amDraft.picks.size < amDraft.count ? ' — the rest are picked randomly' : '');
+    $('aList').querySelectorAll('button').forEach(b => b.classList.toggle('active', amDraft.picks.has(b.dataset.k)));
+  }
+  function toggleAm(name) {
+    if (amDraft.picks.has(name)) { amDraft.picks.delete(name); say($('aMsg'), ''); }
+    else if (amDraft.picks.size >= amDraft.count) { say($('aMsg'), 'You already chose ' + amDraft.count + '. Deselect one or raise the exercise count.', 'err'); return; }
+    else { amDraft.picks.add(name); say($('aMsg'), ''); }
+    renderAmrap();
+  }
+  function buildAmList() {
+    const list = $('aList');
+    list.replaceChildren();
+    const section = (label, arr) => {
+      if (!arr.length) return;
+      list.appendChild(el('div', 'ss-label', label));
+      arr.forEach(e => {
+        const b = el('button', 'xrow');
+        b.dataset.k = e.name;
+        b.append(el('span', 'xn', e.name));
+        if (e.equip) b.append(el('span', 'xtag', HIIT_EQ_LABEL[e.equip]));
+        b.onclick = () => toggleAm(e.name);
+        list.appendChild(b);
+      });
+    };
+    section('POPULAR', hx.filter(e => e.pop));
+    HIIT_FOCUS.forEach(([g, label]) => section(label.toUpperCase(), hx.filter(e => !e.pop && e.group === g)));
+  }
+  buildChips($('aTimeRow'), 'mus', AM_MINS.map(m => [m, m + ' min']), k => { amDraft.mins = Number(k); renderAmrap(); });
+  buildAmList();
+  function openAmrap() {
+    const a = hcfg.amrap;
+    amDraft = { count: a.count, mins: a.mins, picks: new Set(a.picks) };
+    say($('aMsg'), '');
+    renderAmrap();
+    $('amrapModal').classList.remove('hidden');
+  }
+  $('hAmrapRow').onclick = openAmrap;
+  $('aCountMinus').onclick = () => {
+    amDraft.count = Math.max(2, amDraft.count - 1);
+    [...amDraft.picks].slice(amDraft.count).forEach(n => amDraft.picks.delete(n));
+    say($('aMsg'), ''); renderAmrap();
+  };
+  $('aCountPlus').onclick = () => { amDraft.count = Math.min(8, amDraft.count + 1); say($('aMsg'), ''); renderAmrap(); };
+  $('aRandom').onclick = () => {
+    const pick = hiitPick(hiitPool(), amDraft.count, hiitSeed(), HIIT_INT[hcfg.intensity].tier);
+    amDraft.picks = new Set(pick.map(e => e.name));
+    if (!pick.length) say($('aMsg'), 'No exercises match your equipment, low impact and muscle group settings.', 'err');
+    else if (pick.length < amDraft.count) say($('aMsg'), 'Only ' + pick.length + ' exercises match your settings.', 'ok');
+    else say($('aMsg'), '');
+    renderAmrap();
+  };
+  $('aApply').onclick = () => {
+    hcfg.amrap = { on: true, count: amDraft.count, mins: amDraft.mins, picks: new Set(amDraft.picks) };
+    hcfg.tabata.on = false;
+    closeHiitModals(); syncHiit();
+  };
+  $('aOff').onclick = () => { hcfg.amrap.on = false; closeHiitModals(); syncHiit(); };
+
+  // ----- building -----
+  function hiitReps(e) {
+    let n = e.reps * HIIT_INT[hcfg.intensity].rep;
+    n = n >= 20 ? Math.round(n / 5) * 5 : Math.round(n);
+    return Math.max(4, n);
+  }
+  function hiitRender(title, metaTxt, rows) {
+    const card = el('div', 'opt');
+    const head = el('div', 'opt-head');
+    head.style.cursor = 'default';
+    const info = el('div', 'opt-info');
+    info.append(el('span', 'opt-tag', 'YOUR WORKOUT'), el('div', 'opt-title', title), el('div', 'opt-meta', metaTxt));
+    head.append(el('div', 'opt-ico', '⚡'), info);
+    card.appendChild(head);
+    const body = el('div', 'opt-body');
+    rows.forEach(x => {
+      if (x.k === 'label') body.appendChild(el('div', 'ss-label', x.t));
+      else if (x.k === 'note') body.appendChild(el('div', 'rest-note', x.t));
+      else {
+        const row = el('div', 'mv');
+        const left = el('div');
+        left.append(el('div', 'mn', x.n), el('div', 'mr', x.r));
+        row.appendChild(left);
+        body.appendChild(row);
+      }
+    });
+    card.appendChild(body);
+    const actions = el('div', 'plan-actions');
+    const shuffle = el('button', 'secondary', 'Shuffle');
+    shuffle.onclick = buildHiit;
+    const edit = el('button', 'secondary', 'Edit settings');
+    edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    actions.append(shuffle, edit);
+    card.appendChild(actions);
+    $('hOut').replaceChildren(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function buildHiit() {
+    const fail = (m) => { $('hOut').replaceChildren(); lastHiit = null; return say($('hMsg'), m, 'err'); };
+    say($('hMsg'), '');
+    const I = HIIT_INT[hcfg.intensity];
+    const r = hiitSeed();
+    const pool = hiitPool();
+    const tOn = hcfg.tabata.on, aOn = hcfg.amrap.on;
+    if (!pool.length && !(aOn && hcfg.amrap.picks.size)) return fail('No exercises match those settings. Try turning off Low Impact Mode, adding equipment, or choosing Full Body.');
+    const wcm = (tOn || aOn) ? 3 : (hcfg.dur >= 25 ? 5 : hcfg.dur >= 15 ? 3 : 2);
+    const warm = hcfg.warm ? wcm : 0, cool = hcfg.cool ? wcm : 0;
+    const low = hcfg.low;
+    const warmTxt = low ? 'March in place, arm circles, hip circles, easy bodyweight squats and gentle torso twists.' : 'Jog in place, jumping jacks, arm circles, high knees and a few bodyweight squats.';
+    const coolTxt = 'Slow walk, deep breathing, then quad, hamstring, chest and shoulder stretches.';
+    const rows = [];
+    const notes = [];
+    if (warm) rows.push({ k:'label', t:'WARM UP • ' + warm + ' min' }, { k:'note', t:warmTxt });
+    const focusName = HIIT_GROUP_LABEL[hcfg.focus];
+    let title, totalMin, count, countTxt, names;
+    const tag = (e) => HIIT_GROUP_LABEL[e.group] + (e.equip ? ' • ' + HIIT_EQ_LABEL[e.equip] : '');
+
+    if (tOn) {
+      const b = hcfg.tabata.mins / 4;
+      let ex = hiitPick(pool, b, r, I.tier);
+      if (ex.length < b) {
+        notes.push('Only ' + ex.length + ' exercise' + (ex.length === 1 ? '' : 's') + ' match your settings, so some repeat.');
+        const base = ex.slice(); let i = 0;
+        while (ex.length < b) ex.push(base[i++ % base.length]);
+      }
+      rows.push({ k:'label', t:'TABATA • 8 rounds of 20s work / 10s rest per exercise' });
+      ex.forEach((e, i) => {
+        rows.push({ k:'mv', n:e.name, r:'8 × 20s on / 10s off • 4 min • ' + tag(e) });
+        if (i < ex.length - 1) rows.push({ k:'note', t:'Rest 1 min' });
+      });
+      title = focusName + ' Tabata'; totalMin = hcfg.tabata.mins + (b - 1) + warm + cool;
+      count = b; countTxt = b + (b === 1 ? ' exercise' : ' exercises'); names = ex.map(e => e.name);
+    } else if (aOn) {
+      const chosen = [...hcfg.amrap.picks].map(n => hxByName[n]).filter(Boolean);
+      const need = hcfg.amrap.count - chosen.length;
+      const fill = need > 0 ? hiitPick(pool, need, r, I.tier, new Set(chosen.map(e => e.name))) : [];
+      const list = chosen.concat(fill);
+      if (!list.length) return fail('No exercises match those settings.');
+      if (list.length < hcfg.amrap.count) notes.push('Only ' + list.length + ' exercise' + (list.length === 1 ? '' : 's') + ' match your settings.');
+      rows.push({ k:'label', t:'AMRAP • ' + hcfg.amrap.mins + ' min' });
+      rows.push({ k:'note', t:'Complete as many rounds as possible. Go through the list in order, then start again. Rest only when you need to, and count your rounds.' });
+      list.forEach(e => rows.push({ k:'mv', n:e.name, r:hiitReps(e) + (e.equip === 'rope' ? ' skips' : ' reps') + ' • ' + tag(e) }));
+      title = 'AMRAP Circuit'; totalMin = hcfg.amrap.mins + warm + cool;
+      count = list.length; countTxt = list.length + (list.length === 1 ? ' exercise' : ' exercises'); names = list.map(e => e.name);
+    } else {
+      const w = hcfg.work, rs = hcfg.rest, R = hcfg.rounds, RR = hcfg.roundRest;
+      const mainSec = (hcfg.dur - warm - cool) * 60;
+      let N = Math.floor((mainSec - (R - 1) * RR) / (R * (w + rs)));
+      if (N < 1) return fail("Those settings don't fit in " + (hcfg.dur - warm - cool) + ' minutes of work. Lower the rounds, shorten work or rest, or pick a longer duration.');
+      N = Math.min(N, 12, pool.length);
+      const sets = [];
+      if (hcfg.unique && R > 1) {
+        const used = new Set();
+        let repeated = false;
+        for (let i = 0; i < R; i++) {
+          let set = hiitPick(pool, N, r, I.tier, used);
+          if (set.length < N) {
+            repeated = true;
+            const have = new Set(set.map(e => e.name));
+            set = set.concat(hiitPick(pool, N - set.length, r, I.tier, have));
+          }
+          set.forEach(e => used.add(e.name));
+          sets.push(set);
+        }
+        if (repeated) notes.push('Not enough different moves for every round to be unique, so a few repeat.');
+      } else {
+        const set = hiitPick(pool, N, r, I.tier);
+        for (let i = 0; i < R; i++) sets.push(set);
+      }
+      const line = w + 's work / ' + rs + 's rest';
+      if (sets.length > 1 && hcfg.unique) {
+        sets.forEach((set, i) => {
+          rows.push({ k:'label', t:'ROUND ' + (i + 1) + ' OF ' + R });
+          set.forEach(e => rows.push({ k:'mv', n:e.name, r:line + ' • ' + tag(e) }));
+          if (i < R - 1) rows.push({ k:'note', t:'Rest ' + fmtS(RR) });
+        });
+      } else {
+        rows.push({ k:'label', t:'CIRCUIT • ' + R + (R === 1 ? ' round' : ' rounds') });
+        sets[0].forEach(e => rows.push({ k:'mv', n:e.name, r:line + ' • ' + tag(e) }));
+        if (R > 1) rows.push({ k:'note', t:'Rest ' + fmtS(RR) + ' between rounds, then repeat the circuit.' });
+      }
+      const usedSec = R * N * (w + rs) + (R - 1) * RR;
+      if (mainSec - usedSec >= 90) notes.push('This fills about ' + Math.round(usedSec / 60) + ' of ' + Math.round(mainSec / 60) + ' minutes. Add rounds or lengthen work and rest to use the full time.');
+      title = focusName + ' HIIT'; totalMin = (usedSec / 60) + warm + cool;
+      count = N; countTxt = N + (N === 1 ? ' exercise' : ' exercises') + ' × ' + R + (R === 1 ? ' round' : ' rounds');
+      names = [...new Set(sets.flat().map(e => e.name))];
+    }
+    if (cool) rows.push({ k:'label', t:'COOL DOWN • ' + cool + ' min' }, { k:'note', t:coolTxt });
+    notes.forEach(t => rows.push({ k:'note', t }));
+    if (low) rows.splice(0, 0, { k:'note', t:'Low impact mode is on: no jumping moves.' });
+    lastHiit = { mode: tOn ? 'tabata' : aOn ? 'amrap' : 'circuit', names, count, totalMin, rows };
+    hiitRender(title, Math.round(totalMin) + 'm • ' + countTxt + ' • ' + I.label + (low ? ' • Low impact' : ''), rows);
   }
 
   // ---------- EXPORT ----------
