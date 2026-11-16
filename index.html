@@ -119,15 +119,32 @@
   .srow .dn.today { color:#8f85ff; }
   .pv { margin-top:12px; font-size:13px; color:var(--muted); line-height:1.7; }
   .pv b { color:var(--text); }
-  .calhead { display:flex; align-items:center; justify-content:space-between; margin-top:6px; }
-  .calhead .mt { font-size:16px; font-weight:800; }
-  .calhead button { width:40px; height:40px; margin:0; padding:0; border-radius:12px; background:#2a2a40; font-size:20px; }
+  .calpg-top { display:flex; align-items:center; gap:14px; margin:6px 0 16px; }
+  .calpg-top h1 { margin:0; font-size:28px; font-weight:900; letter-spacing:-.01em; }
+  .calnav { display:flex; align-items:center; gap:8px; }
+  .calnav button { width:44px; height:44px; margin:0; padding:0; border-radius:12px; background:#2a2a40; font-size:20px; flex:none; }
+  .calnav button:disabled { opacity:.3; }
+  .calnav button.todaybtn { width:auto; padding:0 12px; font-size:12px; font-weight:800; letter-spacing:.06em; background:var(--accent); }
+  .calnav select { flex:1; min-width:0; height:44px; padding:0 8px; text-align:center; text-align-last:center; font-weight:800; font-size:15px; }
   .calgrid { display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; margin-top:12px; }
   .calgrid .wd { text-align:center; font-size:11px; font-weight:800; color:var(--muted); padding:4px 0; }
-  .cday { position:relative; margin:0; padding:11px 0; border-radius:12px; background:transparent; color:var(--text); font-size:14px; font-weight:700; }
-  .cday.today { border:1px solid #6a5cff; }
-  .cday.sel { background:#2a2a40; }
-  .cday.has::after { content:''; position:absolute; bottom:4px; left:50%; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:#4ade80; }
+  .cday { margin:0; padding:7px 0 5px; min-height:58px; border-radius:12px; background:#12121c; border:1px solid transparent; color:var(--text); font-size:14px; font-weight:700; display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .cday.today { border-color:#6a5cff; }
+  .cday.sel { background:#2f2f4a; border-color:#8c84ff; }
+  .cday .dots { display:flex; gap:3px; flex-wrap:wrap; justify-content:center; max-width:34px; }
+  .cday .dot { width:9px; height:9px; border-radius:50%; box-sizing:border-box; }
+  .cday .dot.plan { background:transparent !important; border:2px solid; }
+  .callegend { display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; font-size:11px; font-weight:700; color:var(--muted); }
+  .callegend span { display:inline-flex; align-items:center; gap:6px; }
+  .callegend .dot { display:inline-block; width:9px; height:9px; border-radius:50%; box-sizing:border-box; background:#8c8ca3; }
+  .callegend .dot.plan { background:transparent; border:2px solid #8c8ca3; }
+  .calsum { font-size:13px; font-weight:700; color:var(--muted); margin-top:14px; }
+  .tag { font-size:9px; font-weight:900; letter-spacing:.1em; padding:3px 7px; border-radius:999px; background:#2a2a40; color:var(--muted); margin-left:8px; vertical-align:middle; white-space:nowrap; }
+  .tag.done { background:rgba(74,222,128,.16); color:var(--green); }
+  .tag.miss { background:rgba(248,113,113,.16); color:var(--danger); }
+  .lrow .racts { display:flex; gap:6px; align-items:center; flex:none; }
+  .rbtn { width:auto; margin:0; padding:8px 14px; font-size:12px; border-radius:999px; }
+  .rbtn.x { background:#2a2a40; color:var(--muted); padding:8px 11px; }
   .lrow { display:flex; justify-content:space-between; gap:10px; padding:11px 0; border-bottom:1px solid var(--line); font-size:14px; }
   .lrow:last-child { border-bottom:0; }
   .lrow .lm { color:var(--muted); font-size:12px; margin-top:2px; }
@@ -823,6 +840,21 @@
     <section id="view-social" data-view="social" class="hidden">
       <h1>Social</h1>
       <div class="soon"><div class="big">👥</div><h2 style="margin-top:12px">Coming soon</h2><p>Friends and sharing will live here.</p></div>
+    </section>
+
+    <!-- CALENDAR (opened from the Home badge) -->
+    <section id="view-calendar" data-view="calendar" class="hidden">
+      <div class="calpg-top">
+        <button id="calPgBack" class="backbtn" aria-label="Back to Home">‹</button>
+        <h1>Calendar</h1>
+      </div>
+      <div class="calnav" id="calNav"></div>
+      <div class="calgrid" id="calGrid"></div>
+      <div class="callegend">
+        <span><i class="dot"></i>Completed</span><span><i class="dot plan"></i>Scheduled</span>
+      </div>
+      <div class="calsum" id="calSum"></div>
+      <div id="calPanel"></div>
     </section>
 
     <!-- BOTTOM NAV -->
@@ -2660,6 +2692,10 @@
     if (!Array.isArray(out.challenges)) out.challenges = defaultAppData().challenges;
     out.challenges = out.challenges.filter(c => c && CMETRICS[c.metric]);
     out.weight = Number(out.weight) > 0 ? Number(out.weight) : 170;
+    const minDate = ymd(new Date(Date.now() - 800 * 86400000));
+    out.prefs.planned = (Array.isArray(out.prefs.planned) ? out.prefs.planned : [])
+      .filter(p => p && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && p.date >= minDate && WTYPES[p.type] && p.type !== 'rest' && Number(p.dur) > 0 && p.id)
+      .map(p => ({ id: String(p.id), date: p.date, type: p.type, dur: Number(p.dur) }));
     return out;
   }
   let saveTimer = null;
@@ -3021,42 +3057,127 @@
     });
   }
 
-  // ----- calendar -----
+  // ----- calendar page -----
+  const CAL_PAST_MONTHS = 24, CAL_FUTURE_MONTHS = 12;
   let calCursor = null, calSel = null;
-  $('homeCal').onclick = () => {
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const monthIdx = (d) => d.getFullYear() * 12 + d.getMonth();
+  const longDate = (key, withYear) => new Date(key + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: withYear ? 'numeric' : undefined });
+
+  // workouts planned for a day: the weekly schedule (today onwards) plus one-off ones the user added
+  function plannedFor(key) {
+    const out = [];
+    if (key >= todayLocal()) {
+      const i = (new Date(key + 'T12:00:00').getDay() + 6) % 7, s = appData.schedule[i];
+      if (s && s.type !== 'rest') out.push({ src: 'weekly', type: s.type, dur: s.dur, idx: i });
+    }
+    (appData.prefs.planned || []).filter(p => p.date === key).forEach(p => out.push({ src: 'custom', type: p.type, dur: p.dur, id: p.id }));
+    return out;
+  }
+  const planDone = (key, p) => logs.some(l => l.performed_on === key && l.wtype === p.type);
+
+  function openCalendarPage() {
     const n = new Date();
     calCursor = new Date(n.getFullYear(), n.getMonth(), 1); calSel = todayLocal();
-    openSheet('Calendar', 'Green dots mark days you completed a workout', renderCalBody);
-  };
-  function renderCalBody(body) {
-    const y = calCursor.getFullYear(), m = calCursor.getMonth();
-    const head = el('div', 'calhead');
-    const prev = el('button', '', '‹'), next = el('button', '', '›');
-    prev.onclick = () => { calCursor = new Date(y, m - 1, 1); refreshSheet(); };
-    next.onclick = () => { calCursor = new Date(y, m + 1, 1); refreshSheet(); };
-    head.append(prev, el('div', 'mt', calCursor.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })), next);
-    body.appendChild(head);
-    const grid = el('div', 'calgrid');
+    showTab('calendar');
+    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === 'home'));
+    renderCalendarPage();
+  }
+  $('homeCal').onclick = openCalendarPage;
+  $('calPgBack').onclick = () => showTab('home');
+
+  function renderCalendarPage() {
+    if (!appData) appData = cleanData(null);
+    const y = calCursor.getFullYear(), m = calCursor.getMonth(), today = todayLocal(), now = new Date();
+    const nowK = monthIdx(now), curK = monthIdx(calCursor);
+
+    // month picker
+    const nav = $('calNav'); nav.replaceChildren();
+    const prev = el('button', '', '‹'), next = el('button', '', '›'), tb = el('button', 'todaybtn', 'Today');
+    prev.disabled = curK <= nowK - CAL_PAST_MONTHS; next.disabled = curK >= nowK + CAL_FUTURE_MONTHS;
+    prev.setAttribute('aria-label', 'Previous month'); next.setAttribute('aria-label', 'Next month');
+    prev.onclick = () => { calCursor = new Date(y, m - 1, 1); renderCalendarPage(); };
+    next.onclick = () => { calCursor = new Date(y, m + 1, 1); renderCalendarPage(); };
+    tb.onclick = () => { calCursor = new Date(now.getFullYear(), now.getMonth(), 1); calSel = today; renderCalendarPage(); };
+    const pick = document.createElement('select'); pick.className = 'hsel'; pick.setAttribute('aria-label', 'Choose month');
+    for (let k = -CAL_PAST_MONTHS; k <= CAL_FUTURE_MONTHS; k++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + k, 1), o = document.createElement('option');
+      o.value = String(k); o.textContent = d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }); pick.appendChild(o);
+    }
+    pick.value = String(curK - nowK);
+    pick.onchange = () => { calCursor = new Date(now.getFullYear(), now.getMonth() + Number(pick.value), 1); renderCalendarPage(); };
+    nav.append(prev, pick, next, tb);
+
+    // month grid: solid dot = completed, ring = scheduled
+    const byDay = {};
+    logs.forEach(l => { (byDay[l.performed_on] = byDay[l.performed_on] || []).push(l); });
+    const grid = $('calGrid'); grid.replaceChildren();
     'MTWTFSS'.split('').forEach(c => grid.appendChild(el('div', 'wd', c)));
     const offset = (new Date(y, m, 1).getDay() + 6) % 7, count = new Date(y, m + 1, 0).getDate();
-    const has = new Set(logs.map(l => l.performed_on)), today = todayLocal();
     for (let i = 0; i < offset; i++) grid.appendChild(el('div'));
+    let doneN = 0, doneMin = 0, planN = 0;
     for (let d = 1; d <= count; d++) {
-      const key = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-      const b = el('button', 'cday' + (has.has(key) ? ' has' : '') + (key === today ? ' today' : '') + (key === calSel ? ' sel' : ''), String(d));
-      b.onclick = () => { calSel = key; refreshSheet(); };
+      const key = y + '-' + pad2(m + 1) + '-' + pad2(d), dl = byDay[key] || [], pl = plannedFor(key).filter(p => !planDone(key, p));
+      doneN += dl.length; doneMin += dl.reduce((s, l) => s + l.minutes, 0); if (key >= today) planN += pl.length;
+      const b = el('button', 'cday' + (key === today ? ' today' : '') + (key === calSel ? ' sel' : ''));
+      b.setAttribute('aria-label', longDate(key, true) + (dl.length ? ', ' + dl.length + ' completed' : '') + (pl.length ? ', ' + pl.length + ' scheduled' : ''));
+      b.appendChild(el('span', null, String(d)));
+      const dots = el('div', 'dots');
+      dl.slice(0, 4).forEach(l => { const o = el('i', 'dot'); o.style.background = (WTYPES[l.wtype] || {}).color || '#8c8ca3'; dots.appendChild(o); });
+      pl.slice(0, Math.max(0, 4 - Math.min(dl.length, 4))).forEach(p => { const o = el('i', 'dot plan'); o.style.borderColor = (WTYPES[p.type] || {}).color || '#8c8ca3'; dots.appendChild(o); });
+      b.appendChild(dots);
+      b.onclick = () => { calSel = key; renderCalendarPage(); };
       grid.appendChild(b);
     }
-    body.appendChild(grid);
-    const dayLogs = logs.filter(l => l.performed_on === calSel);
-    body.appendChild(el('h2', null, new Date(calSel + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })));
-    if (!dayLogs.length) body.appendChild(el('div', 'sheet-note', 'No workouts logged this day.'));
+    $('calSum').textContent = doneN + (doneN === 1 ? ' workout' : ' workouts') + ' completed' + (doneN ? ' · ' + fmtAct(doneMin) : '') + (planN ? ' · ' + planN + ' coming up' : '');
+
+    // selected day
+    const panel = $('calPanel'); panel.replaceChildren();
+    panel.appendChild(el('h2', null, longDate(calSel, true)));
+    const dayLogs = byDay[calSel] || [], plans = plannedFor(calSel).filter(p => !planDone(calSel, p));
+    if (!dayLogs.length && !plans.length) panel.appendChild(el('div', 'sheet-note', calSel < today ? 'No workouts logged this day.' : 'Nothing scheduled yet.'));
     dayLogs.forEach(l => {
-      const row = el('div', 'lrow'), left = el('div');
-      left.append(el('div', null, l.title), el('div', 'lm', l.minutes + ' min · ' + l.calories + ' cal' + (l.lifts ? ' · ' + l.lifts + ' lifts' : '')));
-      row.appendChild(left);
-      body.appendChild(row);
+      const row = el('div', 'lrow'), left = el('div'), t = el('div', null, l.title);
+      t.appendChild(el('span', 'tag done', '✓ DONE'));
+      left.append(t, el('div', 'lm', l.minutes + ' min · ' + l.calories + ' cal' + (l.lifts ? ' · ' + l.lifts + ' lifts' : '')));
+      row.appendChild(left); panel.appendChild(row);
     });
+    plans.forEach(p => {
+      const row = el('div', 'lrow'), left = el('div'), t = el('div', null, WTYPES[p.type].label);
+      const missed = calSel < today;
+      t.appendChild(el('span', 'tag' + (missed ? ' miss' : ''), missed ? 'MISSED' : p.src === 'weekly' ? 'WEEKLY PLAN' : 'SCHEDULED'));
+      left.append(t, el('div', 'lm', p.dur + ' min' + (p.src === 'weekly' ? ' · from your weekly schedule' : '')));
+      const acts = el('div', 'racts');
+      if (calSel === today) {
+        const go = el('button', 'rbtn', 'Start');
+        go.onclick = () => p.src === 'weekly' ? startScheduled(p.idx) : startScheduled(todayIdx(), { type: p.type, dur: p.dur });
+        acts.appendChild(go);
+      }
+      if (p.src === 'custom') {
+        const x = el('button', 'rbtn x', '✕'); x.setAttribute('aria-label', 'Remove scheduled workout');
+        x.onclick = () => { appData.prefs.planned = appData.prefs.planned.filter(q => q.id !== p.id); saveAppData(); renderCalendarPage(); };
+        acts.appendChild(x);
+      }
+      row.append(left, acts); panel.appendChild(row);
+    });
+    if (calSel >= today) {
+      const add = el('button', '', '+ Schedule a workout'); add.onclick = () => openAddPlanned(calSel);
+      panel.appendChild(add);
+      if (plans.some(p => p.src === 'weekly')) panel.appendChild(el('div', 'sheet-note', 'Your weekly schedule fills in automatically. Change it from Home → Weekly Schedule.'));
+    } else if (calSel < today) panel.appendChild(el('div', 'sheet-note', 'Pick today or a future day to schedule a workout.'));
+  }
+
+  function openAddPlanned(dateKey) {
+    let type = 'strength', dur = 45;
+    openSheet('Schedule a workout', longDate(dateKey, true), (body) => {
+      body.appendChild(el('label', null, 'Workout type'));
+      body.appendChild(mkChips('mus-wrap', Object.keys(WTYPES).filter(k => k !== 'rest').map(k => [k, WTYPES[k].label]), k => k === type, k => { type = k; refreshSheet(); }));
+      body.appendChild(el('label', null, 'Duration'));
+      body.appendChild(mkSelect(SCHED_DURS.map(m => [m, m + ' min']), dur, v => { dur = Number(v); }));
+    }, [['Add to calendar', '', () => {
+      const list = (appData.prefs.planned || []).concat({ id: 'p' + Date.now() + Math.random().toString(36).slice(2, 5), date: dateKey, type, dur });
+      appData.prefs.planned = list.slice(-500); saveAppData(); closeSheet(); renderCalendarPage();
+    }], ['Cancel', 'secondary', closeSheet]]);
   }
 
   // ----- schedule: editor, preferences, auto-build, day details -----
@@ -3174,8 +3295,8 @@
 
   // ----- build a scheduled workout -----
   const nearest = (arr, v) => arr.reduce((a, b) => Math.abs(b - v) < Math.abs(a - v) ? b : a);
-  function startScheduled(i) {
-    const d = appData.schedule[i];
+  function startScheduled(i, override) {
+    const d = override || appData.schedule[i];
     if (!d || d.type === 'rest') return;
     const loc = appData.prefs.loc, lv = appData.prefs.intensity;
     showTab('workout'); setMode('custom');
