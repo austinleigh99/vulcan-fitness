@@ -236,6 +236,21 @@
   .arow .hstep-c { width:150px; }
   .rndbtn { width:100%; margin:12px 0 0; padding:13px; font-size:14px; border-radius:14px; background:transparent; border:1px solid var(--accent); color:#d9a6ff; }
 
+  /* Recovery configuration */
+  #recoveryCfg { --accent: #35d7e6; }
+  #recoveryCfg .cfg-title .s { color: var(--accent); }
+  .rdur-row { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; }
+  .rdur { margin:0; padding:22px 0; border-radius:18px; background:#2a2a40; color:var(--text); font-size:17px; font-weight:800; }
+  .rdur.active { background: var(--accent); color:#062a2f; box-shadow: 0 6px 18px rgba(53,215,230,.35); }
+  .rgoal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .rgoal { margin:0; padding:24px 16px; border-radius:20px; background:#2a2a40; border:2px solid transparent; color:var(--text); font-size:16px; font-weight:800; text-align:left; }
+  .rgoal.active { border-color: var(--accent); background: rgba(53,215,230,.14); color:#7ff0f8; }
+  #recBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; color:#062a2f; box-shadow: 0 10px 30px rgba(53,215,230,.4); margin-top: 26px; }
+  #recOut { margin-top: 18px; }
+  #recoveryCfg .opt-tag { color: var(--accent); background: rgba(53,215,230,.15); }
+  #recoveryCfg .opt-ico { background: rgba(53,215,230,.2); }
+  #recoveryCfg .ss-label { color: var(--accent); }
+
   /* Coming soon tabs */
   .soon { text-align:center; padding: 56px 16px; }
   .soon .big { font-size: 48px; }
@@ -539,6 +554,27 @@
             <div class="hsheet-actions"><button id="aOff" class="secondary">Turn off</button><button id="aApply">Apply</button></div>
           </div>
         </div>
+      </div>
+
+      <!-- RECOVERY CONFIGURATION -->
+      <div id="recoveryCfg" class="hidden">
+        <div class="cfg-top">
+          <button id="recBack" class="backbtn" aria-label="Back">←</button>
+          <div class="cfg-title"><div class="t">RECOVERY</div><div class="s">CONFIGURATION</div></div>
+        </div>
+
+        <h2>Workout Duration</h2>
+        <div id="recDurRow" class="rdur-row"></div>
+
+        <h2>Recovery Goal</h2>
+        <div id="recGoalRow" class="rgoal-grid"></div>
+
+        <h2>Target Muscle Group</h2>
+        <div id="recMuscleRow" class="rgoal-grid"></div>
+
+        <button id="recBuild">✨ Build Recovery</button>
+        <div id="recMsg" class="msg"></div>
+        <div id="recOut"></div>
       </div>
       </div>
     </section>
@@ -902,6 +938,7 @@
     if (planType === 'cardio') return openCardioConfig();
     if (planType === 'calisthenics') return openCalisConfig();
     if (planType === 'hiit') return openHiitConfig();
+    if (planType === 'recovery') return openRecoveryConfig();
     const p = PLAN[planType];
     const pool = p.both.concat(p[planLoc]);
     const r = rng(Math.floor(Math.random() * 4294967296));
@@ -1836,6 +1873,208 @@
     if (low) rows.splice(0, 0, { k:'note', t:'Low impact mode is on: no jumping moves.' });
     lastHiit = { mode: tOn ? 'tabata' : aOn ? 'amrap' : 'circuit', names, count, totalMin, rows };
     hiitRender(title, Math.round(totalMin) + 'm • ' + countTxt + ' • ' + I.label + (low ? ' • Low impact' : ''), rows);
+  }
+
+  // ---------- RECOVERY CONFIGURATION ----------
+  const REC_DURS = [10, 20, 30, 45];
+  const REC_GOALS = [['soreness', 'Muscle Soreness'], ['mobility', 'Mobility'], ['prevention', 'Injury Prevention'], ['rest', 'Rest Day']];
+  const REC_GOAL_KEY = { soreness:'s', mobility:'m', prevention:'i', rest:'r' };
+  const REC_MUSCLES = [['full', 'Full Body'], ['legs', 'Legs'], ['upper', 'Upper Body'], ['back', 'Back'], ['hips', 'Hips'], ['shoulders', 'Shoulders'], ['calves', 'Calves']];
+  const REC_MUSCLE_LABEL = Object.fromEntries(REC_MUSCLES);
+  const REC_NEAR = { legs:['calves','hips'], calves:['legs'], hips:['legs','back'], back:['hips','shoulders'], shoulders:['upper','back'], upper:['shoulders'] };
+  const REC_PHASE = { 1:'MOVE', 2:'STRETCH', 3:'RESTORE' };
+  // [name, muscles, goals (s=soreness m=mobility i=prevention r=rest), phase, kind, sides, cue, seconds (timed only)]
+  const REC_EX = [
+    ['Cat-Cow','back,hips','smr',1,'flow',1,'Move with your breath, one slow rep per breath.'],
+    ['Open Books (Thoracic Rotations)','back,shoulders','smi',1,'flow',2,'Rotate through your upper back and keep your hips stacked.'],
+    ['Slow Arm Circles','shoulders,upper','smi',1,'flow',1,'Start small and gradually make the circles larger.'],
+    ['Shoulder Rolls & Shrugs','shoulders,upper','sr',1,'flow',1,'Let your shoulders drop away from your ears each rep.'],
+    ['Standing Hip Circles','hips','smr',1,'flow',2,'Large, smooth circles with your knee lifted.'],
+    ['90/90 Hip Switches','hips','mi',1,'flow',1,'Rotate your knees side to side and sit tall.'],
+    ["World's Greatest Stretch",'legs,hips,back','m',1,'flow',2,'Lunge, rotate and reach toward the ceiling.'],
+    ['Leg Swings','legs,hips','mi',1,'flow',2,'Hold a wall for balance and swing in an easy range.'],
+    ['Ankle Circles','calves,legs','smir',1,'flow',2,'Draw slow circles with your toes.'],
+    ['Deep Squat Rocks','hips,legs','m',1,'flow',1,'Hold a deep squat and rock gently side to side.'],
+    ['Slow Inchworms','legs,back,upper','m',1,'flow',1,'Walk your hands out and back with control.'],
+    ['Easy Walk','legs,calves','sr',1,'timed',1,'Relaxed pace with slow nose breathing.',120],
+    ['Wall Slides','shoulders,upper,back','mi',1,'act',1,'Keep your ribs down and slide your arms up the wall.'],
+    ['Glute Bridges','hips,legs','i',1,'act',1,'Squeeze at the top and avoid arching your low back.'],
+    ['Clamshells','hips','i',1,'act',2,'Keep your feet together and your pelvis still.'],
+    ['Bird Dog','back,hips','i',1,'act',2,'Reach long, keep hips level and move slowly.'],
+    ['Dead Bug','back,hips','i',1,'act',1,'Press your low back gently into the floor.'],
+    ['Side-Lying Leg Raises','hips,legs','i',1,'act',2,'Toes forward and lift with control.'],
+    ['Scapular Push-Ups','shoulders,upper,back','i',1,'act',1,'Arms straight, move only your shoulder blades.'],
+    ['Prone Y-T-W Raises','shoulders,back','i',1,'act',1,'Light squeeze between your shoulder blades.'],
+    ['Slow Calf Raises','calves,legs','i',1,'act',1,'Three seconds up, three seconds down.'],
+    ['Wall Tibialis Raises','calves,legs','i',1,'act',1,'Heels on the floor, lift your toes up.'],
+    ['Slow Reverse Lunges','legs,hips','i',1,'act',2,'Bodyweight only, knee tracks over your toes.'],
+    ['Standing Hip Abduction','hips,legs','i',1,'act',2,'Stand tall and lift out to the side without leaning.'],
+    ['Single-Leg Balance','legs,calves','i',1,'hold',2,'Soft knee, eyes on a fixed point.'],
+    ["Child's Pose",'back,hips,shoulders','smr',2,'hold',1,'Sink your hips back and breathe into your back.'],
+    ['Seated Forward Fold','back,legs','sr',2,'hold',1,'Hinge from the hips and keep it comfortable.'],
+    ['Standing Hamstring Stretch','legs','smr',2,'hold',2,'Heel forward, hinge from the hips with a flat back.'],
+    ['Standing Quad Stretch','legs','sm',2,'hold',2,'Knees together, tuck your pelvis slightly.'],
+    ['Kneeling Hip Flexor Stretch','hips,legs','smr',2,'hold',2,'Squeeze the back-leg glute and stay tall.'],
+    ['Figure-Four Stretch','hips','smr',2,'hold',2,'Lie on your back and pull the crossed leg in.'],
+    ['Pigeon Pose','hips','smr',2,'hold',2,'Fold forward only as far as feels comfortable.'],
+    ['Butterfly Stretch','hips','sr',2,'hold',1,'Soles together, sit tall.'],
+    ['Standing Calf Stretch','calves','smr',2,'hold',2,'Back heel down, press into a wall.'],
+    ['Downward Dog Pedals','calves,legs,back','sm',2,'hold',1,'Alternate bending your knees to stretch the calves.'],
+    ['Cross-Body Shoulder Stretch','shoulders','sr',2,'hold',2,'Pull your arm across your chest and keep the shoulder down.'],
+    ['Doorway Chest Stretch','upper,shoulders','smr',2,'hold',1,'Forearm on the frame, step through gently.'],
+    ['Triceps Stretch','upper,shoulders','s',2,'hold',2,'Elbow overhead with gentle pressure.'],
+    ['Wrist & Forearm Stretch','upper','sr',2,'hold',2,'Arm straight, gently pull your fingers back.'],
+    ['Thread the Needle','back,shoulders','smr',2,'hold',2,'Reach under and rest your shoulder and ear on the floor.'],
+    ['Supine Spinal Twist','back,hips','sr',2,'hold',2,'Keep both shoulders on the floor.'],
+    ['Knees-to-Chest','back,hips','sr',2,'hold',1,'Hug your knees in and rock gently.'],
+    ['Sphinx Pose','back','sm',2,'hold',1,'Elbows under shoulders, glutes relaxed.'],
+    ['Kneeling Lat Stretch','back,shoulders','sm',2,'hold',1,'Hands on a couch or chair seat, sink your chest down.'],
+    ['Happy Baby','hips,back','sr',2,'hold',1,'Hold your feet, knees wide, relax your lower back.'],
+    ['Legs Up the Wall','legs,calves','sr',3,'timed',1,'Lie back and let your legs relax.',120]
+  ].map(a => ({ name:a[0], muscles:a[1].split(','), goals:a[2], phase:a[3], kind:a[4], sides:a[5], cue:a[6], secs:a[7] || 0 }));
+  const rcfg = { dur: 30, goal: 'soreness', muscle: 'full' };
+  let lastRec = null;
+
+  function syncRec() {
+    mark($('recDurRow'), k => k === String(rcfg.dur));
+    mark($('recGoalRow'), k => k === rcfg.goal);
+    mark($('recMuscleRow'), k => k === rcfg.muscle);
+  }
+  buildChips($('recDurRow'), 'rdur', REC_DURS.map(d => [d, d + 'm']), k => { rcfg.dur = Number(k); syncRec(); });
+  buildChips($('recGoalRow'), 'rgoal', REC_GOALS, k => { rcfg.goal = k; syncRec(); });
+  buildChips($('recMuscleRow'), 'rgoal', REC_MUSCLES, k => { rcfg.muscle = k; syncRec(); });
+  $('recBuild').onclick = buildRecovery;
+  $('recBack').onclick = () => {
+    $('recoveryCfg').classList.add('hidden');
+    $('builderMain').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  };
+  function openRecoveryConfig() {
+    syncRec();
+    $('recOut').replaceChildren();
+    say($('recMsg'), '');
+    $('builderMain').classList.add('hidden');
+    $('recoveryCfg').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  // seconds an exercise takes (hs = hold seconds, tf = timed scale)
+  function recCost(e, hs, tf) {
+    if (e.kind === 'hold') return hs * e.sides + 10;
+    if (e.kind === 'flow') return 45 * e.sides;
+    if (e.kind === 'act') return 55 * e.sides;
+    return Math.round(e.secs * tf / 10) * 10;
+  }
+  function recRx(e, hs, tf) {
+    const each = e.sides === 2 ? ' each side' : '';
+    if (e.kind === 'hold') return 'Hold ' + hs + 's' + each;
+    if (e.kind === 'flow') return (e.sides === 2 ? '6-8' : '8-10') + ' slow reps' + each;
+    if (e.kind === 'act') return '2 × ' + (e.sides === 2 ? '10' : '10-12') + ' reps' + each;
+    return fmtT(recCost(e, hs, tf));
+  }
+
+  function buildRecovery() {
+    say($('recMsg'), '');
+    const r = hiitSeed();
+    const gk = REC_GOAL_KEY[rcfg.goal];
+    const long = rcfg.dur >= 20;
+    const rest = rcfg.goal === 'rest';
+    const openSec = rest ? (long ? 120 : 60) : (long ? 90 : 60);
+    let closeSec = rest ? (long ? 180 : 90) : (long ? 120 : 60);
+    const budget = rcfg.dur * 60 - openSec - closeSec;
+    const baseHold = rest ? 60 : rcfg.goal === 'soreness' ? 40 : 30;
+
+    const all = REC_EX.filter(e => e.goals.includes(gk));
+    let tiers;
+    if (rcfg.muscle === 'full') {
+      const buckets = {};
+      pickN(r, all, all.length).forEach(e => { (buckets[e.muscles[0]] = buckets[e.muscles[0]] || []).push(e); });
+      const keys = pickN(r, Object.keys(buckets), Object.keys(buckets).length);
+      const order = [];
+      while (keys.some(k => buckets[k].length)) keys.forEach(k => { if (buckets[k].length) order.push(buckets[k].shift()); });
+      tiers = [order];
+    } else {
+      const near = REC_NEAR[rcfg.muscle] || [];
+      const t0 = all.filter(e => e.muscles.includes(rcfg.muscle));
+      const t1 = all.filter(e => !t0.includes(e) && e.muscles.some(m => near.includes(m)));
+      const t2 = all.filter(e => !t0.includes(e) && !t1.includes(e));
+      tiers = [t0, t1, t2].map(t => pickN(r, t, t.length));
+    }
+    const picked = [];
+    let used = 0;
+    for (const tier of tiers) {
+      if (budget - used < 60) break;
+      for (const e of tier) {
+        const c = recCost(e, baseHold, 1);
+        if (used + c <= budget) { picked.push(e); used += c; }
+      }
+    }
+    // short on moves: stretch the holds and timed moves to use the time
+    let hs = baseHold, tf = 1;
+    if (used < budget * 0.85 && picked.length) {
+      let f = Math.min(1.6, budget / used);
+      const calc = (ff) => picked.reduce((s, e) => s + recCost(e, Math.round(baseHold * ff / 5) * 5, ff), 0);
+      while (f > 1 && calc(f) > budget) f -= 0.05;
+      f = Math.max(1, f);
+      hs = Math.round(baseHold * f / 5) * 5; tf = f;
+      used = calc(f);
+    }
+    const leftover = budget - used;
+    if (leftover >= 30) closeSec += Math.min(Math.floor(leftover / 30) * 30, 300);
+    const main = picked.slice().sort((a, b) => a.phase - b.phase);
+
+    const rows = [];
+    rows.push({ k:'label', t:'SETTLE • ' + fmtT(openSec) });
+    rows.push({ k:'mv', n:'Belly Breathing', r:fmtT(openSec), c:'Inhale through your nose for 4 seconds, exhale slowly for 6.' });
+    let phase = 0;
+    main.forEach(e => {
+      if (e.phase !== phase) { phase = e.phase; rows.push({ k:'label', t:REC_PHASE[phase] }); }
+      rows.push({ k:'mv', n:e.name, r:recRx(e, hs, tf) + ' • ' + e.muscles.map(m => REC_MUSCLE_LABEL[m]).join(', '), c:e.cue });
+    });
+    rows.push({ k:'label', t:'RELAX • ' + fmtT(closeSec) });
+    rows.push({ k:'mv', n:'Body Scan', r:fmtT(closeSec), c:'Lie flat and relax from your feet up to your face.' });
+    if (rcfg.muscle !== 'full' && !picked.some(e => e.muscles.includes(rcfg.muscle))) rows.push({ k:'note', t:'No ' + REC_MUSCLE_LABEL[rcfg.muscle].toLowerCase() + ' moves match this goal.' });
+    else if (rcfg.muscle !== 'full') {
+      const off = picked.filter(e => !e.muscles.includes(rcfg.muscle)).length;
+      if (off) rows.push({ k:'note', t:off + ' nearby move' + (off === 1 ? '' : 's') + ' added to fill your time. Pick Full Body for more variety.' });
+    }
+    if (rcfg.goal === 'prevention') rows.push({ k:'note', t:'Move slowly and stop if anything feels sharp. Recovery work should feel comfortable, never painful.' });
+    if (rest) rows.push({ k:'note', t:'Keep it easy today. Skip anything that feels like work.' });
+
+    const total = openSec + used + closeSec;
+    lastRec = { names: picked.map(e => e.name), total, rows, open: openSec, close: closeSec, hold: hs };
+    const goalName = Object.fromEntries(REC_GOALS)[rcfg.goal];
+
+    const card = el('div', 'opt');
+    const head = el('div', 'opt-head');
+    head.style.cursor = 'default';
+    const info = el('div', 'opt-info');
+    info.append(el('span', 'opt-tag', 'YOUR RECOVERY'), el('div', 'opt-title', goalName + ' Recovery'),
+      el('div', 'opt-meta', Math.round(total / 60) + 'm • ' + picked.length + (picked.length === 1 ? ' move' : ' moves') + ' • ' + REC_MUSCLE_LABEL[rcfg.muscle]));
+    head.append(el('div', 'opt-ico', '🛌'), info);
+    card.appendChild(head);
+    const body = el('div', 'opt-body');
+    rows.forEach(x => {
+      if (x.k === 'label') body.appendChild(el('div', 'ss-label', x.t));
+      else if (x.k === 'note') body.appendChild(el('div', 'rest-note', x.t));
+      else {
+        const row = el('div', 'mv');
+        const left = el('div');
+        left.append(el('div', 'mn', x.n), el('div', 'mr', x.r), el('div', 'mnote', x.c));
+        row.appendChild(left);
+        body.appendChild(row);
+      }
+    });
+    card.appendChild(body);
+    const actions = el('div', 'plan-actions');
+    const shuffle = el('button', 'secondary', 'Shuffle');
+    shuffle.onclick = buildRecovery;
+    const edit = el('button', 'secondary', 'Edit settings');
+    edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    actions.append(shuffle, edit);
+    card.appendChild(actions);
+    $('recOut').replaceChildren(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ---------- EXPORT ----------
