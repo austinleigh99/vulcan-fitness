@@ -47,6 +47,35 @@
   .stat .lbl { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity:.7; }
   .s1 { background:#ececf5; color:#14141f; } .s2 { background:#3a2cff; color:#fff; }
   .s3 { background:#3fbf85; color:#06261a; } .s4 { background:#f0931f; color:#2b1600; }
+  .stat.tap { cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .12s; }
+  .stat.tap:active { transform:scale(.95); }
+  .rseg { display:flex; gap:6px; background:#0b0b12; border:1px solid var(--line); border-radius:14px; padding:4px; margin:4px 0 14px; }
+  .rseg button { margin:0; padding:10px 0; flex:1; font-size:12px; font-weight:800; letter-spacing:.04em; border-radius:10px; background:transparent; color:var(--muted); }
+  .rseg button.on { background:var(--accent); color:#fff; }
+  .sread { display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin-bottom:10px; }
+  .sread .big { font-size:26px; font-weight:900; line-height:1.1; }
+  .sread .sm { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:3px; }
+  .sread .avg { text-align:right; }
+  .schart { background:#12121c; border:1px solid var(--line); border-radius:18px; padding:14px 10px 10px; }
+  .sbars { display:flex; align-items:flex-end; gap:4px; height:150px; border-bottom:1px solid var(--line); }
+  .sbars.many { gap:2px; }
+  .sbar { margin:0; padding:0; width:auto; flex:1; min-width:0; height:100%; background:transparent; border-radius:6px 6px 0 0; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:3px; }
+  .sbar .sf { width:100%; border-radius:6px 6px 0 0; min-height:3px; opacity:.85; }
+  .sbar.zero .sf { opacity:.18; }
+  .sbar.pick .sf { opacity:1; box-shadow:0 0 0 2px #fff inset; }
+  .sbar .sv { font-size:9px; font-weight:800; color:var(--muted); white-space:nowrap; }
+  .slabs { display:flex; gap:4px; margin-top:6px; }
+  .slabs.many { gap:2px; }
+  .slabs div { flex:1; min-width:0; text-align:center; font-size:9px; font-weight:800; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; white-space:nowrap; overflow:visible; }
+  .sgrid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+  .stile { border-radius:22px; padding:16px 16px 14px; min-height:104px; display:flex; flex-direction:column; justify-content:space-between; }
+  .stile .tl { font-size:11px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; opacity:.8; }
+  .stile .tn { font-size:30px; font-weight:900; line-height:1.05; }
+  .stile .tu { font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; opacity:.7; }
+  .t1 { background:#22222f; color:#fff; border:1px solid var(--line); } .t2 { background:#3a2cff; color:#fff; }
+  .t3 { background:#3fbf85; color:#06261a; } .t4 { background:#f0931f; color:#2b1600; }
+  .hgroup { font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:16px 0 2px; }
+  .lrow .lr { text-align:right; font-weight:800; white-space:nowrap; }
   .stat-note { text-align:center; font-size:11px; color:var(--muted); margin-top:8px; font-weight:600; }
   .hsec { display:flex; align-items:center; justify-content:space-between; margin: 28px 0 12px; }
   .hsec h3 { margin:0; font-size:12px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
@@ -415,9 +444,9 @@
       </div>
 
       <div class="stats">
-        <div class="stat s1"><span class="sic ic" data-i="flame"></span><div class="num" id="stCal">0</div><div class="lbl">Cal</div></div>
-        <div class="stat s2"><span class="sic ic" data-i="pulse"></span><div class="num" id="stActive">0m</div><div class="lbl">Active</div></div>
-        <div class="stat s3"><span class="sic ic" data-i="dumb"></span><div class="num" id="stLifts">0</div><div class="lbl">Lifts</div></div>
+        <div class="stat s1 tap" id="tileCal" role="button" tabindex="0"><span class="sic ic" data-i="flame"></span><div class="num" id="stCal">0</div><div class="lbl">Cal</div></div>
+        <div class="stat s2 tap" id="tileActive" role="button" tabindex="0"><span class="sic ic" data-i="pulse"></span><div class="num" id="stActive">0m</div><div class="lbl">Active</div></div>
+        <div class="stat s3 tap" id="tileLifts" role="button" tabindex="0"><span class="sic ic" data-i="dumb"></span><div class="num" id="stLifts">0</div><div class="lbl">Lifts</div></div>
         <div class="stat s4"><span class="sic ic" data-i="bolt"></span><div class="num" id="stStreak">0d</div><div class="lbl">Streak</div></div>
       </div>
       <div class="stat-note">Calories, active time and lifts are this week's totals.</div>
@@ -2847,6 +2876,129 @@
     items.forEach(([k, label]) => { const b = el('button', 'mus' + (isOn(k) ? ' active' : ''), label); b.onclick = () => onPick(k); w.appendChild(b); });
     return w;
   };
+
+  // ----- stat detail sheets (tap Calories / Active / Lifts) -----
+  const STAT_META = {
+    calories: { title: 'Calories burnt', unit: 'kcal', color: '#f0931f', get: l => l.calories, fmt: n => n.toLocaleString(), short: fmtCal },
+    minutes: { title: 'Active time', unit: '', color: '#6a5cff', get: l => l.minutes, fmt: fmtAct, short: fmtAct }
+  };
+  const RANGES = [['7', '7 days'], ['31', '31 days'], ['12', '12 months']];
+  const RANGE_LABEL = { '7': 'Last 7 days', '31': 'Last 31 days', '12': 'Last 12 months' };
+  let statKey = 'calories', statRange = '7', statPick = null;
+
+  function statBuckets(get) {
+    const sum = {};
+    logs.forEach(l => { const k = statRange === '12' ? l.performed_on.slice(0, 7) : l.performed_on; sum[k] = (sum[k] || 0) + get(l); });
+    const out = [];
+    if (statRange === '12') {
+      const n = new Date();
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(n.getFullYear(), n.getMonth() - i, 1, 12), k = ymd(d).slice(0, 7);
+        out.push({ label: d.toLocaleDateString(undefined, { month: 'short' }), full: d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }), value: sum[k] || 0 });
+      }
+    } else {
+      const cnt = Number(statRange), d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - (cnt - 1));
+      for (let i = 0; i < cnt; i++) {
+        const c = new Date(d); c.setDate(d.getDate() + i);
+        out.push({
+          label: cnt === 7 ? c.toLocaleDateString(undefined, { weekday: 'short' }) : (i % 5 === 0 ? String(c.getDate()) : ''),
+          full: c.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }), value: sum[ymd(c)] || 0
+        });
+      }
+    }
+    return out;
+  }
+  function rangeStart() {
+    if (statRange === '12') { const n = new Date(); return ymd(new Date(n.getFullYear(), n.getMonth() - 11, 1, 12)); }
+    const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - (Number(statRange) - 1)); return ymd(d);
+  }
+  function mkRangeSeg(onPick) {
+    const seg = el('div', 'rseg');
+    RANGES.forEach(([k, label]) => {
+      const b = el('button', statRange === k ? 'on' : '', label);
+      b.onclick = () => { statRange = k; statPick = null; onPick(); };
+      seg.appendChild(b);
+    });
+    return seg;
+  }
+  function openStat(key) {
+    statKey = key; statRange = '7'; statPick = null;
+    openSheet(STAT_META[key].title, 'Your totals over time', renderStatBody);
+  }
+  function renderStatBody(body) {
+    const M = STAT_META[statKey], data = statBuckets(M.get);
+    body.appendChild(mkRangeSeg(refreshSheet));
+    const total = data.reduce((s, b) => s + b.value, 0), max = Math.max(...data.map(b => b.value), 0);
+    const per = statRange === '12' ? 'month' : 'day';
+    const avg = Math.round(total / data.length);
+    const pick = statPick != null ? data[statPick] : null;
+    const read = el('div', 'sread'), left = el('div'), right = el('div', 'avg');
+    left.append(el('div', 'big', M.fmt(pick ? pick.value : total) + (M.unit ? ' ' + M.unit : '')),
+      el('div', 'sm', pick ? pick.full : RANGE_LABEL[statRange] + ' · total'));
+    right.append(el('div', 'big', M.fmt(avg)), el('div', 'sm', 'avg / ' + per));
+    right.firstChild.style.fontSize = '18px';
+    read.append(left, right);
+    body.appendChild(read);
+    const many = data.length > 12, chart = el('div', 'schart'), bars = el('div', 'sbars' + (many ? ' many' : '')), labs = el('div', 'slabs' + (many ? ' many' : ''));
+    data.forEach((b, i) => {
+      const col = el('button', 'sbar' + (b.value ? '' : ' zero') + (statPick === i ? ' pick' : ''));
+      col.setAttribute('aria-label', b.full + ': ' + M.fmt(b.value) + ' ' + M.unit);
+      if (statRange === '7' && b.value) col.appendChild(el('div', 'sv', M.short(b.value)));
+      const f = el('div', 'sf'); f.style.background = M.color;
+      f.style.height = max ? Math.max(b.value ? 3 : 0, Math.round(b.value / max * (statRange === '7' ? 118 : 138))) + 'px' : '0px';
+      col.appendChild(f);
+      col.onclick = () => { statPick = statPick === i ? null : i; refreshSheet(); };
+      bars.appendChild(col);
+      labs.appendChild(el('div', null, b.label));
+    });
+    chart.append(bars, labs);
+    body.appendChild(chart);
+    if (!total) body.appendChild(el('div', 'sheet-note', 'Nothing logged in this period yet. Tap “✓ Complete workout” after a workout and it will show up here.'));
+
+    // number tiles: today / this week / this month / this year
+    const today = todayLocal(), wk = new Set(weekDates());
+    const sumOf = (fn) => logs.filter(fn).reduce((s, l) => s + M.get(l), 0);
+    const tiles = [['Today', sumOf(l => l.performed_on === today)], ['Weekly', sumOf(l => wk.has(l.performed_on))],
+      ['Monthly', sumOf(l => l.performed_on.slice(0, 7) === today.slice(0, 7))], ['Yearly', sumOf(l => l.performed_on.slice(0, 4) === today.slice(0, 4))]];
+    const grid = el('div', 'sgrid');
+    tiles.forEach(([lbl, v], i) => {
+      const t = el('div', 'stile t' + (i + 1));
+      t.append(el('div', 'tl', lbl), el('div', 'tn', M.fmt(v)), el('div', 'tu', M.unit || 'active'));
+      grid.appendChild(t);
+    });
+    body.appendChild(grid);
+    body.appendChild(el('div', 'sheet-note', 'Weekly is this week (Mon–Sun). Monthly and Yearly are this calendar month and year.'));
+  }
+
+  function openHistory() {
+    statRange = '7';
+    openSheet('Workout history', 'Workouts you completed', renderHistoryBody);
+  }
+  function renderHistoryBody(body) {
+    body.appendChild(mkRangeSeg(refreshSheet));
+    const start = rangeStart(), today = todayLocal();
+    const list = logs.filter(l => l.performed_on >= start && l.performed_on <= today)
+      .sort((a, b) => a.performed_on < b.performed_on ? 1 : a.performed_on > b.performed_on ? -1 : 0);
+    const t = totals(list);
+    body.appendChild(el('div', 'sheet-note', RANGE_LABEL[statRange] + ': ' + t.workouts + (t.workouts === 1 ? ' workout' : ' workouts') + ' · ' + t.lifts + ' lifts'));
+    if (!list.length) { body.appendChild(el('div', 'sheet-note', 'No workouts logged in this period.')); return; }
+    let lastDay = null;
+    list.forEach(l => {
+      if (l.performed_on !== lastDay) {
+        lastDay = l.performed_on;
+        body.appendChild(el('div', 'hgroup', new Date(l.performed_on + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: statRange === '12' ? 'numeric' : undefined })));
+      }
+      const row = el('div', 'lrow'), left = el('div'), right = el('div', 'lr');
+      left.append(el('div', null, l.title), el('div', 'lm', (((WTYPES[l.wtype] || {}).label || l.wtype) === l.title ? '' : ((WTYPES[l.wtype] || {}).label || l.wtype) + ' · ') + l.minutes + ' min · ' + l.calories + ' cal'));
+      right.textContent = l.lifts ? l.lifts + ' lifts' : '';
+      row.append(left, right);
+      body.appendChild(row);
+    });
+  }
+  const tapTile = (id, fn) => { const t = $(id); t.onclick = fn; t.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } }; };
+  tapTile('tileCal', () => openStat('calories'));
+  tapTile('tileActive', () => openStat('minutes'));
+  tapTile('tileLifts', openHistory);
 
   // ----- settings -----
   $('homeSettings').onclick = openSettings;
