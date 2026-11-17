@@ -323,6 +323,39 @@
   .stkcell .sq { width:100%; aspect-ratio:1; border-radius:14px; background:var(--inset); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
   .stkcell .sq.on { background:#34d399; border-color:#34d399; color:#06281c; } .stkcell .sq svg { width:46%; height:46%; fill:currentColor; stroke:none; }
   .stkcell .dn { font-size:11px; font-weight:900; color:var(--muted); }
+  .gsum { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .gs { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px 12px; text-align:center; }
+  .gs .v { font-size:24px; font-weight:900; color:var(--accent2); } .gs .k { font-size:10px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+  .ghead { display:flex; align-items:center; justify-content:space-between; }
+  .ghead .wdsec { margin:26px 0 10px; }
+  .gadd { width:auto; margin:16px 0 0; padding:9px 14px; border-radius:999px; font-size:13px; }
+  .gcard { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px; width:100%; margin:0 0 10px; padding:16px; border-radius:22px; background:var(--card); border:1px solid var(--line); color:var(--text); text-align:left; }
+  .gcard.hit { border-color:rgba(52,211,153,.55); }
+  .gcard .pgic { width:46px; height:46px; border-radius:14px; } .gcard .pgic svg { width:24px; height:24px; }
+  .gmid { display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .gt { font-size:16px; font-weight:800; line-height:1.25; overflow-wrap:anywhere; }
+  .gsub { font-size:12.5px; color:var(--muted); font-weight:600; line-height:1.35; }
+  .gmeta { font-size:11px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); margin-top:2px; } .gmeta.late { color:var(--danger-t); }
+  .gringw { display:block; width:54px; height:54px; } .gring { display:block; width:54px; height:54px; }
+  .gring .t { fill:none; stroke:var(--line); stroke-width:5; } .gring .p { fill:none; stroke:var(--accent2); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset .5s; }
+  .gring text { fill:var(--text); font-size:13px; font-weight:900; } .gring.done .p { stroke:#34d399; } .gring.done text { fill:#34d399; font-size:18px; }
+  .gdots { grid-column:1 / -1; display:flex; gap:6px; }
+  .gd { flex:1; height:30px; border-radius:9px; background:var(--inset); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:var(--muted); }
+  .gd.on { background:#34d399; color:#06281c; font-size:13px; } .gd.now:not(.on) { outline:2px solid var(--accent); outline-offset:-2px; color:var(--text); }
+  .gempty { text-align:center; padding:26px 18px 20px; } .gebig { font-size:40px; } .get { font-size:18px; font-weight:900; margin-top:8px; }
+  .ges { font-size:13.5px; color:var(--muted); margin:6px 0 14px; line-height:1.45; } .gquick { display:flex; flex-direction:column; gap:8px; } .gquick button { margin:0; }
+  .gdone { display:flex; align-items:center; gap:12px; width:100%; margin:0 0 8px; padding:12px 14px; border-radius:16px; background:var(--card); border:1px solid var(--line); color:var(--text); text-align:left; }
+  .gtick { width:30px; height:30px; border-radius:50%; background:rgba(52,211,153,.18); color:#34d399; display:flex; align-items:center; justify-content:center; font-weight:900; flex:none; }
+  .gbadges { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .gbadge { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px 6px 12px; text-align:center; opacity:.55; }
+  .gbadge.got { opacity:1; border-color:color-mix(in srgb, var(--accent) 55%, var(--line)); }
+  .gbic { width:44px; height:44px; border-radius:50%; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; background:var(--inset); color:var(--muted); }
+  .gbadge.got .gbic { background:linear-gradient(135deg, var(--accent2), var(--accent)); color:var(--on-accent); }
+  .gbic svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .gbadge .bn { font-size:12px; font-weight:800; line-height:1.2; } .gbadge .bs { font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:4px; } .gbadge.got .bs { color:#34d399; }
+  .gtypes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .gtype { display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin:0; padding:14px; border-radius:16px; background:var(--inset); border:1px solid var(--line); color:var(--text); text-align:left; }
+  .gtype .pgic { width:38px; height:38px; } .gtype .tn { font-size:14px; font-weight:800; line-height:1.2; } .gtype .tb { font-size:11.5px; color:var(--muted); font-weight:600; line-height:1.3; }
   .lgl h2 { font-size:15px; margin:18px 0 6px; } .lgl p { font-size:14px; line-height:1.55; color:var(--soft); margin:0 0 8px; }
   .lgl ul { margin:0 0 8px; padding-left:20px; color:var(--soft); font-size:14px; line-height:1.55; }
   .wdlink { width:100%; margin:8px 0 0; background:none; color:var(--muted); font-size:12px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
@@ -1037,8 +1070,8 @@
 
     <!-- GOALS -->
     <section id="view-goals" data-view="goals" class="hidden">
-      <h1>Goals</h1>
-      <div class="soon"><div class="big">🎯</div><h2 style="margin-top:12px">Coming soon</h2><p>Set and track your goals here.</p></div>
+      <div class="calpg-top"><div><h1>Goals</h1><div class="wdsub">Track what you’re chasing</div></div></div>
+      <div id="gBody"></div>
     </section>
 
     <!-- SOCIAL -->
@@ -1161,6 +1194,7 @@
     document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
     if (name === 'workout' && typeof renderLibrary === 'function') renderLibrary();
     if (name === 'progress' && typeof renderProgress === 'function') renderProgress();
+    if (name === 'goals' && typeof renderGoals === 'function') renderGoals();
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('.nav button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
@@ -3000,6 +3034,11 @@
     const okDate = (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d), okName = (n) => typeof n === 'string' && n.trim() && n.length <= 40;
     P.lifts = (Array.isArray(P.lifts) ? P.lifts : []).filter(x => x && okDate(x.d) && okName(x.ex) && x.w > 0 && x.w <= 5000 && x.s >= 1 && x.r >= 1).slice(0, 1500)
       .map(x => ({ id: String(x.id || Math.random().toString(36).slice(2)), d: x.d, ex: x.ex.trim(), w: Number(x.w), s: Math.round(x.s), r: Math.round(x.r) }));
+    const GMAX = { workouts: 7, streak: 1000, calories: 1000000, minutes: 100000, steps: 100000, active: 366, lift: 5000, endurance: 86400, bodyweight: 5000 };
+    P.goals = (Array.isArray(P.goals) ? P.goals : []).filter(g => g && GMAX[g.type] && g.target > 0 && g.target <= GMAX[g.type]).slice(0, 40).map(g => ({
+      id: String(g.id || Math.random().toString(36).slice(2)), type: g.type, target: ['lift'].includes(g.type) ? Number(g.target) : Math.round(g.target), period: g.period === 'month' ? 'month' : 'week',
+      name: ['lift', 'endurance', 'bodyweight'].includes(g.type) && typeof g.name === 'string' ? g.name.trim().slice(0, 40) : '', deadline: okDate(g.deadline) ? g.deadline : '', created: okDate(g.created) ? g.created : '', doneOn: okDate(g.doneOn) ? g.doneOn : ''
+    })).filter(g => !['lift', 'endurance', 'bodyweight'].includes(g.type) || g.name);
     P.records = (Array.isArray(P.records) ? P.records : []).filter(x => x && okDate(x.d) && okName(x.name) && ['lift', 'endurance', 'bodyweight'].includes(x.cat) && x.v > 0).slice(0, 500)
       .map(x => ({ id: String(x.id || Math.random().toString(36).slice(2)), d: x.d, cat: x.cat, name: x.name.trim(), v: Number(x.v) }));
     P.smartEquip = P.smartEquip === undefined ? true : !!P.smartEquip;
@@ -3230,7 +3269,7 @@
     const body = $('sheetBody'); body.replaceChildren(); sheetRender(body);
     box.scrollTop = top;
   }
-  function closeSheet() { $('sheetModal').classList.add('hidden'); sheetRender = null; renderHomeUI(); if (!$('view-progress').classList.contains('hidden')) renderProgress(); if (!$('view-settings').classList.contains('hidden')) renderSettingsPage(); }
+  function closeSheet() { $('sheetModal').classList.add('hidden'); sheetRender = null; renderHomeUI(); if (!$('view-progress').classList.contains('hidden')) renderProgress(); if (!$('view-goals').classList.contains('hidden')) renderGoals(); if (!$('view-settings').classList.contains('hidden')) renderSettingsPage(); }
   $('sheetClose').onclick = closeSheet;
   $('sheetModal').onclick = (e) => { if (e.target === $('sheetModal')) closeSheet(); };
   const mkSelect = (opts, value, onChange) => {
@@ -3526,8 +3565,7 @@
   // ---- heatmap ----
   function pgHeatmap(root) {
     const P = appData.prefs, y = pgHeatYear, today = todayLocal(), thisYear = Number(today.slice(0, 4));
-    const mins = {}; logs.forEach(l => { mins[l.performed_on] = (mins[l.performed_on] || 0) + (l.minutes || 0); });
-    const level = (k) => { const m = mins[k] || 0, s = P.steps[k] || 0; return Math.max(m >= 45 ? 3 : m >= 25 ? 2 : m > 0 ? 1 : 0, s >= 12000 ? 3 : s >= 8000 ? 2 : s >= 5000 ? 1 : 0); };
+    const mins = pgMins(), level = pgLevelFor(mins);
     const head = el('div', 'pghead'), hi = el('span', 'pgic cal'); hi.innerHTML = pgSvg('cal'); head.append(hi, el('span', null, 'Activity heatmap')); root.appendChild(head);
     const card = el('div', 'wdcard pgcard');
     const top = el('div', 'hmtop'); top.appendChild(el('div', 'hmtitle', 'Monthly consistency'));
@@ -3640,10 +3678,7 @@
   // ---- streaks ----
   const PG_MILESTONES = [3, 5, 7, 10, 14, 15, 21, 30, 45, 60, 75, 100, 150, 200, 250, 365, 500, 1000];
   function pgStreaksView(root) {
-    const days = [...new Set(logs.map(l => l.performed_on))].sort(), cur = logStreak();
-    let best = 0, run = 0, prev = null;
-    days.forEach(d => { run = prev && ymd(new Date(new Date(prev + 'T12:00:00').getTime() + 86400000)) === d ? run + 1 : 1; best = Math.max(best, run); prev = d; });
-    best = Math.max(best, cur);
+    const { days, cur, best } = pgStreakInfo();
     const c1 = el('div', 'stk cur'); c1.appendChild(el('div', 'k', 'Current streak'));
     const big = el('div', 'bigd', String(cur)); big.appendChild(el('small', null, cur === 1 ? 'DAY' : 'DAYS')); c1.appendChild(big);
     const next = PG_MILESTONES.find(n => n > cur);
@@ -3729,6 +3764,209 @@
       const P = appData.prefs; P.records.unshift({ id: pgId(), d: rf.d, cat: rf.cat, name, v }); P.records = P.records.slice(0, 500);
       saveAppData(); closeSheet(); renderProgress();
     }], ['Cancel', 'secondary', closeSheet]]);
+  }
+
+  // ===== GOALS TAB =====
+  const G_TYPES = {
+    workouts: { label: 'Workouts per week', blurb: 'Days you train each week', icon: 'bolt', cls: 'bolt', recurring: true },
+    streak: { label: 'Workout streak', blurb: 'Days in a row', icon: 'calories', cls: 'calories' },
+    calories: { label: 'Calories burned', blurb: 'Per week or month', icon: 'calories', cls: 'calories', recurring: true },
+    minutes: { label: 'Active minutes', blurb: 'Per week or month', icon: 'time', cls: 'time', recurring: true },
+    steps: { label: 'Daily steps', blurb: 'A target for every day', icon: 'steps', cls: 'steps', recurring: true },
+    active: { label: 'Active days this year', blurb: 'Days you move', icon: 'cal', cls: 'cal' },
+    lift: { label: 'Lift a target weight', blurb: 'Hit a number on a lift', icon: 'volume', cls: 'volume' },
+    endurance: { label: 'Beat a target time', blurb: 'Like a 5K under 20:00', icon: 'time', cls: 'time' },
+    bodyweight: { label: 'Bodyweight reps', blurb: 'Pull-ups, push-ups…', icon: 'bolt', cls: 'bolt' }
+  };
+  const G_CAT = { lift: 'lift', endurance: 'endurance', bodyweight: 'bodyweight' };
+  const G_STARTERS = [{ type: 'workouts', target: 4 }, { type: 'streak', target: 30 }, { type: 'steps', target: 8000 }];
+  const gNum = (n) => Math.round(n).toLocaleString();
+
+  // shared helpers (also used by the heatmap and streaks view)
+  function pgMins() { const m = {}; logs.forEach(l => { m[l.performed_on] = (m[l.performed_on] || 0) + (l.minutes || 0); }); return m; }
+  function pgLevelFor(mins) {
+    const steps = appData.prefs.steps;
+    return (k) => { const m = mins[k] || 0, s = steps[k] || 0; return Math.max(m >= 45 ? 3 : m >= 25 ? 2 : m > 0 ? 1 : 0, s >= 12000 ? 3 : s >= 8000 ? 2 : s >= 5000 ? 1 : 0); };
+  }
+  function pgStreakInfo() {
+    const days = [...new Set(logs.map(l => l.performed_on))].sort(), cur = logStreak();
+    let best = 0, run = 0, prev = null;
+    days.forEach(d => { run = prev && ymd(new Date(new Date(prev + 'T12:00:00').getTime() + 86400000)) === d ? run + 1 : 1; best = Math.max(best, run); prev = d; });
+    return { cur, best: Math.max(best, cur), days };
+  }
+  function pgYearActive(y) {
+    const lv = pgLevelFor(pgMins()), today = todayLocal(), end = String(y) === today.slice(0, 4) ? today : y + '-12-31'; let a = 0;
+    for (const d = new Date(y, 0, 1, 12); ymd(d) <= end; d.setDate(d.getDate() + 1)) if (lv(ymd(d)) > 0) a++;
+    return a;
+  }
+
+  // progress for one goal: { cur, frac, done, title, sub }
+  function gProgress(g) {
+    const P = appData.prefs, wu = pgUnit(), K = pgK(), today = todayLocal(), per = g.period === 'month' ? 'this month' : 'this week';
+    const inPeriod = (k) => g.period === 'month' ? k.slice(0, 7) === today.slice(0, 7) : weekDates().includes(k);
+    const best = (cat) => { const pr = pgPRs(G_CAT[g.type]).find(p => p.name.toLowerCase() === String(g.name).toLowerCase()); return pr ? pr.best : 0; };
+    let cur = 0, title = '', sub = '', done = false, frac = 0, days = null;
+    switch (g.type) {
+      case 'workouts': {
+        const wk = new Set(weekDates()); days = new Set(logs.filter(l => wk.has(l.performed_on)).map(l => l.performed_on)); cur = days.size;
+        title = g.target + (g.target === 1 ? ' workout' : ' workouts') + ' a week'; sub = cur + ' of ' + g.target + (g.target === 1 ? ' day' : ' days') + ' this week'; frac = cur / g.target; done = cur >= g.target; break;
+      }
+      case 'streak': cur = pgStreakInfo().cur; title = g.target + '-day streak'; sub = 'Current streak: ' + cur + ' of ' + g.target + ' days'; frac = cur / g.target; done = cur >= g.target; break;
+      case 'calories': logs.forEach(l => { if (inPeriod(l.performed_on)) cur += l.calories || 0; }); title = gNum(g.target) + ' kcal ' + (g.period === 'month' ? 'a month' : 'a week'); sub = gNum(cur) + ' of ' + gNum(g.target) + ' kcal ' + per; frac = cur / g.target; done = cur >= g.target; break;
+      case 'minutes': logs.forEach(l => { if (inPeriod(l.performed_on)) cur += l.minutes || 0; }); title = gNum(g.target) + ' active min ' + (g.period === 'month' ? 'a month' : 'a week'); sub = gNum(cur) + ' of ' + gNum(g.target) + ' min ' + per; frac = cur / g.target; done = cur >= g.target; break;
+      case 'steps': cur = P.steps[today] || 0; title = gNum(g.target) + ' steps a day'; sub = gNum(cur) + ' of ' + gNum(g.target) + ' steps today'; frac = cur / g.target; done = cur >= g.target; break;
+      case 'active': cur = pgYearActive(Number(today.slice(0, 4))); title = g.target + ' active days in ' + today.slice(0, 4); sub = cur + ' of ' + g.target + ' active days'; frac = cur / g.target; done = cur >= g.target; break;
+      case 'lift': cur = best(); title = g.name + ': ' + pgRound(g.target * K) + ' ' + wu; sub = cur ? 'Best ' + pgRound(cur * K) + ' ' + wu + (cur < g.target ? ' · ' + pgRound((g.target - cur) * K) + ' ' + wu + ' to go' : '') : 'No lift logged yet'; frac = cur / g.target; done = cur >= g.target; break;
+      case 'endurance': cur = best(); title = g.name + ' under ' + pgFmtDur(g.target); sub = cur ? 'Best ' + pgFmtDur(cur) + (cur > g.target ? ' · ' + pgFmtDelta(Math.round(cur - g.target)) + ' to go' : '') : 'No time logged yet'; frac = cur ? Math.min(1, g.target / cur) : 0; done = !!cur && cur <= g.target; break;
+      case 'bodyweight': cur = best(); title = g.name + ': ' + g.target + ' reps'; sub = cur ? 'Best ' + cur + ' reps' + (cur < g.target ? ' · ' + (g.target - cur) + ' to go' : '') : 'No reps logged yet'; frac = cur / g.target; done = cur >= g.target; break;
+    }
+    return { cur, frac: Math.max(0, Math.min(1, frac)), done, title, sub, days };
+  }
+  function gDeadline(g) {
+    if (!g.deadline) return '';
+    const left = Math.round((new Date(g.deadline + 'T12:00:00') - new Date(todayLocal() + 'T12:00:00')) / 86400000);
+    return left < 0 ? 'Deadline passed' : left === 0 ? 'Due today' : left === 1 ? '1 day left' : left + ' days left';
+  }
+  const gRing = (frac, done) => {
+    const c = 2 * Math.PI * 22, pct = Math.round(frac * 100);
+    return '<svg viewBox="0 0 56 56" class="gring' + (done ? ' done' : '') + '" aria-label="' + pct + ' percent"><circle cx="28" cy="28" r="22" class="t"/><circle cx="28" cy="28" r="22" class="p" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - frac)).toFixed(1) + '" transform="rotate(-90 28 28)"/><text x="28" y="32" text-anchor="middle">' + (done ? '✓' : pct + '%') + '</text></svg>';
+  };
+
+  function gBadges() {
+    const info = pgStreakInfo(), P = appData.prefs, totalMin = logs.reduce((s, l) => s + (l.minutes || 0), 0), maxSteps = Math.max(0, ...Object.values(P.steps));
+    const prs = P.records.length + P.lifts.length, goalsDone = P.goals.filter(g => g.doneOn).length;
+    return [
+      ['First workout', 'Complete 1 workout', 'bolt', logs.length, 1], ['10 workouts', 'Complete 10 workouts', 'bolt', logs.length, 10],
+      ['50 workouts', 'Complete 50 workouts', 'trophy', logs.length, 50], ['100 workouts', 'Complete 100 workouts', 'trophy', logs.length, 100],
+      ['7-day streak', 'Train 7 days in a row', 'calories', info.best, 7], ['30-day streak', 'Train 30 days in a row', 'calories', info.best, 30],
+      ['10k steps', 'Log a 10,000-step day', 'steps', maxSteps, 10000], ['1,000 minutes', 'Be active 1,000 minutes', 'time', totalMin, 1000],
+      ['First record', 'Log a lift or record', 'volume', prs, 1], ['Goal getter', 'Complete a goal', 'cal', goalsDone, 1]
+    ].map(([name, req, icon, cur, need]) => ({ name, req, icon, cur, need, got: cur >= need }));
+  }
+
+  function renderGoals() {
+    if (!appData) appData = cleanData(null);
+    const root = $('gBody'), P = appData.prefs; root.replaceChildren();
+    let changed = false;
+    P.goals.forEach(g => { if (!G_TYPES[g.type].recurring && !g.doneOn && gProgress(g).done) { g.doneOn = todayLocal(); changed = true; } });
+    if (changed) saveAppData();
+    const active = P.goals.filter(g => !g.doneOn), finished = P.goals.filter(g => g.doneOn), badges = gBadges(), earned = badges.filter(b => b.got).length;
+
+    const sum = el('div', 'gsum');
+    [[active.length, 'Active'], [finished.length, 'Completed'], [earned + '/' + badges.length, 'Badges']].forEach(([v, k]) => { const t = el('div', 'gs'); t.append(el('div', 'v', String(v)), el('div', 'k', k)); sum.appendChild(t); });
+    root.appendChild(sum);
+
+    const head = el('div', 'ghead'); head.appendChild(el('div', 'wdsec', 'Your goals'));
+    const add = el('button', 'gadd', '+ New goal'); add.onclick = () => openGoalForm(); head.appendChild(add); root.appendChild(head);
+
+    if (!active.length) {
+      const empty = el('div', 'wdcard gempty'); empty.append(el('div', 'gebig', '🎯'), el('div', 'get', 'Set your first goal'), el('div', 'ges', 'Pick a target and FitPulse tracks it for you. Try a quick start:'));
+      const row = el('div', 'gquick');
+      G_STARTERS.forEach(s => { const g = { type: s.type, target: s.target }, b = el('button', 'secondary', gProgress(g).title); b.onclick = () => { P.goals.unshift({ id: pgId(), type: s.type, target: s.target, period: 'week', name: '', deadline: '', created: todayLocal(), doneOn: '' }); saveAppData(); renderGoals(); }; row.appendChild(b); });
+      empty.appendChild(row); root.appendChild(empty);
+    }
+    active.forEach(g => {
+      const T = G_TYPES[g.type], pr = gProgress(g), card = el('button', 'gcard' + (pr.done ? ' hit' : ''));
+      const ic = el('span', 'pgic ' + T.cls); ic.innerHTML = pgSvg(T.icon);
+      const mid = el('span', 'gmid'); mid.append(el('span', 'gt', pr.title), el('span', 'gsub', pr.sub));
+      const dl = gDeadline(g); if (dl || pr.done) mid.appendChild(el('span', 'gmeta' + (dl === 'Deadline passed' ? ' late' : ''), pr.done && T.recurring ? (g.type === 'steps' ? 'Hit today 🎉' : 'Hit ' + (g.period === 'month' ? 'this month' : 'this week') + ' 🎉') : dl));
+      const ring = el('span', 'gringw'); ring.innerHTML = gRing(pr.frac, pr.done);
+      card.append(ic, mid, ring);
+      if (pr.days) {
+        const dots = el('span', 'gdots'), wd = weekDates(), today = todayLocal();
+        wd.forEach((k, i) => { const d = el('span', 'gd' + (pr.days.has(k) ? ' on' : '') + (k === today ? ' now' : ''), pr.days.has(k) ? '✓' : ['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]); dots.appendChild(d); });
+        card.appendChild(dots);
+      }
+      card.onclick = () => openGoalForm(g); root.appendChild(card);
+    });
+
+    if (finished.length) {
+      root.appendChild(el('div', 'wdsec', 'Completed'));
+      finished.slice().sort((a, b) => a.doneOn < b.doneOn ? 1 : -1).forEach(g => {
+        const row = el('button', 'gdone'), tick = el('span', 'gtick', '✓'), mid = el('span', 'gmid');
+        mid.append(el('span', 'gt', gProgress(g).title), el('span', 'gsub', 'Reached ' + pgDate(g.doneOn, { month: 'short', day: 'numeric', year: 'numeric' })));
+        row.append(tick, mid); row.onclick = () => openGoalForm(g); root.appendChild(row);
+      });
+    }
+
+    root.appendChild(el('div', 'wdsec', 'Milestones · ' + earned + ' of ' + badges.length + ' earned'));
+    const grid = el('div', 'gbadges');
+    badges.forEach(b => {
+      const c = el('div', 'gbadge' + (b.got ? ' got' : '')), ic = el('span', 'gbic'); ic.innerHTML = pgSvg(b.icon);
+      c.append(ic, el('div', 'bn', b.name), el('div', 'bs', b.got ? 'Earned' : gNum(Math.min(b.cur, b.need)) + ' / ' + gNum(b.need)));
+      c.title = b.req; grid.appendChild(c);
+    });
+    root.appendChild(grid);
+  }
+
+  // ---- add / edit a goal ----
+  let gf = null;
+  const gToForm = (g) => {
+    const t = g.type, o = { id: g.id, type: t, target: String(g.target), period: g.period || 'week', name: g.name || '', other: '', deadline: g.deadline || '', created: g.created, editing: true };
+    if (t === 'lift') o.target = String(pgRound(g.target * pgK())); else if (t === 'endurance') o.target = pgFmtDur(g.target);
+    if (G_CAT[t] && !PG_PRESETS[G_CAT[t]].includes(o.name)) { o.other = o.name; o.name = 'Other…'; }
+    return o;
+  };
+  function openGoalForm(g) {
+    gf = g ? gToForm(g) : { type: null, target: '', period: 'week', name: '', other: '', deadline: '', editing: false };
+    openSheet(g ? 'Edit goal' : 'New goal', g ? G_TYPES[g.type].label : 'What do you want to chase?', gBuildForm, [['Save', '', gSave], ['Cancel', 'secondary', closeSheet]]);
+  }
+  function gPickType(t) {
+    gf.type = t; gf.target = ''; gf.period = 'week'; gf.deadline = '';
+    gf.name = G_CAT[t] ? PG_PRESETS[G_CAT[t]][0] : '';
+    $('sheetSub').textContent = G_TYPES[t].label; refreshSheet();
+  }
+  function gBuildForm(body) {
+    pgErr = null;
+    if (!gf.type) {
+      const grid = el('div', 'gtypes');
+      Object.keys(G_TYPES).forEach(k => {
+        const T = G_TYPES[k], b = el('button', 'gtype'), ic = el('span', 'pgic ' + T.cls); ic.innerHTML = pgSvg(T.icon);
+        b.append(ic, el('span', 'tn', T.label), el('span', 'tb', T.blurb)); b.onclick = () => gPickType(k); grid.appendChild(b);
+      });
+      body.appendChild(grid); pgErr = el('div', 'okmsg'); pgErr.style.color = 'var(--danger-t)'; body.appendChild(pgErr); return;
+    }
+    const t = gf.type, T = G_TYPES[t], wu = pgUnit();
+    if (!gf.editing) { const back = el('button', 'wdlink', '‹ Change type'); back.style.cssText = 'width:auto;margin:0 0 4px;padding:4px 0;text-align:left'; back.onclick = () => { gf.type = null; $('sheetSub').textContent = 'What do you want to chase?'; refreshSheet(); }; body.appendChild(back); }
+    if (t === 'workouts') {
+      body.appendChild(el('label', null, 'Days per week'));
+      body.appendChild(mkChips('mus-wrap', [1, 2, 3, 4, 5, 6, 7].map(n => [String(n), String(n)]), k => gf.target === k, (k) => { gf.target = k; refreshSheet(); }));
+    } else {
+      if (t === 'calories' || t === 'minutes') { body.appendChild(el('label', null, 'Period')); body.appendChild(mkChips('mus-wrap', [['week', 'Each week'], ['month', 'Each month']], k => gf.period === k, (k) => { gf.period = k; refreshSheet(); })); }
+      if (G_CAT[t]) {
+        const sel = mkSelect(PG_PRESETS[G_CAT[t]].concat(['Other…']).map(n => [n, n]), gf.name, v => { gf.name = v; refreshSheet(); });
+        body.appendChild(el('label', null, 'Exercise')); body.appendChild(sel);
+        if (gf.name === 'Other…') { const o = mkInput('text', gf.other, 'Name'); o.maxLength = 40; o.oninput = () => { gf.other = o.value; }; o.style.marginTop = '8px'; body.appendChild(o); }
+      }
+      const lab = { streak: 'Target (days in a row)', calories: 'Target (kcal)', minutes: 'Target (minutes)', steps: 'Target (steps per day)', active: 'Target (active days)', lift: 'Target weight (' + wu + ')', endurance: 'Target time (mm:ss or h:mm:ss)', bodyweight: 'Target reps' }[t];
+      const ph = { streak: '30', calories: '2000', minutes: '150', steps: '8000', active: '250', lift: '225', endurance: '19:59', bodyweight: '20' }[t];
+      const inp = pgField(body, lab, mkInput(t === 'endurance' ? 'text' : 'number', gf.target, ph)); inp.inputMode = t === 'endurance' ? 'text' : 'decimal'; inp.oninput = () => { gf.target = inp.value; };
+    }
+    if (!T.recurring) { const d = pgField(body, 'Deadline (optional)', mkInput('date', gf.deadline)); d.min = todayLocal(); d.onchange = () => { gf.deadline = d.value; }; }
+    pgErr = el('div', 'okmsg'); pgErr.style.color = 'var(--danger-t)'; body.appendChild(pgErr);
+    if (gf.editing) {
+      const del = el('button', 'danger', 'Delete this goal');
+      del.onclick = () => { if (confirm('Delete this goal?')) { appData.prefs.goals = appData.prefs.goals.filter(x => x.id !== gf.id); saveAppData(); closeSheet(); renderGoals(); } };
+      body.appendChild(del);
+    }
+  }
+  function gSave() {
+    if (!gf || !gf.type) return pgMsg('Pick a goal type first.');
+    const t = gf.type, T = G_TYPES[t], P = appData.prefs, g = { id: gf.id || pgId(), type: t, target: 0, period: 'week', name: '', deadline: '', created: gf.created || todayLocal(), doneOn: '' };
+    const n = Number(gf.target);
+    if (t === 'workouts') { if (!(n >= 1 && n <= 7)) return pgMsg('Pick how many days per week.'); g.target = Math.round(n); }
+    else if (t === 'lift') { const v = n / pgK(); if (!(v > 0 && v <= 5000)) return pgMsg('Enter a target weight.'); g.target = Math.round(v * 10) / 10; }
+    else if (t === 'endurance') { const s = pgParseDur(gf.target); if (!(s > 0 && s <= 86400)) return pgMsg('Enter a time like 19:59.'); g.target = s; }
+    else {
+      const max = { streak: 1000, calories: 1000000, minutes: 100000, steps: 100000, active: 366, bodyweight: 5000 }[t];
+      if (!(Number.isFinite(n) && Math.round(n) >= 1 && Math.round(n) <= max)) return pgMsg('Enter a whole number between 1 and ' + max.toLocaleString() + '.');
+      g.target = Math.round(n);
+    }
+    if (t === 'calories' || t === 'minutes') g.period = gf.period === 'month' ? 'month' : 'week';
+    if (G_CAT[t]) { g.name = (gf.name === 'Other…' ? gf.other : gf.name).trim().slice(0, 40); if (!g.name) return pgMsg('Enter the exercise name.'); }
+    if (!T.recurring && gf.deadline) { if (gf.deadline < todayLocal() && !gf.editing) return pgMsg('Pick a deadline from today on.'); g.deadline = gf.deadline; }
+    P.goals = gf.editing ? P.goals.map(x => x.id === g.id ? g : x) : [g].concat(P.goals).slice(0, 40);
+    saveAppData(); closeSheet(); renderGoals();
   }
 
   // ----- guided workouts: step builders -----
