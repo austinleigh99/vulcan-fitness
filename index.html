@@ -217,6 +217,30 @@
   .pv b { color:var(--text); }
   .calpg-top { display:flex; align-items:center; gap:14px; margin:6px 0 16px; }
   .calpg-top h1 { margin:0; font-size:28px; font-weight:900; letter-spacing:-.01em; }
+  .wdsub { font-size:11px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--accent2); margin-top:2px; }
+  .wdsec { font-size:11px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--accent2); margin:26px 0 10px; }
+  .wdcard { background:var(--card); border:1px solid var(--line); border-radius:22px; padding:6px 16px 14px; }
+  .wdcard .togrow:last-child { border-bottom:0; }
+  .wdlab { font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:14px 0 2px; }
+  .wdcard .rseg { margin:6px 0 4px; }
+  .wdrow { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; margin:4px 0 8px; border-radius:16px; background:var(--inset); }
+  .wdrow .wl { font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .wdnum { width:84px; margin:0; text-align:center; font-weight:800; padding:10px 8px; }
+  .wdrow .wu { font-size:12px; font-weight:800; color:var(--muted); margin-left:8px; }
+  .wdpair { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:4px 0 8px; }
+  .wdpair .wdrow { margin:0; flex-direction:column; align-items:stretch; gap:6px; }
+  .wdpair .wdnum { width:100%; }
+  .eqgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .eqitem { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0; padding:12px 12px; border-radius:14px; background:var(--inset); border:1.5px solid transparent; color:var(--text); font-size:13px; font-weight:700; text-align:left; text-transform:none; letter-spacing:0; }
+  .eqitem .bx { flex:none; width:22px; height:22px; border-radius:7px; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; color:transparent; }
+  .eqitem.on { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 18%, var(--inset)); }
+  .eqitem.on .bx { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+  .eqhead { display:flex; align-items:center; gap:10px; margin:18px 0 8px; }
+  .eqhead .g { font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--accent2); }
+  .eqhead .c { font-size:11px; color:var(--muted); font-weight:700; }
+  .eqhead button { width:auto; margin:0 0 0 auto; padding:4px; background:none; color:var(--muted); font-size:12px; font-weight:700; text-decoration:underline; }
+  .wdsave { margin-top:26px; }
+  .wdlink { width:100%; margin:8px 0 0; background:none; color:var(--muted); font-size:12px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
   .calnav { display:flex; align-items:center; gap:8px; }
   .calnav button { width:44px; height:44px; margin:0; padding:0; border-radius:12px; background:var(--chip); font-size:20px; flex:none; }
   .calnav button:disabled { opacity:.3; }
@@ -962,6 +986,15 @@
       <div id="setBody"></div>
     </section>
 
+    <!-- WORKOUT DEFAULTS (opened from Settings) -->
+    <section id="view-wdefaults" data-view="wdefaults" class="hidden">
+      <div class="calpg-top">
+        <button id="wdBack" class="backbtn" aria-label="Back to Settings">‹</button>
+        <div><h1>Workout defaults</h1><div class="wdsub">Session preferences</div></div>
+      </div>
+      <div id="wdBody"></div>
+    </section>
+
     <!-- GUIDED WORKOUT -->
     <div id="guidedModal" class="gmodal hidden" role="dialog" aria-modal="true" aria-label="Guided workout">
       <div class="gbox" id="gBox"></div>
@@ -1394,6 +1427,8 @@
     return req.all.every(reqOk);
   }
   const cfg = { dur: 40, area: 'full', muscles: new Set(), intensity: 'moderate', sup: false, equip: new Set() };
+  // rest between sets: the user's default if they turned it on, otherwise it follows the workout's intensity
+  const restFor = (I) => appData && appData.prefs && appData.prefs.restOn ? appData.prefs.restSecs : I.rest;
   const cap = (s) => s.replace(/\b\w/g, c => c.toUpperCase());
 
   function buildChips(container, cls, items, onPick) {
@@ -1478,7 +1513,8 @@
   };
 
   function openStrengthConfig() {
-    cfg.equip = new Set(planLoc === 'gym' ? Object.keys(EQUIP) : ['dumbbells', 'bench', 'bands']);
+    const P = appData && appData.prefs;
+    cfg.equip = new Set(P && P.smartEquip ? (planLoc === 'gym' ? P.equipGym : P.equipHome) : (planLoc === 'gym' ? Object.keys(EQUIP) : ['dumbbells', 'bench', 'bands']));
     syncCfg();
     $('cfgOut').replaceChildren();
     say($('cfgMsg'), '');
@@ -1511,10 +1547,13 @@
     }
     picked.sort((a, b) => groups.indexOf(a[1]) - groups.indexOf(b[1]));
 
+    const DP = appData && appData.prefs && appData.prefs.setsRepsOn ? appData.prefs : null;
     const items = picked.map(e => {
-      const sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1));
+      let sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1));
       const pool = e[2] === 'bodyweight' ? I.bw : I.reps;
-      const rx = e[3] ? sets + ' × 30-45s hold' : sets + ' × ' + pool[Math.floor(r() * pool.length)];
+      const pr = pool[Math.floor(r() * pool.length)];
+      if (DP) sets = DP.defSets;
+      const rx = e[3] ? sets + ' × 30-45s hold' : sets + ' × ' + (DP ? DP.defReps : pr);
       return { name: e[0], muscle: e[1], rx };
     });
 
@@ -1534,7 +1573,7 @@
     const body = el('div', 'opt-body');
     body.appendChild(el('div', 'rest-note', cfg.sup
       ? 'Super sets: alternate the pair back-to-back, rest 30s between exercises and 90s after each pair.'
-      : 'Rest ' + I.rest + 's between sets.'));
+      : 'Rest ' + restFor(I) + 's between sets.'));
     if (picked.length < n) {
       body.appendChild(el('div', 'rest-note', 'Only ' + picked.length + ' exercise' + (picked.length === 1 ? '' : 's') + ' match your equipment and muscle choices. Add more equipment or muscle groups for a fuller workout.'));
     }
@@ -1563,7 +1602,7 @@
     edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
     const gi = { type:'strength', title:'Strength', mins:cfg.dur, lifts:items.length, intensity:cfg.intensity };
     actions.append(shuffle, edit, makeCompleteBtn(gi));
-    addGuide(actions, title, repSteps(items, I.rest, cfg.sup), gi);
+    addGuide(actions, title, repSteps(items, restFor(I), cfg.sup), gi);
     card.appendChild(actions);
 
     $('cfgOut').replaceChildren(card);
@@ -1881,7 +1920,7 @@
     card.appendChild(head);
 
     const body = el('div', 'opt-body');
-    body.appendChild(el('div', 'rest-note', 'Rest ' + I.rest + 's between sets. Warm up for about 5 minutes first (jumping jacks, arm circles, easy squats) and stretch afterward.'));
+    body.appendChild(el('div', 'rest-note', 'Rest ' + restFor(I) + 's between sets. Warm up for about 5 minutes first (jumping jacks, arm circles, easy squats) and stretch afterward.'));
     if (items.length < n) body.appendChild(el('div', 'rest-note', 'Only ' + items.length + ' exercise' + (items.length === 1 ? '' : 's') + ' match your choices. Add more categories for a fuller workout.'));
     items.forEach(m => {
       const row = el('div', 'mv');
@@ -1899,7 +1938,7 @@
     edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
     const gi = { type:'calisthenics', title:'Calisthenics', mins:calCfg.dur, lifts:items.length, intensity:calCfg.intensity };
     actions.append(shuffle, edit, makeCompleteBtn(gi));
-    addGuide(actions, title, repSteps(items, I.rest, false), gi);
+    addGuide(actions, title, repSteps(items, restFor(I), false), gi);
     card.appendChild(actions);
 
     $('calOut').replaceChildren(card);
@@ -2847,6 +2886,20 @@
     if (!['beginner', 'intermediate', 'advanced'].includes(P.level)) P.level = 'intermediate';
     if (!['muscle', 'fat', 'fit', 'flex'].includes(P.goal)) P.goal = '';
     P.units = P.units === 'kg' ? 'kg' : 'lb';
+    if (!['mi', 'km'].includes(P.distUnit)) P.distUnit = P.units === 'kg' ? 'km' : 'mi';
+    if (!['ftin', 'cm'].includes(P.heightUnit)) P.heightUnit = P.units === 'kg' ? 'cm' : 'ftin';
+    P.restOn = !!P.restOn; P.restSecs = Math.min(600, Math.max(10, Math.round(Number(P.restSecs)) || 60));
+    P.autoRest = P.autoRest === undefined ? true : !!P.autoRest;
+    P.incStep = [2.5, 5, 10].includes(Number(P.incStep)) ? Number(P.incStep) : 5;
+    P.setsRepsOn = !!P.setsRepsOn;
+    P.defSets = Math.min(10, Math.max(1, Math.round(Number(P.defSets)) || 3));
+    P.defReps = Math.min(50, Math.max(1, Math.round(Number(P.defReps)) || 10));
+    P.demos = P.demos === undefined ? true : !!P.demos;
+    P.smartEquip = P.smartEquip === undefined ? true : !!P.smartEquip;
+    const eqKeys = Object.keys(EQUIP);
+    const cleanEq = (a, dflt) => Array.isArray(a) ? a.filter(k => eqKeys.includes(k)) : dflt;
+    P.equipGym = cleanEq(P.equipGym, eqKeys.slice());
+    P.equipHome = cleanEq(P.equipHome, ['dumbbells', 'bench', 'bands']);
     P.age = Number.isInteger(Number(P.age)) && Number(P.age) >= 10 && Number(P.age) <= 100 && P.age !== '' ? Number(P.age) : '';
     P.heightCm = Number(P.heightCm) >= 90 && Number(P.heightCm) <= 250 ? Math.round(Number(P.heightCm) * 10) / 10 : '';
     if (!['male', 'female'].includes(P.sex)) P.sex = '';
@@ -3349,6 +3402,8 @@
     if (i >= Guided.steps.length) return guidedFinish();
     i = Math.max(0, i); const st = Guided.steps[i], nx = Guided.steps[i + 1];
     Object.assign(Guided, { i, paused: false, remaining: st.secs, endAt: st.secs ? Date.now() + st.secs * 1000 : 0, lastTick: -1 });
+    // Auto-start rest off: the rest countdown waits for a tap on Resume
+    if (st.kind === 'rest' && st.secs && appData && appData.prefs && appData.prefs.autoRest === false) { Guided.paused = true; Guided.pausedMs = st.secs * 1000; }
     const say = st.kind === 'rest' ? 'Rest. ' + secsWords(st.secs) + (nx ? '. Next: ' + nx.name : '') : (st.say || st.name);
     Cue.play(st.kind === 'rest' ? 'rest' : 'work', say);
     guidedRender(); LockTimer.update();
@@ -3409,7 +3464,7 @@
     const ctl = el('div', 'gctl'), back = el('button', 'sm', '⏮'), skip = el('button', 'sm', '⏭');
     back.setAttribute('aria-label', 'Previous step'); skip.setAttribute('aria-label', 'Skip step');
     back.onclick = guidedBack; skip.onclick = guidedNext;
-    const main = el('button', 'big', timed ? (Guided.paused ? 'Resume' : 'Pause') : 'Done ✓');
+    const main = el('button', 'big', timed ? (Guided.paused ? (st.kind === 'rest' && Guided.pausedMs === st.secs * 1000 ? 'Start rest' : 'Resume') : 'Pause') : 'Done ✓');
     main.onclick = timed ? (Guided.paused ? guidedResume : guidedPause) : guidedNext;
     ctl.append(back, main, skip); box.appendChild(ctl);
     guidedTime();
@@ -3565,8 +3620,9 @@
     const age = mkInput('number', P.age === '' ? '' : String(P.age), 'Years'); age.inputMode = 'numeric'; age.min = '10'; age.max = '100';
     age.oninput = () => { if (age.value.trim() === '') { P.age = ''; saveAppData(); } else { const v = Number(age.value); if (Number.isInteger(v) && v >= 10 && v <= 100) { P.age = v; saveAppData(); } } };
     body.appendChild(age);
-    body.appendChild(el('label', null, kg ? 'Height (cm)' : 'Height (ft / in)'));
-    if (kg) {
+    const cmH = P.heightUnit === 'cm';
+    body.appendChild(el('label', null, cmH ? 'Height (cm)' : 'Height (ft / in)'));
+    if (cmH) {
       const h = mkInput('number', P.heightCm === '' ? '' : String(Math.round(P.heightCm)), 'cm'); h.inputMode = 'numeric';
       h.oninput = () => { if (h.value.trim() === '') { P.heightCm = ''; saveAppData(); } else { const v = Number(h.value); if (v >= 90 && v <= 250) { P.heightCm = v; saveAppData(); } } };
       body.appendChild(h);
@@ -3720,9 +3776,6 @@
       const cur = window.FP_ACCENTS.find(a => a[0] === P.accent);
       body.appendChild(el('div', 'sheet-note', cur[1] + '. Each workout type keeps its own signature color.'));
 
-      body.appendChild(el('h2', null, 'Units'));
-      body.appendChild(mkChips('mus-wrap', [['lb', 'Pounds (lb)'], ['kg', 'Kilograms (kg)']], k => P.units === k, (k) => { P.units = k; saveAppData(); refreshSheet(); }));
-
       body.appendChild(el('h2', null, 'During workouts'));
       body.appendChild(mkToggle('Stay awake', wakeSupported() ? 'Keeps your screen on while FitPulse is open' : 'Not supported by this browser', P.stayAwake, v => { P.stayAwake = v; saveAppData(); syncWakeLock(); }));
       body.appendChild(mkToggle('Lock screen timer', 'Shows your rest time or time left in an exercise on the lock screen during a guided workout', P.lockTimer, v => { P.lockTimer = v; saveAppData(); }));
@@ -3740,15 +3793,99 @@
     }, closeBtn);
   }
 
-  function openWorkoutDefaults() {
-    openSheet('Workout defaults', 'Used when your scheduled workouts are built', (body) => {
-      body.appendChild(el('h2', null, 'Where you train'));
-      body.appendChild(mkChips('mus-wrap', [['gym', 'In the Gym'], ['home', 'At Home']], k => appData.prefs.loc === k, (k) => { appData.prefs.loc = k; saveAppData(); refreshSheet(); }));
-      body.appendChild(el('h2', null, 'Intensity'));
-      body.appendChild(mkChips('mus-wrap', [['light', 'Light'], ['moderate', 'Moderate'], ['hard', 'Hard']], k => appData.prefs.intensity === k, (k) => { appData.prefs.intensity = k; saveAppData(); refreshSheet(); }));
-      body.appendChild(el('div', 'sheet-note', 'These are the same choices as the gear in Weekly Schedule on Home.'));
-    }, closeBtn);
+  // ----- workout defaults page -----
+  let wdLoc = 'gym';
+  const mkSeg = (opts, isOn, onPick) => {
+    const seg = el('div', 'rseg');
+    opts.forEach(([k, label]) => { const b = el('button', isOn(k) ? 'on' : '', label); b.onclick = () => onPick(k); seg.appendChild(b); });
+    return seg;
+  };
+  const mkNum = (value, min, max, onSet) => {
+    const i = mkInput('number', String(value)); i.className = 'wdnum'; i.inputMode = 'numeric'; i.min = String(min); i.max = String(max);
+    i.oninput = () => { const v = Math.round(Number(i.value)); if (i.value.trim() !== '' && v >= min && v <= max) onSet(v); };
+    i.onblur = () => { const v = Math.round(Number(i.value)); if (!(i.value.trim() !== '' && v >= min && v <= max)) i.value = String(value); };
+    return i;
+  };
+  function renderWorkoutDefaults() {
+    if (!appData) appData = cleanData(null);
+    const root = $('wdBody'), P = appData.prefs, wu = P.units === 'kg' ? 'kg' : 'lbs';
+    const top = window.scrollY; root.replaceChildren();
+    const redraw = () => renderWorkoutDefaults();
+    const sec = (t) => root.appendChild(el('div', 'wdsec', t));
+    const card = () => root.appendChild(el('div', 'wdcard'));
+
+    sec('Measurement units');
+    let c = card();
+    c.appendChild(el('div', 'wdlab', 'Weight'));
+    c.appendChild(mkSeg([['lb', 'lbs'], ['kg', 'kg']], k => P.units === k, k => { P.units = k; saveAppData(); redraw(); }));
+    c.appendChild(el('div', 'wdlab', 'Distance'));
+    c.appendChild(mkSeg([['mi', 'miles'], ['km', 'km']], k => P.distUnit === k, k => { P.distUnit = k; saveAppData(); redraw(); }));
+    c.appendChild(el('div', 'wdlab', 'Height'));
+    c.appendChild(mkSeg([['ftin', 'ft & in'], ['cm', 'cm']], k => P.heightUnit === k, k => { P.heightUnit = k; saveAppData(); redraw(); }));
+
+    sec('Scheduled workouts');
+    c = card();
+    c.appendChild(el('div', 'wdlab', 'Where you train'));
+    c.appendChild(mkSeg([['gym', 'In the Gym'], ['home', 'At Home']], k => P.loc === k, k => { P.loc = k; saveAppData(); redraw(); }));
+    c.appendChild(el('div', 'wdlab', 'Intensity'));
+    c.appendChild(mkSeg([['light', 'Light'], ['moderate', 'Moderate'], ['hard', 'Hard']], k => P.intensity === k, k => { P.intensity = k; saveAppData(); redraw(); }));
+
+    sec('Workout preferences');
+    c = card();
+    c.appendChild(mkToggle('Default rest timer', 'Use the same rest time between sets in every plan. Off: rest follows the workout’s intensity', P.restOn, v => { P.restOn = v; saveAppData(); redraw(); }));
+    if (P.restOn) {
+      const r = el('div', 'wdrow'); r.append(el('span', 'wl', 'Default time'));
+      const right = el('span'); right.append(mkNum(P.restSecs, 10, 600, v => { P.restSecs = v; saveAppData(); }), el('span', 'wu', 'sec'));
+      r.appendChild(right); c.appendChild(r);
+    }
+    c.appendChild(mkToggle('Auto-start rest', 'In a guided workout, start the rest countdown as soon as you finish a set', P.autoRest, v => { P.autoRest = v; saveAppData(); }));
+    c.appendChild(el('div', 'wdlab', 'Weight increment steps'));
+    c.appendChild(mkSeg([[2.5, '2.5 ' + wu], [5, '5 ' + wu], [10, '10 ' + wu]], k => P.incStep === k, k => { P.incStep = k; saveAppData(); redraw(); }));
+    c.appendChild(mkToggle('Default sets & reps', 'Use the same sets and reps for new strength exercises', P.setsRepsOn, v => { P.setsRepsOn = v; saveAppData(); redraw(); }));
+    if (P.setsRepsOn) {
+      const pair = el('div', 'wdpair');
+      const mk = (label, val, min, max, set) => { const r = el('div', 'wdrow'); r.append(el('span', 'wl', label), mkNum(val, min, max, set)); return r; };
+      pair.append(mk('Default sets', P.defSets, 1, 10, v => { P.defSets = v; saveAppData(); }), mk('Default reps', P.defReps, 1, 50, v => { P.defReps = v; saveAppData(); }));
+      c.appendChild(pair);
+    }
+    c.appendChild(mkToggle('Exercise demos', 'Show video demonstrations', P.demos, v => { P.demos = v; saveAppData(); }));
+
+    sec('Equipment inventory');
+    c = card();
+    c.appendChild(mkToggle('Smart equipment logic', 'Start new strength and HIIT workouts with the gear you have selected below', P.smartEquip, v => { P.smartEquip = v; saveAppData(); }));
+    c.appendChild(mkSeg([['gym', 'In the Gym'], ['home', 'At Home']], k => wdLoc === k, k => { wdLoc = k; redraw(); }));
+    const field = wdLoc === 'gym' ? 'equipGym' : 'equipHome', have = new Set(P[field]);
+    const commit = () => { P[field] = EQUIP_KEYS.filter(k => have.has(k)); saveAppData(); };
+    EQUIP_GROUPS.forEach(g => {
+      const keys = g.items.map(i => i[0]);
+      const head = el('div', 'eqhead'), cnt = el('span', 'c'), all = el('button');
+      const sync = () => { const n = keys.filter(k => have.has(k)).length; cnt.textContent = n + '/' + keys.length; all.textContent = n === keys.length ? 'Clear' : 'Select all'; };
+      head.append(el('span', 'g', g.name), cnt, all); c.appendChild(head);
+      const grid = el('div', 'eqgrid'), btns = {};
+      g.items.forEach(([k, label]) => {
+        const b = el('button', 'eqitem' + (have.has(k) ? ' on' : '')); b.setAttribute('aria-pressed', String(have.has(k)));
+        b.append(el('span', null, label), el('span', 'bx', '✓')); btns[k] = b;
+        b.onclick = () => { have.has(k) ? have.delete(k) : have.add(k); b.classList.toggle('on', have.has(k)); b.setAttribute('aria-pressed', String(have.has(k))); sync(); commit(); };
+        grid.appendChild(b);
+      });
+      all.onclick = () => { const allOn = keys.every(k => have.has(k)); keys.forEach(k => { allOn ? have.delete(k) : have.add(k); btns[k].classList.toggle('on', have.has(k)); btns[k].setAttribute('aria-pressed', String(have.has(k))); }); sync(); commit(); };
+      sync(); c.appendChild(grid);
+    });
+
+    const save = el('button', 'wdsave', '✓ Update defaults');
+    save.onclick = () => { saveAppData(); openSettingsPage(); };
+    const back = el('button', 'wdlink', 'Back to settings'); back.onclick = openSettingsPage;
+    root.append(save, back);
+    window.scrollTo(0, top);
   }
+  const EQUIP_KEYS = Object.keys(EQUIP);
+  function openWorkoutDefaults() {
+    showTab('wdefaults');
+    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === 'home'));
+    wdLoc = appData.prefs.loc === 'home' ? 'home' : 'gym';
+    renderWorkoutDefaults(); window.scrollTo(0, 0);
+  }
+  $('wdBack').onclick = () => openSettingsPage();
 
   function openHealth() {
     openSheet('Health & Integration', 'Body stats used for your estimates', (body) => {
@@ -4095,7 +4232,8 @@
         openHiitConfig();
         hcfg.dur = nearest(HIIT_DURS, d.dur); hcfg.intensity = pick({ light:'light', moderate:'moderate', hard:'hard' });
         hcfg.work = HIIT_INT[hcfg.intensity].work; hcfg.rest = HIIT_INT[hcfg.intensity].rest; hcfg.focus = 'full';
-        hcfg.equip = loc === 'gym' ? new Set(HIIT_EQUIP.map(e => e[0])) : new Set();
+        { const P = appData.prefs, own = new Set(loc === 'gym' ? P.equipGym : P.equipHome), map = { plyo:'boxjump', rope:'jumprope', db:'dumbbells', kb:'kettlebell', bar:'pullupbar', wheel:'abwheel' };
+          hcfg.equip = P.smartEquip ? new Set(HIIT_EQUIP.map(e => e[0]).filter(k => own.has(map[k]))) : (loc === 'gym' ? new Set(HIIT_EQUIP.map(e => e[0])) : new Set()); }
         hcfg.adv = false; hcfg.tabata.on = false; hcfg.amrap.on = false; hcfg.unique = false;
         syncHiit(); buildHiit(); break;
       case 'yoga':
