@@ -93,6 +93,7 @@
   .setrow .chev { color:var(--muted); display:flex; }
   .setrow .chev svg { width:18px; height:18px; }
   .signout { border:1px solid rgba(248,113,113,.5); background:rgba(248,113,113,.08); color:#fb7185; margin-top:26px; }
+  .dangerfill { background:#e11d48; color:#fff; }
   .danger { background:rgba(248,113,113,.1); color:#fb7185; border:1px solid rgba(248,113,113,.4); }
   .togrow { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
   .togrow .tt { font-weight:700; font-size:15px; }
@@ -103,6 +104,8 @@
   .okmsg { font-size:13px; font-weight:700; margin-top:10px; }
   body.hi-contrast { --muted:#c9c9dc; --line:#4b4b66; }
   body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after { animation:none !important; transition:none !important; }
+  button.google { display:flex; align-items:center; justify-content:center; gap:12px; background:#fff; color:#1f1f1f; font-weight:700; margin-top:0; }
+  button.google svg { width:20px; height:20px; flex:none; }
   .stat-note { text-align:center; font-size:11px; color:var(--muted); margin-top:8px; font-weight:600; }
   .hsec { display:flex; align-items:center; justify-content:space-between; margin: 28px 0 12px; }
   .hsec h3 { margin:0; font-size:12px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
@@ -2826,7 +2829,7 @@
   }
   const fmtCal = (n) => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n);
   const fmtAct = (m) => m < 60 ? m + 'm' : Math.floor(m / 60) + 'h' + (m % 60 ? ' ' + (m % 60) + 'm' : '');
-  const defaultName = () => { const n = currentUser && currentUser.email ? currentUser.email.split('@')[0] : ''; return n ? n.charAt(0).toUpperCase() + n.slice(1) : ''; };
+  const defaultName = () => { const meta = (currentUser && currentUser.user_metadata) || {}; const full = String(meta.full_name || meta.name || '').trim(); if (full) return full.split(/\s+/)[0]; const n = currentUser && currentUser.email ? currentUser.email.split('@')[0] : ''; return n ? n.charAt(0).toUpperCase() + n.slice(1) : ''; };
 
   // ----- completing workouts -----
   async function addLog(info) {
@@ -3244,7 +3247,7 @@
         rm.onclick = () => { appData.prefs.avatar = ''; saveAppData(); refreshSheet(); };
         body.appendChild(rm);
       }
-      body.appendChild(el('label', null, 'Display name'));
+      body.appendChild(el('label', null, 'Username'));
       const n = mkInput('text', appData.name || '', defaultName() || 'Your name'); n.maxLength = 24;
       n.oninput = () => { appData.name = n.value.trim(); saveAppData(); };
       body.appendChild(n);
@@ -3258,9 +3261,35 @@
     }, closeBtn);
   }
 
+  const GOOGLE_G = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
+  const appUrl = () => location.href.split('#')[0].split('?')[0].replace(/index\.html$/, '');
+
   function openAccount() {
     openSheet('Account', 'Your login details', (body) => {
+      const providers = (currentUser && currentUser.app_metadata && currentUser.app_metadata.providers) || [];
       body.appendChild(kv('Email', (currentUser && currentUser.email) || '—'));
+      body.appendChild(el('label', null, 'Username'));
+      const un = mkInput('text', appData.name || '', defaultName() || 'Your name'); un.maxLength = 24; un.autocomplete = 'off';
+      un.oninput = () => { appData.name = un.value.trim(); saveAppData(); };
+      body.appendChild(un);
+      body.appendChild(el('div', 'sheet-note', 'This is the name shown on Home and your profile.'));
+
+      body.appendChild(el('h2', null, 'Sign-in methods'));
+      const names = providers.map(x => x === 'email' ? 'Email & password' : x.charAt(0).toUpperCase() + x.slice(1));
+      if (names.length) body.appendChild(kv('Linked', names.join(', ')));
+      if (!providers.includes('google')) {
+        const g = el('button', 'google'); g.innerHTML = GOOGLE_G + '<span>Link Google account</span>';
+        const gmsg = el('div', 'okmsg');
+        g.onclick = async () => {
+          gmsg.style.color = 'var(--muted)'; gmsg.textContent = 'Opening Google...';
+          try {
+            const { error } = await sb.auth.linkIdentity({ provider: 'google', options: { redirectTo: appUrl() } });
+            if (error) throw error;
+          } catch (e) { gmsg.style.color = '#fb7185'; gmsg.textContent = (e && e.message) || 'Could not start Google linking.'; }
+        };
+        body.append(g, gmsg);
+      }
+
       body.appendChild(el('h2', null, 'Change password'));
       const p1 = mkInput('password', '', 'New password (6+ characters)'), p2 = mkInput('password', '', 'Confirm new password');
       p1.autocomplete = p2.autocomplete = 'new-password';
@@ -3279,7 +3308,36 @@
         go.disabled = false;
       };
       body.append(p1, p2, go, msg);
+
+      body.appendChild(el('h2', null, 'Danger zone'));
+      const del = el('button', 'danger', 'Permanently delete account');
+      del.onclick = openDeleteAccount;
+      body.appendChild(del);
     }, closeBtn);
+  }
+
+  function openDeleteAccount() {
+    const msg = el('div', 'okmsg');
+    openSheet('Are you sure?', 'You are about to permanently delete your account', (body) => {
+      const warn = el('div', 'sheet-note', 'This permanently deletes your login, profile, weekly schedule, goals and every workout you’ve logged. It can’t be undone.');
+      warn.style.color = '#fb7185'; body.append(warn, msg);
+    }, [['Delete', 'dangerfill', async () => {
+      const btns = [...$('sheetActions').querySelectorAll('button')]; btns.forEach(b => { b.disabled = true; });
+      msg.style.color = 'var(--muted)'; msg.textContent = 'Deleting...';
+      try {
+        clearTimeout(saveTimer);
+        const { error } = await sb.rpc('delete_my_account');
+        if (error) throw error;
+        ['data', 'logs'].forEach(k => { try { localStorage.removeItem(lsKey(k)); } catch (e) { /* ignore */ } });
+        closeSheet();
+        try { await sb.auth.signOut(); } catch (e) { /* the account is already gone */ }
+      } catch (e) {
+        const m = (e && e.message) || '';
+        msg.style.color = '#fb7185';
+        msg.textContent = /function|schema cache|not find/i.test(m) ? 'Account deletion isn’t set up yet. Run account_setup.sql in Supabase (SQL Editor), then try again.' : (m || 'Could not delete the account.');
+        btns.forEach(b => { b.disabled = false; });
+      }
+    }], ['Cancel', 'secondary', closeSheet]]);
   }
 
   function openNotifications() {
@@ -3356,7 +3414,7 @@
       const r = el('button', 'danger', 'Reset profile, schedule & goals');
       r.onclick = () => { if (confirm('Reset your profile, weekly schedule, goals and settings? Your workout history stays.')) { resetEverything(); refreshSheet(); } };
       body.appendChild(r);
-      body.appendChild(el('div', 'sheet-note', 'Only you can see your data. To delete your account completely, remove it from the Supabase dashboard (Authentication → Users).'));
+      body.appendChild(el('div', 'sheet-note', 'Only you can see your data. To remove your account completely, use Delete account in Settings → Account.'));
     }, closeBtn);
   }
 
