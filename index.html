@@ -28,7 +28,7 @@
 
   /* Home */
   .date-label { text-align:center; color:var(--muted); font-size: 12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-top: 12px; }
-  .welcome { text-align:center; font-size: clamp(19px, 5.6vw, 26px); white-space: nowrap; font-weight: 800; margin: 4px 0 0; }
+  .welcome { text-align:center; font-size: clamp(19px, 5.6vw, 26px); overflow-wrap:anywhere; font-weight: 800; margin: 4px 0 0; }
   .home-top { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; margin: 6px 0 22px; }
   .home-mid { min-width:0; }
   .home-mid .date-label { margin-top:0; }
@@ -76,6 +76,33 @@
   .t3 { background:#3fbf85; color:#06261a; } .t4 { background:#f0931f; color:#2b1600; }
   .hgroup { font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:16px 0 2px; }
   .lrow .lr { text-align:right; font-weight:800; white-space:nowrap; }
+  .setprof { display:flex; flex-direction:column; align-items:center; margin:10px 0 4px; }
+  .avatar { position:relative; width:104px; height:104px; margin:0; padding:3px; border-radius:32px; background:linear-gradient(135deg,#6a5cff,#a78bfa); }
+  .avatar .ai { width:100%; height:100%; border-radius:29px; background:#1b1b2b; display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:900; overflow:hidden; }
+  .avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+  .avatar .cam { position:absolute; right:-6px; bottom:-6px; width:34px; height:34px; border-radius:12px; background:#2a2a40; border:3px solid var(--bg); display:flex; align-items:center; justify-content:center; }
+  .avatar .cam svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .setname { font-size:24px; font-weight:900; margin-top:16px; text-align:center; }
+  .settag { font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+  .settag b { color:#8c84ff; }
+  .setgrp { font-size:11px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; margin:26px 0 10px; }
+  .setrow { display:flex; align-items:center; gap:14px; width:100%; margin:0 0 10px; padding:12px 14px; border-radius:20px; background:var(--card); border:1px solid var(--line); color:var(--text); font-size:16px; font-weight:700; text-align:left; }
+  .setrow .sti { width:40px; height:40px; border-radius:13px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .setrow svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .setrow .lab { flex:1; }
+  .setrow .chev { color:var(--muted); display:flex; }
+  .setrow .chev svg { width:18px; height:18px; }
+  .signout { border:1px solid rgba(248,113,113,.5); background:rgba(248,113,113,.08); color:#fb7185; margin-top:26px; }
+  .danger { background:rgba(248,113,113,.1); color:#fb7185; border:1px solid rgba(248,113,113,.4); }
+  .togrow { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
+  .togrow .tt { font-weight:700; font-size:15px; }
+  .togrow .ts { font-size:12px; color:var(--muted); margin-top:2px; line-height:1.4; }
+  .kv { display:flex; justify-content:space-between; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); font-size:14px; }
+  .kv span:first-child { color:var(--muted); }
+  .kv span:last-child { font-weight:700; text-align:right; word-break:break-all; }
+  .okmsg { font-size:13px; font-weight:700; margin-top:10px; }
+  body.hi-contrast { --muted:#c9c9dc; --line:#4b4b66; }
+  body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after { animation:none !important; transition:none !important; }
   .stat-note { text-align:center; font-size:11px; color:var(--muted); margin-top:8px; font-weight:600; }
   .hsec { display:flex; align-items:center; justify-content:space-between; margin: 28px 0 12px; }
   .hsec h3 { margin:0; font-size:12px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
@@ -855,6 +882,15 @@
       </div>
       <div class="calsum" id="calSum"></div>
       <div id="calPanel"></div>
+    </section>
+
+    <!-- SETTINGS (opened from the Home gear) -->
+    <section id="view-settings" data-view="settings" class="hidden">
+      <div class="calpg-top">
+        <button id="setBack" class="backbtn" aria-label="Back to Home">‹</button>
+        <h1>Settings</h1>
+      </div>
+      <div id="setBody"></div>
     </section>
 
     <!-- BOTTOM NAV -->
@@ -2696,6 +2732,15 @@
     out.prefs.planned = (Array.isArray(out.prefs.planned) ? out.prefs.planned : [])
       .filter(p => p && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && p.date >= minDate && WTYPES[p.type] && p.type !== 'rest' && Number(p.dur) > 0 && p.id)
       .map(p => ({ id: String(p.id), date: p.date, type: p.type, dur: Number(p.dur) }));
+    const P = out.prefs;
+    if (!['beginner', 'intermediate', 'advanced'].includes(P.level)) P.level = 'intermediate';
+    if (!['muscle', 'fat', 'fit', 'flex'].includes(P.goal)) P.goal = '';
+    P.units = P.units === 'kg' ? 'kg' : 'lb';
+    P.reduceMotion = !!P.reduceMotion; P.contrast = !!P.contrast;
+    if (typeof P.avatar !== 'string' || !P.avatar.startsWith('data:image/') || P.avatar.length > 80000) P.avatar = '';
+    const N = Object.assign({ reminders: false, time: '18:00', streak: false, weekly: false }, P.notif && typeof P.notif === 'object' ? P.notif : {});
+    N.reminders = !!N.reminders; N.streak = !!N.streak; N.weekly = !!N.weekly; N.time = /^\d{2}:\d{2}$/.test(N.time) ? N.time : '18:00';
+    P.notif = N;
     return out;
   }
   let saveTimer = null;
@@ -2820,6 +2865,8 @@
   // ----- rendering the Home screen -----
   function renderHomeUI() {
     if (!appData) appData = cleanData(null);
+    document.body.classList.toggle('reduce-motion', !!appData.prefs.reduceMotion);
+    document.body.classList.toggle('hi-contrast', !!appData.prefs.contrast);
     const now = new Date();
     $('calMon').textContent = now.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
     $('calDay').textContent = String(now.getDate());
@@ -2898,7 +2945,7 @@
     const body = $('sheetBody'); body.replaceChildren(); sheetRender(body);
     box.scrollTop = top;
   }
-  function closeSheet() { $('sheetModal').classList.add('hidden'); sheetRender = null; renderHomeUI(); }
+  function closeSheet() { $('sheetModal').classList.add('hidden'); sheetRender = null; renderHomeUI(); if (!$('view-settings').classList.contains('hidden')) renderSettingsPage(); }
   $('sheetClose').onclick = closeSheet;
   $('sheetModal').onclick = (e) => { if (e.target === $('sheetModal')) closeSheet(); };
   const mkSelect = (opts, value, onChange) => {
@@ -3036,25 +3083,258 @@
   tapTile('tileActive', () => openStat('minutes'));
   tapTile('tileLifts', openHistory);
 
-  // ----- settings -----
-  $('homeSettings').onclick = openSettings;
-  function openSettings() {
-    openSheet('Settings', 'Your profile and calorie estimates', (body) => {
+  // ----- settings page -----
+  const APP_VERSION = '1.0';
+  const SET_ICONS = {
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+    shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+    bell: '<path d="M18 16v-5a6 6 0 10-12 0v5l-2 2h16z"/><path d="M10 21h4"/>',
+    eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    sliders: '<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+    heart: '<path d="M12 20s-7-4.5-9-9a5 5 0 019-3 5 5 0 019 3c-2 4.5-9 9-9 9z"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+    shieldcheck: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    chev: '<path d="M9 6l6 6-6 6"/>',
+    cam: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'
+  };
+  const setSvg = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + SET_ICONS[k] + '</svg>';
+  const SET_GROUPS = [
+    ['General settings', [
+      ['Edit Profile', 'user', '#8c84ff', 'rgba(91,75,255,.25)', () => openEditProfile()],
+      ['Account', 'shield', '#c9c9dc', 'rgba(140,140,163,.2)', () => openAccount()],
+      ['Notifications', 'bell', '#fb923c', 'rgba(251,146,60,.2)', () => openNotifications()],
+      ['Display & Accessibility', 'eye', '#fbbf24', 'rgba(251,191,36,.18)', () => openDisplay()]
+    ]],
+    ['Workout settings', [
+      ['Workout defaults', 'sliders', '#a78bfa', 'rgba(167,139,250,.22)', () => openWorkoutDefaults()],
+      ['Health & Integration', 'heart', '#fb7185', 'rgba(251,113,133,.2)', () => openHealth()]
+    ]],
+    ['Privacy & info', [
+      ['Data & Privacy', 'lock', '#60a5fa', 'rgba(96,165,250,.2)', () => openDataPrivacy()],
+      ['Permissions', 'shieldcheck', '#34d399', 'rgba(52,211,153,.2)', () => openPermissions()],
+      ['App info', 'info', '#c9c9dc', 'rgba(140,140,163,.2)', () => openAppInfo()]
+    ]]
+  ];
+  const LEVEL_LABEL = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' };
+  const displayName = () => (appData && appData.name) || defaultName() || 'Athlete';
+  const isSynced = () => !!(cloud.data && cloud.logs);
+
+  function avatarNode() {
+    const a = el('button', 'avatar'); a.setAttribute('aria-label', 'Change profile photo');
+    const inner = el('div', 'ai');
+    if (appData.prefs.avatar) { const im = document.createElement('img'); im.alt = ''; im.src = appData.prefs.avatar; inner.appendChild(im); }
+    else inner.textContent = displayName().charAt(0).toUpperCase();
+    const cam = el('span', 'cam'); cam.innerHTML = setSvg('cam');
+    a.append(inner, cam);
+    a.onclick = pickAvatar;
+    return a;
+  }
+  function pickAvatar() {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = () => {
+      const f = inp.files && inp.files[0]; if (!f) return;
+      const url = URL.createObjectURL(f), img = new Image();
+      img.onload = () => {
+        const S = 160, c = document.createElement('canvas'); c.width = c.height = S;
+        const m = Math.min(img.width, img.height);
+        c.getContext('2d').drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S);
+        URL.revokeObjectURL(url);
+        appData.prefs.avatar = c.toDataURL('image/jpeg', 0.82); saveAppData();
+        renderSettingsPage(); if (sheetRender) refreshSheet();
+      };
+      img.onerror = () => URL.revokeObjectURL(url);
+      img.src = url;
+    };
+    inp.click();
+  }
+
+  function renderSettingsPage() {
+    if (!appData) appData = cleanData(null);
+    const root = $('setBody'); root.replaceChildren();
+    const prof = el('div', 'setprof');
+    prof.appendChild(avatarNode());
+    prof.appendChild(el('div', 'setname', displayName()));
+    const tag = el('div', 'settag'); tag.innerHTML = 'Member · <b></b>'; tag.querySelector('b').textContent = LEVEL_LABEL[appData.prefs.level];
+    prof.appendChild(tag);
+    root.appendChild(prof);
+    SET_GROUPS.forEach(([title, rows]) => {
+      root.appendChild(el('div', 'setgrp', title));
+      rows.forEach(([label, icon, color, bg, fn]) => {
+        const r = el('button', 'setrow'), t = el('span', 'sti'), c = el('span', 'chev');
+        t.innerHTML = setSvg(icon); t.style.color = color; t.style.background = bg; c.innerHTML = setSvg('chev');
+        r.append(t, el('span', 'lab', label), c);
+        r.onclick = fn; root.appendChild(r);
+      });
+    });
+    const out = el('button', 'setrow signout', 'Sign Out'); out.style.justifyContent = 'center';
+    out.onclick = () => { sb.auth.signOut(); };
+    root.appendChild(out);
+  }
+  function openSettingsPage() {
+    showTab('settings');
+    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === 'home'));
+    renderSettingsPage();
+  }
+  $('homeSettings').onclick = openSettingsPage;
+  $('setBack').onclick = () => showTab('home');
+
+  const mkToggle = (title, sub, on, onChange) => {
+    const row = el('div', 'togrow'), txt = el('div'), sw = el('button', 'switch' + (on ? ' on' : ''));
+    txt.append(el('div', 'tt', title)); if (sub) txt.append(el('div', 'ts', sub));
+    sw.setAttribute('aria-pressed', String(!!on)); sw.setAttribute('aria-label', title);
+    sw.onclick = () => { const v = !sw.classList.contains('on'); sw.classList.toggle('on', v); sw.setAttribute('aria-pressed', String(v)); onChange(v); };
+    row.append(txt, sw); return row;
+  };
+  const mkInput = (type, value, ph) => { const i = document.createElement('input'); i.type = type; i.value = value; if (ph) i.placeholder = ph; return i; };
+  const kv = (k, v) => { const r = el('div', 'kv'); r.append(el('span', null, k), el('span', null, v)); return r; };
+  const closeBtn = [['Done', '', closeSheet]];
+
+  function openEditProfile() {
+    openSheet('Edit Profile', 'How you appear in FitPulse', (body) => {
+      const wrap = el('div', 'setprof'); wrap.appendChild(avatarNode()); body.appendChild(wrap);
+      if (appData.prefs.avatar) {
+        const rm = el('button', 'secondary', 'Remove photo');
+        rm.onclick = () => { appData.prefs.avatar = ''; saveAppData(); refreshSheet(); };
+        body.appendChild(rm);
+      }
       body.appendChild(el('label', null, 'Display name'));
-      const n = document.createElement('input'); n.type = 'text'; n.value = appData.name || ''; n.placeholder = defaultName() || 'Your name'; n.maxLength = 24;
+      const n = mkInput('text', appData.name || '', defaultName() || 'Your name'); n.maxLength = 24;
       n.oninput = () => { appData.name = n.value.trim(); saveAppData(); };
       body.appendChild(n);
-      body.appendChild(el('label', null, 'Body weight (lb) — used to estimate calories burned'));
-      const w = document.createElement('input'); w.type = 'number'; w.value = String(appData.weight); w.min = '60'; w.max = '600'; w.inputMode = 'numeric';
-      w.oninput = () => { const v = Number(w.value); if (v >= 60 && v <= 600) { appData.weight = v; saveAppData(); } };
+      body.appendChild(el('h2', null, 'Experience level'));
+      body.appendChild(mkChips('mus-wrap', Object.entries(LEVEL_LABEL), k => appData.prefs.level === k, (k) => { appData.prefs.level = k; saveAppData(); refreshSheet(); }));
+      body.appendChild(el('h2', null, 'Main goal'));
+      body.appendChild(mkChips('mus-wrap', Object.entries(SPLIT_GOALS).map(([k, g]) => [k, g.label]), k => appData.prefs.goal === k,
+        (k) => { appData.prefs.goal = appData.prefs.goal === k ? '' : k; if (appData.prefs.goal) { autoGoal = k; autoGoalSet = true; } saveAppData(); refreshSheet(); }));
+      body.appendChild(el('div', 'sheet-note', 'Your main goal is the starting choice when you Auto-build your weekly split.'));
+    }, closeBtn);
+  }
+
+  function openAccount() {
+    openSheet('Account', 'Your login details', (body) => {
+      body.appendChild(kv('Email', (currentUser && currentUser.email) || '—'));
+      body.appendChild(el('h2', null, 'Change password'));
+      const p1 = mkInput('password', '', 'New password (6+ characters)'), p2 = mkInput('password', '', 'Confirm new password');
+      p1.autocomplete = p2.autocomplete = 'new-password';
+      const msg = el('div', 'okmsg');
+      const go = el('button', '', 'Update password');
+      go.onclick = async () => {
+        msg.style.color = '#fb7185';
+        if (p1.value.length < 6) { msg.textContent = 'Use at least 6 characters.'; return; }
+        if (p1.value !== p2.value) { msg.textContent = 'The two passwords do not match.'; return; }
+        go.disabled = true; msg.style.color = 'var(--muted)'; msg.textContent = 'Updating...';
+        try {
+          const { error } = await sb.auth.updateUser({ password: p1.value });
+          if (error) throw error;
+          p1.value = p2.value = ''; msg.style.color = 'var(--green)'; msg.textContent = 'Password updated.';
+        } catch (e) { msg.style.color = '#fb7185'; msg.textContent = (e && e.message) || 'Could not update the password.'; }
+        go.disabled = false;
+      };
+      body.append(p1, p2, go, msg);
+    }, closeBtn);
+  }
+
+  function openNotifications() {
+    openSheet('Notifications', 'Choose what you want to be reminded about', (body) => {
+      const N = appData.prefs.notif, save = () => saveAppData();
+      body.appendChild(mkToggle('Workout reminders', 'A nudge on days you have a workout planned', N.reminders, v => { N.reminders = v; save(); }));
+      body.appendChild(el('label', null, 'Reminder time'));
+      const t = mkInput('time', N.time); t.oninput = () => { if (/^\d{2}:\d{2}$/.test(t.value)) { N.time = t.value; save(); } };
+      body.appendChild(t);
+      body.appendChild(mkToggle('Streak alerts', 'Warn me before my streak would break', N.streak, v => { N.streak = v; save(); }));
+      body.appendChild(mkToggle('Weekly summary', 'A recap of your week every Monday', N.weekly, v => { N.weekly = v; save(); }));
+      body.appendChild(el('div', 'sheet-note', 'Heads up: your choices are saved, but FitPulse can’t send notifications to your phone yet. That needs a separate push-notification setup, which can be added later.'));
+    }, closeBtn);
+  }
+
+  function openDisplay() {
+    openSheet('Display & Accessibility', 'Make FitPulse easier to read and use', (body) => {
+      body.appendChild(el('h2', null, 'Units'));
+      body.appendChild(mkChips('mus-wrap', [['lb', 'Pounds (lb)'], ['kg', 'Kilograms (kg)']], k => appData.prefs.units === k, (k) => { appData.prefs.units = k; saveAppData(); refreshSheet(); }));
+      body.appendChild(mkToggle('Reduce motion', 'Turns off animations and transitions', appData.prefs.reduceMotion, v => { appData.prefs.reduceMotion = v; saveAppData(); renderHomeUI(); }));
+      body.appendChild(mkToggle('Higher contrast', 'Brighter secondary text and borders', appData.prefs.contrast, v => { appData.prefs.contrast = v; saveAppData(); renderHomeUI(); }));
+    }, closeBtn);
+  }
+
+  function openWorkoutDefaults() {
+    openSheet('Workout defaults', 'Used when your scheduled workouts are built', (body) => {
+      body.appendChild(el('h2', null, 'Where you train'));
+      body.appendChild(mkChips('mus-wrap', [['gym', 'In the Gym'], ['home', 'At Home']], k => appData.prefs.loc === k, (k) => { appData.prefs.loc = k; saveAppData(); refreshSheet(); }));
+      body.appendChild(el('h2', null, 'Intensity'));
+      body.appendChild(mkChips('mus-wrap', [['light', 'Light'], ['moderate', 'Moderate'], ['hard', 'Hard']], k => appData.prefs.intensity === k, (k) => { appData.prefs.intensity = k; saveAppData(); refreshSheet(); }));
+      body.appendChild(el('div', 'sheet-note', 'These are the same choices as the gear in Weekly Schedule on Home.'));
+    }, closeBtn);
+  }
+
+  function openHealth() {
+    openSheet('Health & Integration', 'Body stats used for your estimates', (body) => {
+      const kg = appData.prefs.units === 'kg';
+      body.appendChild(el('label', null, 'Body weight (' + (kg ? 'kg' : 'lb') + ') — used to estimate calories burned'));
+      const w = mkInput('number', String(kg ? Math.round(appData.weight * 0.4536 * 10) / 10 : appData.weight)); w.inputMode = 'decimal'; w.step = 'any';
+      w.oninput = () => { const v = Number(w.value), lb = kg ? v / 0.4536 : v; if (lb >= 60 && lb <= 600) { appData.weight = Math.round(lb * 10) / 10; saveAppData(); } };
       body.appendChild(w);
-      const synced = cloud.data && cloud.logs;
-      body.appendChild(el('div', 'sheet-note', synced ? 'Your schedule, goals and workout history are synced to your account.' :
-        'Your schedule, goals and workout history are saved on this device. Run the home_setup.sql file in Supabase to sync them across devices.'));
-      const out = el('button', 'secondary', 'Log out');
-      out.onclick = () => { closeSheet(); sb.auth.signOut(); };
-      body.appendChild(out);
-    });
+      body.appendChild(el('div', 'sheet-note', 'Calories are an estimate from workout type, length, intensity and your weight.'));
+      body.appendChild(el('h2', null, 'Connected apps'));
+      body.appendChild(el('div', 'sheet-note', 'Apple Health and Google Fit can’t be connected to a web app like this one, so none are available.'));
+    }, closeBtn);
+  }
+
+  function csvCell(v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function exportLogs() {
+    const rows = [['date', 'type', 'title', 'minutes', 'calories', 'lifts']].concat(
+      logs.slice().sort((a, b) => a.performed_on < b.performed_on ? -1 : a.performed_on > b.performed_on ? 1 : 0)
+        .map(l => [l.performed_on, l.wtype, l.title, l.minutes, l.calories, l.lifts]));
+    const blob = new Blob([rows.map(r => r.map(csvCell).join(',')).join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'fitpulse-workouts-' + todayLocal() + '.csv';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  async function clearHistory() {
+    logs = []; lsSet('logs', logs);
+    if (cloud.logs && currentUser) { try { await sb.from('workout_logs').delete().eq('user_id', currentUser.id); } catch (e) { /* ignore */ } }
+    renderHomeUI();
+  }
+  function resetEverything() {
+    appData = cleanData(null); lsSet('data', appData); saveAppData(); renderHomeUI();
+  }
+  function openDataPrivacy() {
+    openSheet('Data & Privacy', 'You own your workout data', (body) => {
+      body.appendChild(kv('Where it’s saved', isSynced() ? 'Your account (synced)' : 'This device only'));
+      body.appendChild(kv('Workouts logged', String(logs.length)));
+      const ex = el('button', '', 'Download my workouts (CSV)');
+      ex.onclick = exportLogs; body.appendChild(ex);
+      const h = el('button', 'danger', 'Delete my workout history');
+      h.onclick = async () => { if (confirm('Delete all ' + logs.length + ' logged workouts? This can’t be undone.')) { await clearHistory(); refreshSheet(); } };
+      body.appendChild(h);
+      const r = el('button', 'danger', 'Reset profile, schedule & goals');
+      r.onclick = () => { if (confirm('Reset your profile, weekly schedule, goals and settings? Your workout history stays.')) { resetEverything(); refreshSheet(); } };
+      body.appendChild(r);
+      body.appendChild(el('div', 'sheet-note', 'Only you can see your data. To delete your account completely, remove it from the Supabase dashboard (Authentication → Users).'));
+    }, closeBtn);
+  }
+
+  function openPermissions() {
+    openSheet('Permissions', 'What FitPulse can access on this device', (body) => {
+      const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+      body.appendChild(kv('Notifications', { granted: 'Allowed', denied: 'Blocked', default: 'Not asked yet', unsupported: 'Not supported here' }[perm]));
+      if (perm === 'default') {
+        const b = el('button', '', 'Allow notifications');
+        b.onclick = () => { Notification.requestPermission().then(() => refreshSheet()); };
+        body.appendChild(b);
+      }
+      if (perm === 'denied') body.appendChild(el('div', 'sheet-note', 'Notifications are blocked. You can change this in your browser or phone settings for this site.'));
+      body.appendChild(kv('Photos', 'Only when you pick a profile photo'));
+      body.appendChild(kv('Location, camera, microphone', 'Never used'));
+    }, closeBtn);
+  }
+
+  function openAppInfo() {
+    openSheet('App info', 'FitPulse', (body) => {
+      body.appendChild(kv('Version', APP_VERSION));
+      body.appendChild(kv('Signed in as', (currentUser && currentUser.email) || '—'));
+      body.appendChild(kv('Sync', isSynced() ? 'On — saved to your account' : 'Off — saved on this device'));
+      if (!isSynced()) body.appendChild(el('div', 'sheet-note', 'To turn sync on, run the home_setup.sql file in Supabase → SQL Editor.'));
+    }, closeBtn);
   }
 
   // ----- calendar page -----
@@ -3230,7 +3510,9 @@
     return sched;
   }
   let autoDays = 4, autoGoal = 'muscle';
+  let autoGoalSet = false;
   function openAutoBuild() {
+    if (!autoGoalSet && appData.prefs.goal) { autoGoal = appData.prefs.goal; autoGoalSet = true; }
     openSheet('Auto-build my split', 'Pick how often you want to train and what you are aiming for', (body) => {
       body.appendChild(el('h2', null, 'Workout days per week'));
       body.appendChild(mkChips('mus-wrap', [2, 3, 4, 5, 6].map(n => [n, String(n)]), k => String(autoDays) === String(k), (k) => { autoDays = Number(k); refreshSheet(); }));
