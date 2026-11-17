@@ -251,6 +251,78 @@
   .dptile { display:flex; flex-direction:column; align-items:center; gap:8px; margin:0; padding:18px 10px; border-radius:16px; background:var(--inset); color:var(--text); font-size:12px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
   .dptile svg { width:26px; height:26px; color:var(--accent2); }
   .dpdanger { margin:0 0 10px; }
+  .pgtabs { margin:0 0 16px; }
+  .pgtiles { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .pgtile { margin:0; padding:14px 12px; min-height:128px; border-radius:22px; background:var(--card); border:1px solid var(--line); color:var(--text); display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; text-align:left; transition:transform .12s; }
+  .pgtile:active { transform:scale(.96); }
+  .pgtile .pgl { font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:14px; }
+  .pgtile .pgv { font-size:24px; font-weight:900; letter-spacing:-.01em; }
+  .pgtile.on { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+  .pgtile.on .pgl { color:inherit; opacity:.75; }
+  .pgweek { font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:10px 2px 0; text-align:center; }
+  .pgic { width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .pgic svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .pgic.steps { background:rgba(52,211,153,.18); color:#34d399; } .pgic.calories { background:rgba(244,63,125,.16); color:#f43f7d; }
+  .pgic.volume { background:rgba(124,108,255,.2); color:#8c84ff; } .pgic.time { background:rgba(96,165,250,.18); color:#60a5fa; }
+  .pgic.bolt { background:rgba(251,191,36,.18); color:#fbbf24; } .pgic.cal { background:rgba(124,108,255,.2); color:#8c84ff; width:30px; height:30px; border-radius:9px; }
+  .pgic.cal svg { width:18px; height:18px; }
+  .pgtile.on .pgic { background:color-mix(in srgb, var(--on-accent) 16%, transparent); color:var(--on-accent); }
+  .pghead { display:flex; align-items:center; gap:10px; margin:26px 0 10px; font-size:12px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+  .pghead .pgic.calories, .pghead .pgic.steps, .pghead .pgic.volume { width:30px; height:30px; border-radius:9px; } .pghead .pgic svg { width:18px; height:18px; }
+  .pgcard { padding:14px 14px 16px; }
+  .pgcard .rseg { margin:0 0 14px; }
+  .pgcard .sread { margin-bottom:12px; }
+  .pgchart { background:var(--inset); }
+  .pgstats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+  .pgstat { background:var(--inset); border-radius:16px; padding:14px; }
+  .pgstat .k { font-size:11px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .pgstat .k.up { color:#34d399; } .pgstat .k.down { color:#fb7185; }
+  .pgstat .v { font-size:24px; font-weight:900; margin-top:6px; } .pgstat .v small { font-size:11px; font-weight:800; color:var(--muted); margin-left:5px; text-transform:uppercase; }
+  .pgstat .v2 { font-size:15px; font-weight:800; margin-top:8px; }
+  .pgadd { margin:14px 0 0; }
+  .pgtag { font-size:10px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); background:color-mix(in srgb, var(--accent) 16%, transparent); padding:4px 8px; border-radius:8px; }
+  .pgx { width:30px; height:30px; margin:0; padding:0; border-radius:9px; background:transparent; color:var(--muted); border:1px solid var(--line); font-size:12px; }
+  .hmtop { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .hmtitle { font-size:12px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+  .hmlegend { display:flex; align-items:center; gap:4px; font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; }
+  .hmlegend span { margin:0 3px; }
+  .hmnav { display:flex; align-items:center; justify-content:center; gap:18px; margin:10px 0 8px; font-weight:900; font-size:15px; }
+  .hmnav button { width:34px; height:34px; margin:0; padding:0; border-radius:10px; background:var(--inset); color:var(--text); font-size:20px; line-height:1; }
+  .hmnav button:disabled { opacity:.3; }
+  .hmwrap { overflow-x:auto; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
+  .hmgrid { display:grid; grid-template-columns:34px repeat(31, 15px); gap:3px; width:max-content; align-items:center; }
+  .hmd { font-size:9px; font-weight:800; color:var(--muted); text-align:center; }
+  .hmm { font-size:10px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); position:sticky; left:0; background:var(--card); z-index:1; }
+  .hm { width:15px; height:15px; margin:0; padding:0; border-radius:4px; border:0; display:block; }
+  i.hm { width:12px; height:12px; border-radius:3px; }
+  .hm.l0 { background:color-mix(in srgb, var(--soft) 28%, var(--inset)); }
+  .hm.l1 { background:#a0623a; } .hm.l2 { background:#f08a24; } .hm.l3 { background:#ef3f55; }
+  .hm.fut { background:transparent; border:1px dashed var(--line); }
+  .hm.pick { outline:2px solid var(--text); outline-offset:1px; }
+  .hmread { font-size:13px; font-weight:700; color:var(--soft); margin:10px 2px 0; min-height:18px; }
+  .hmfoot { display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-size:12px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+  .hmfoot b { color:#34d399; }
+  .prcard { display:flex; align-items:center; gap:14px; width:100%; margin:0 0 10px; padding:14px; border-radius:22px; background:var(--card); border:1px solid var(--line); color:var(--text); text-align:left; }
+  .prcard .pgic { width:48px; height:48px; border-radius:14px; } .prcard .pgic svg { width:26px; height:26px; }
+  .prmid { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .prago { font-size:11px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .prname { font-size:17px; font-weight:900; text-transform:uppercase; letter-spacing:-.01em; overflow-wrap:anywhere; }
+  .prright { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex:none; }
+  .prval { font-size:26px; font-weight:900; color:var(--accent2); line-height:1; } .prval small { font-size:10px; font-weight:900; color:var(--muted); margin-left:4px; }
+  .prdelta { font-size:11px; font-weight:900; color:#34d399; background:rgba(52,211,153,.15); padding:3px 8px; border-radius:8px; }
+  .stk { border-radius:26px; padding:20px; margin-bottom:12px; }
+  .stk .k { font-size:11px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
+  .stk .bigd { font-size:58px; font-weight:900; line-height:1; margin-top:12px; letter-spacing:-.02em; } .stk .bigd small { font-size:16px; letter-spacing:0; margin-left:8px; font-weight:900; }
+  .stk.cur { background:linear-gradient(135deg, var(--accent2), var(--accent)); color:var(--on-accent); }
+  .stk.cur .k, .stk.cur .msg2 { opacity:.8; } .stk .msg2 { margin-top:16px; font-size:15px; font-weight:600; line-height:1.4; }
+  .stk.best { background:var(--card); border:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
+  .stk.best .k { color:var(--muted); } .stk.best .bigd { color:var(--accent2); font-size:44px; } .stk.best .bigd small { color:var(--text); font-size:13px; }
+  .stk.best .pgic { width:60px; height:60px; border-radius:18px; } .stk.best .pgic svg { width:30px; height:30px; }
+  .stkdays { display:flex; gap:8px; }
+  .stkcell { flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .stkcell .sq { width:100%; aspect-ratio:1; border-radius:14px; background:var(--inset); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
+  .stkcell .sq.on { background:#34d399; border-color:#34d399; color:#06281c; } .stkcell .sq svg { width:46%; height:46%; fill:currentColor; stroke:none; }
+  .stkcell .dn { font-size:11px; font-weight:900; color:var(--muted); }
   .lgl h2 { font-size:15px; margin:18px 0 6px; } .lgl p { font-size:14px; line-height:1.55; color:var(--soft); margin:0 0 8px; }
   .lgl ul { margin:0 0 8px; padding-left:20px; color:var(--soft); font-size:14px; line-height:1.55; }
   .wdlink { width:100%; margin:8px 0 0; background:none; color:var(--muted); font-size:12px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
@@ -959,8 +1031,8 @@
 
     <!-- PROGRESS -->
     <section id="view-progress" data-view="progress" class="hidden">
-      <h1>Progress</h1>
-      <div class="soon"><div class="big">📈</div><h2 style="margin-top:12px">Coming soon</h2><p>Charts and personal records will live here.</p></div>
+      <div class="calpg-top"><div><h1>Your progress</h1><div class="wdsub">Performance tracking</div></div></div>
+      <div id="pgBody"></div>
     </section>
 
     <!-- GOALS -->
@@ -1088,6 +1160,7 @@
     document.querySelectorAll('[data-view]').forEach(v => v.classList.toggle('hidden', v.dataset.view !== name));
     document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
     if (name === 'workout' && typeof renderLibrary === 'function') renderLibrary();
+    if (name === 'progress' && typeof renderProgress === 'function') renderProgress();
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('.nav button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
@@ -2920,6 +2993,15 @@
     if (!['public', 'friends', 'private'].includes(P.visibility)) P.visibility = 'private';
     P.shareActivity = !!P.shareActivity; P.analytics = !!P.analytics;
     P.cloudBackup = P.cloudBackup === undefined ? true : !!P.cloudBackup;
+    // progress data: steps typed in by hand, logged lifts, personal records
+    const stepsIn = P.steps && typeof P.steps === 'object' && !Array.isArray(P.steps) ? P.steps : {}, stepsOut = {};
+    Object.keys(stepsIn).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort().slice(-800).forEach(k => { const n = Math.round(Number(stepsIn[k])); if (n > 0 && n <= 200000) stepsOut[k] = n; });
+    P.steps = stepsOut;
+    const okDate = (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d), okName = (n) => typeof n === 'string' && n.trim() && n.length <= 40;
+    P.lifts = (Array.isArray(P.lifts) ? P.lifts : []).filter(x => x && okDate(x.d) && okName(x.ex) && x.w > 0 && x.w <= 5000 && x.s >= 1 && x.r >= 1).slice(0, 1500)
+      .map(x => ({ id: String(x.id || Math.random().toString(36).slice(2)), d: x.d, ex: x.ex.trim(), w: Number(x.w), s: Math.round(x.s), r: Math.round(x.r) }));
+    P.records = (Array.isArray(P.records) ? P.records : []).filter(x => x && okDate(x.d) && okName(x.name) && ['lift', 'endurance', 'bodyweight'].includes(x.cat) && x.v > 0).slice(0, 500)
+      .map(x => ({ id: String(x.id || Math.random().toString(36).slice(2)), d: x.d, cat: x.cat, name: x.name.trim(), v: Number(x.v) }));
     P.smartEquip = P.smartEquip === undefined ? true : !!P.smartEquip;
     const eqKeys = Object.keys(EQUIP);
     const cleanEq = (a, dflt) => Array.isArray(a) ? a.filter(k => eqKeys.includes(k)) : dflt;
@@ -3148,7 +3230,7 @@
     const body = $('sheetBody'); body.replaceChildren(); sheetRender(body);
     box.scrollTop = top;
   }
-  function closeSheet() { $('sheetModal').classList.add('hidden'); sheetRender = null; renderHomeUI(); if (!$('view-settings').classList.contains('hidden')) renderSettingsPage(); }
+  function closeSheet() { $('sheetModal').classList.add('hidden'); sheetRender = null; renderHomeUI(); if (!$('view-progress').classList.contains('hidden')) renderProgress(); if (!$('view-settings').classList.contains('hidden')) renderSettingsPage(); }
   $('sheetClose').onclick = closeSheet;
   $('sheetModal').onclick = (e) => { if (e.target === $('sheetModal')) closeSheet(); };
   const mkSelect = (opts, value, onChange) => {
@@ -3285,6 +3367,369 @@
   tapTile('tileCal', () => openStat('calories'));
   tapTile('tileActive', () => openStat('minutes'));
   tapTile('tileLifts', openHistory);
+
+  // ===== PROGRESS TAB =====
+  const PG_ICONS = {
+    steps: '<path d="M8 3c2 0 3 2 3 4.5S10 11 8 11 5 9.5 5 7.5 6 3 8 3zM7 14h4v2a2 2 0 01-4 0z"/><path d="M16 9c2 0 3 2 3 4.5S18 17 16 17s-3-2-3-4.5S14 9 16 9zM15 20h4v1a2 2 0 01-4 0z"/>',
+    calories: '<path d="M12 3c1 3 5 5 5 10a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/>',
+    volume: '<path d="M6 8v8M3 10v4M18 8v8M21 10v4M6 12h12"/>',
+    time: '<circle cx="12" cy="13" r="7"/><path d="M12 9v4l2 2M9 3h6"/>',
+    bolt: '<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+    trophy: '<path d="M8 4h8v5a4 4 0 01-8 0zM8 6H5v1a3 3 0 003 3M16 6h3v1a3 3 0 01-3 3M12 13v4M8 21h8M10 17h4"/>',
+    cal: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'
+  };
+  const pgSvg = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + PG_ICONS[k] + '</svg>';
+  const PG_METRICS = { steps: { title: 'Steps', color: '#34d399' }, calories: { title: 'Calories', color: '#f0931f' }, volume: { title: 'Volume', color: '#7c6cff' } };
+  const PG_RANGES = [['7', '7D'], ['31', '31D'], ['12', '12M'], ['all', 'ALL']];
+  const PG_PRESETS = {
+    lift: ['Bench press', 'Back squat', 'Deadlift', 'Overhead press'],
+    endurance: ['5K run', '10K run', 'Mile run', 'Half marathon'],
+    bodyweight: ['Pull-ups', 'Push-ups', 'Dips', 'Sit-ups']
+  };
+  const PG_CATS = [['lift', 'Main lifts'], ['endurance', 'Endurance'], ['bodyweight', 'Bodyweight']];
+  const PG_ICON_FOR = { lift: 'volume', endurance: 'time', bodyweight: 'bolt' };
+  let pgTab = 'overview', pgMetric = 'calories', pgRange = '7', pgPick = null, pgHeatYear = new Date().getFullYear(), pgHeatPick = null, pgLogCount = 15;
+  const pgId = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const pgUnit = () => appData.prefs.units === 'kg' ? 'kg' : 'lb';
+  const pgK = () => appData.prefs.units === 'kg' ? 0.4536 : 1;
+  const pgRound = (n) => Math.round(n * 10) / 10;
+  const pgShort = (v) => v >= 10000 ? (v / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : Math.round(v).toLocaleString();
+  const pgDate = (k, opt) => new Date(k + 'T12:00:00').toLocaleDateString(undefined, opt || { month: 'short', day: 'numeric' });
+  function pgAgo(k) {
+    const a = new Date(todayLocal() + 'T12:00:00'), b = new Date(k + 'T12:00:00'), n = Math.round((a - b) / 86400000);
+    if (n <= 0) return 'Today'; if (n === 1) return 'Yesterday'; if (n < 7) return n + ' days ago';
+    if (n < 14) return '1 week ago'; if (n < 31) return Math.floor(n / 7) + ' weeks ago';
+    return pgDate(k, { month: 'short', day: '2-digit' });
+  }
+  function pgFmtDur(s) {
+    s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+    return (h ? h + ':' + String(m).padStart(2, '0') : String(m)) + ':' + String(x).padStart(2, '0');
+  }
+  const pgFmtDelta = (s) => s < 60 ? s + 's' : Math.floor(s / 60) + 'm' + (s % 60 ? ' ' + (s % 60) + 's' : '');
+  function pgParseDur(t) {
+    const p = String(t).trim().split(':').map(Number);
+    if (!p.length || p.length > 3 || p.some(n => !Number.isFinite(n) || n < 0)) return 0;
+    return p.reduce((s, n) => s * 60 + n, 0);
+  }
+
+  // one number per day for each metric
+  function pgDayMap(m) {
+    const map = {}, P = appData.prefs;
+    if (m === 'calories') logs.forEach(l => { map[l.performed_on] = (map[l.performed_on] || 0) + (l.calories || 0); });
+    else if (m === 'steps') Object.assign(map, P.steps);
+    else if (m === 'volume') { P.lifts.forEach(x => { map[x.d] = (map[x.d] || 0) + x.w * x.s * x.r * pgK(); }); Object.keys(map).forEach(k => { map[k] = Math.round(map[k]); }); }
+    return map;
+  }
+  function pgBuckets(map, range) {
+    const today = new Date(); today.setHours(12, 0, 0, 0);
+    const addD = (d, n) => { const c = new Date(d); c.setDate(c.getDate() + n); return c; };
+    const mStart = (y, m) => new Date(y, m, 1, 12);
+    const sumR = (a, b) => { let s = 0; for (const k in map) if (k >= a && k <= b) s += map[k]; return s; };
+    const sumP = (p) => { let s = 0; for (const k in map) if (k.startsWith(p)) s += map[k]; return s; };
+    const data = []; let prev = null;
+    if (range === '7' || range === '31') {
+      const n = Number(range), start = addD(today, -(n - 1));
+      for (let i = 0; i < n; i++) {
+        const c = addD(start, i);
+        data.push({ label: n === 7 ? c.toLocaleDateString(undefined, { weekday: 'short' }) : (i % 5 === 0 ? String(c.getDate()) : ''), full: c.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }), value: map[ymd(c)] || 0 });
+      }
+      const pe = addD(start, -1), ps = addD(pe, -(n - 1)); prev = sumR(ymd(ps), ymd(pe));
+    } else {
+      let first;
+      if (range === '12') first = mStart(today.getFullYear(), today.getMonth() - 11);
+      else { const min = Object.keys(map).filter(k => map[k]).sort()[0], e = min ? new Date(min + 'T12:00:00') : today; first = mStart(e.getFullYear(), e.getMonth()); }
+      const span = (today.getFullYear() * 12 + today.getMonth()) - (first.getFullYear() * 12 + first.getMonth()) + 1;
+      if (range === 'all' && span > 24) {
+        for (let y = first.getFullYear(); y <= today.getFullYear(); y++) data.push({ label: String(y), full: String(y), value: sumP(String(y)) });
+      } else {
+        for (let i = 0; i < span; i++) {
+          const d = mStart(first.getFullYear(), first.getMonth() + i);
+          data.push({ label: (span > 12 && i % 3 !== 0) ? '' : d.toLocaleDateString(undefined, { month: 'short' }), full: d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }), value: sumP(ymd(d).slice(0, 7)) });
+        }
+      }
+      if (range === '12') prev = sumR(ymd(mStart(today.getFullYear(), today.getMonth() - 23)), ymd(addD(first, -1)));
+    }
+    return { data, prev };
+  }
+
+  function renderProgress() {
+    if (!appData) appData = cleanData(null);
+    const root = $('pgBody'), top = window.scrollY; root.replaceChildren();
+    const seg = el('div', 'rseg pgtabs');
+    [['overview', 'Overview'], ['prs', 'PRs'], ['streaks', 'Streaks']].forEach(([k, label]) => {
+      const b = el('button', pgTab === k ? 'on' : '', label); b.onclick = () => { pgTab = k; renderProgress(); window.scrollTo(0, 0); }; seg.appendChild(b);
+    });
+    root.appendChild(seg);
+    if (pgTab === 'overview') pgOverview(root); else if (pgTab === 'prs') pgPRsView(root); else pgStreaksView(root);
+    window.scrollTo(0, top);
+  }
+
+  // ---- overview ----
+  function pgOverview(root) {
+    const P = appData.prefs, wk = new Set(weekDates()), wu = pgUnit();
+    const tiles = el('div', 'pgtiles');
+    Object.keys(PG_METRICS).forEach(k => {
+      const map = pgDayMap(k); let v = 0; for (const d in map) if (wk.has(d)) v += map[d];
+      const t = el('button', 'pgtile' + (pgMetric === k ? ' on' : '')), ic = el('span', 'pgic ' + k); ic.innerHTML = pgSvg(k);
+      t.append(ic, el('span', 'pgl', PG_METRICS[k].title), el('span', 'pgv', pgShort(v)));
+      t.setAttribute('aria-pressed', String(pgMetric === k));
+      t.onclick = () => { pgMetric = k; pgPick = null; renderProgress(); };
+      tiles.appendChild(t);
+    });
+    root.appendChild(tiles);
+    root.appendChild(el('div', 'pgweek', 'This week · tap one to dive in'));
+
+    // deep dive
+    const M = PG_METRICS[pgMetric], unit = pgMetric === 'steps' ? 'steps' : pgMetric === 'calories' ? 'kcal' : wu;
+    const head = el('div', 'pghead'), hi = el('span', 'pgic ' + pgMetric); hi.innerHTML = pgSvg(pgMetric);
+    head.append(hi, el('span', null, M.title + ' deep dive')); root.appendChild(head);
+    const card = el('div', 'wdcard pgcard');
+    const rs = el('div', 'rseg');
+    PG_RANGES.forEach(([k, label]) => { const b = el('button', pgRange === k ? 'on' : '', label); b.onclick = () => { pgRange = k; pgPick = null; renderProgress(); }; rs.appendChild(b); });
+    card.appendChild(rs);
+    const { data, prev } = pgBuckets(pgDayMap(pgMetric), pgRange);
+    const total = data.reduce((s, b) => s + b.value, 0), max = Math.max(...data.map(b => b.value), 0), pick = pgPick != null ? data[pgPick] : null;
+    const rd = el('div', 'sread'), left = el('div');
+    left.append(el('div', 'big', Math.round(pick ? pick.value : total).toLocaleString() + ' ' + unit), el('div', 'sm', pick ? pick.full : 'Total · ' + ({ '7': 'last 7 days', '31': 'last 31 days', '12': 'last 12 months', all: 'all time' })[pgRange]));
+    rd.appendChild(left); card.appendChild(rd);
+    const many = data.length > 12, chart = el('div', 'schart pgchart'), bars = el('div', 'sbars' + (many ? ' many' : '')), labs = el('div', 'slabs' + (many ? ' many' : ''));
+    data.forEach((b, i) => {
+      const col = el('button', 'sbar' + (b.value ? '' : ' zero') + (pgPick === i ? ' pick' : ''));
+      col.setAttribute('aria-label', b.full + ': ' + Math.round(b.value).toLocaleString() + ' ' + unit);
+      if (pgRange === '7' && b.value) col.appendChild(el('div', 'sv', pgShort(b.value)));
+      const f = el('div', 'sf'); f.style.background = M.color;
+      f.style.height = max ? Math.max(b.value ? 3 : 0, Math.round(b.value / max * (pgRange === '7' ? 118 : 138))) + 'px' : '0px';
+      col.appendChild(f); col.onclick = () => { pgPick = pgPick === i ? null : i; renderProgress(); };
+      bars.appendChild(col); labs.appendChild(el('div', null, b.label));
+    });
+    chart.append(bars, labs); card.appendChild(chart);
+    if (!total) card.appendChild(el('div', 'dpnote', pgMetric === 'calories' ? 'Nothing yet. Tap “✓ Complete workout” after a workout and it shows up here.' : pgMetric === 'steps' ? 'No steps logged in this period. Add today’s steps below.' : 'No lifts logged in this period. Log a lift below.'));
+    const stats = el('div', 'pgstats');
+    const t1 = el('div', 'pgstat'); t1.append(el('div', 'k', 'Total ' + ({ '7': '7D', '31': '31D', '12': '12M', all: 'all time' })[pgRange]), (() => { const v = el('div', 'v', pgShort(total)); v.appendChild(el('small', null, unit)); return v; })());
+    const t2 = el('div', 'pgstat');
+    if (prev == null) t2.append(el('div', 'k', 'Compare'), el('div', 'v2', 'All time'));
+    else if (prev > 0) { const pct = Math.round((total - prev) / prev * 100); t2.append(el('div', 'k ' + (pct >= 0 ? 'up' : 'down'), (pct >= 0 ? '▲ +' : '▼ ') + pct + '%'), el('div', 'v2', 'Vs previous period')); }
+    else t2.append(el('div', 'k', total ? 'New' : '—'), el('div', 'v2', 'Vs previous period'));
+    stats.append(t1, t2); card.appendChild(stats);
+    if (pgMetric === 'steps') {
+      const b = el('button', 'pgadd', '+ Log steps'); b.onclick = () => openLogSteps(); card.appendChild(b);
+      card.appendChild(el('div', 'dpnote', 'Steps are typed in by hand. A web app can’t read your phone’s step counter.'));
+    } else if (pgMetric === 'volume') {
+      const b = el('button', 'pgadd', '+ Log a lift'); b.onclick = () => openLogLift(); card.appendChild(b);
+      card.appendChild(el('div', 'dpnote', 'Volume = weight × reps × sets for the lifts you log, in ' + wu + '.'));
+    }
+    root.appendChild(card);
+    pgHeatmap(root);
+    pgLogList(root);
+  }
+
+  // ---- heatmap ----
+  function pgHeatmap(root) {
+    const P = appData.prefs, y = pgHeatYear, today = todayLocal(), thisYear = Number(today.slice(0, 4));
+    const mins = {}; logs.forEach(l => { mins[l.performed_on] = (mins[l.performed_on] || 0) + (l.minutes || 0); });
+    const level = (k) => { const m = mins[k] || 0, s = P.steps[k] || 0; return Math.max(m >= 45 ? 3 : m >= 25 ? 2 : m > 0 ? 1 : 0, s >= 12000 ? 3 : s >= 8000 ? 2 : s >= 5000 ? 1 : 0); };
+    const head = el('div', 'pghead'), hi = el('span', 'pgic cal'); hi.innerHTML = pgSvg('cal'); head.append(hi, el('span', null, 'Activity heatmap')); root.appendChild(head);
+    const card = el('div', 'wdcard pgcard');
+    const top = el('div', 'hmtop'); top.appendChild(el('div', 'hmtitle', 'Monthly consistency'));
+    const lg = el('div', 'hmlegend'); lg.append(el('span', null, 'Less')); [0, 1, 2, 3].forEach(n => lg.appendChild(el('i', 'hm l' + n))); lg.append(el('span', null, 'More')); top.appendChild(lg); card.appendChild(top);
+    const years = [thisYear]; Object.keys(P.steps).concat(logs.map(l => l.performed_on)).forEach(k => years.push(Number(k.slice(0, 4))));
+    const minY = Math.min(...years), nav = el('div', 'hmnav');
+    const prevB = el('button', '', '‹'), nextB = el('button', '', '›');
+    prevB.disabled = y <= minY; nextB.disabled = y >= thisYear; prevB.setAttribute('aria-label', 'Previous year'); nextB.setAttribute('aria-label', 'Next year');
+    prevB.onclick = () => { pgHeatYear--; pgHeatPick = null; renderProgress(); }; nextB.onclick = () => { pgHeatYear++; pgHeatPick = null; renderProgress(); };
+    nav.append(prevB, el('span', null, String(y)), nextB); card.appendChild(nav);
+    const wrap = el('div', 'hmwrap'), grid = el('div', 'hmgrid');
+    grid.appendChild(el('span'));
+    for (let d = 1; d <= 31; d++) grid.appendChild(el('span', 'hmd', String(d)));
+    let active = 0, elapsed = 0;
+    for (let m = 0; m < 12; m++) {
+      grid.appendChild(el('span', 'hmm', new Date(y, m, 1).toLocaleDateString(undefined, { month: 'short' })));
+      const dim = new Date(y, m + 1, 0).getDate();
+      for (let d = 1; d <= 31; d++) {
+        if (d > dim) { grid.appendChild(el('span')); continue; }
+        const k = y + '-' + pad2(m + 1) + '-' + pad2(d), future = k > today, lv = future ? -1 : level(k);
+        if (!future) { elapsed++; if (lv > 0) active++; }
+        const c = el('button', 'hm ' + (future ? 'fut' : 'l' + lv) + (pgHeatPick === k ? ' pick' : ''));
+        c.dataset.k = k; c.setAttribute('aria-label', pgDate(k, { month: 'short', day: 'numeric', year: 'numeric' }) + (future ? '' : lv ? ': active' : ': rest'));
+        grid.appendChild(c);
+      }
+    }
+    grid.onclick = (e) => { const c = e.target.closest('.hm[data-k]'); if (!c) return; pgHeatPick = pgHeatPick === c.dataset.k ? null : c.dataset.k; renderProgress(); };
+    wrap.appendChild(grid); card.appendChild(wrap);
+    let txt = 'Tap a day for details · swipe sideways for the rest of the month';
+    if (pgHeatPick && pgHeatPick.startsWith(String(y))) {
+      const k = pgHeatPick, m = mins[k] || 0, s = P.steps[k] || 0, parts = [];
+      if (m) parts.push(m + ' min of workouts'); if (s) parts.push(s.toLocaleString() + ' steps');
+      txt = pgDate(k, { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + (k > today ? 'upcoming' : parts.length ? parts.join(' · ') : 'rest day');
+    }
+    card.appendChild(el('div', 'hmread', txt));
+    const foot = el('div', 'hmfoot'); foot.append(el('span', null, 'Yearly goal progress'), el('b', null, (elapsed ? Math.round(active / elapsed * 100) : 0) + '% active')); card.appendChild(foot);
+    card.appendChild(el('div', 'dpnote', active + ' active ' + (active === 1 ? 'day' : 'days') + ' so far. Brown, orange and red come from workout time (1+, 25+, 45+ min) or steps (5k, 8k, 12k). Gray is a rest day.'));
+    root.appendChild(card);
+  }
+
+  // ---- recorded logs ----
+  function pgLogList(root) {
+    const P = appData.prefs, wu = pgUnit(), items = [];
+    logs.forEach(l => items.push({ d: l.performed_on, t: l.title, m: l.minutes + ' min · ' + l.calories + ' kcal', r: PG_METRICS.calories.title, del: () => removeLog(l) }));
+    Object.keys(P.steps).forEach(k => items.push({ d: k, t: P.steps[k].toLocaleString() + ' steps', m: 'Logged by hand', r: 'Steps', del: () => { delete P.steps[k]; saveAppData(); } }));
+    P.lifts.forEach(x => items.push({ d: x.d, t: x.ex, m: pgRound(x.w * pgK()) + ' ' + wu + ' × ' + x.r + ' reps × ' + x.s + ' sets · ' + Math.round(x.w * x.s * x.r * pgK()).toLocaleString() + ' ' + wu, r: 'Volume', del: () => { P.lifts = P.lifts.filter(z => z.id !== x.id); saveAppData(); } }));
+    items.sort((a, b) => a.d < b.d ? 1 : a.d > b.d ? -1 : 0);
+    const head = el('div', 'pghead'), hi = el('span', 'pgic cal'); hi.innerHTML = pgSvg('cal'); head.append(hi, el('span', null, 'Recorded performance logs')); root.appendChild(head);
+    const card = el('div', 'wdcard pgcard');
+    if (!items.length) card.appendChild(el('div', 'dpnote', 'Nothing recorded yet. Finish a workout, log steps, or log a lift and it will appear here.'));
+    items.slice(0, pgLogCount).forEach(it => {
+      const row = el('div', 'lrow'), left = el('div'), acts = el('div', 'racts');
+      left.append(el('div', null, it.t), el('div', 'lm', pgDate(it.d, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + it.m));
+      const tag = el('span', 'pgtag', it.r), x = el('button', 'pgx', '✕'); x.setAttribute('aria-label', 'Delete this entry');
+      x.onclick = () => { if (confirm('Delete this entry?')) { it.del(); renderProgress(); renderHomeUI(); } };
+      acts.append(tag, x); row.append(left, acts); card.appendChild(row);
+    });
+    if (items.length > pgLogCount) { const more = el('button', 'secondary', 'Show more'); more.onclick = () => { pgLogCount += 15; renderProgress(); }; card.appendChild(more); }
+    root.appendChild(card);
+  }
+
+  // ---- PRs ----
+  function pgPRs(cat) {
+    const P = appData.prefs, groups = new Map();
+    const add = (name, d, v, src, id) => { const k = name.toLowerCase(); if (!groups.has(k)) groups.set(k, { name, entries: [] }); groups.get(k).entries.push({ d, v, src, id }); };
+    P.records.filter(r => r.cat === cat).forEach(r => add(r.name, r.d, r.v, 'rec', r.id));
+    if (cat === 'lift') P.lifts.forEach(x => add(x.ex, x.d, x.w, 'lift', x.id));
+    const better = cat === 'endurance' ? (a, b) => a < b : (a, b) => a > b;
+    return [...groups.values()].map(g => {
+      g.entries.sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
+      let best = null, prevBest = null, bestE = null;
+      g.entries.forEach(e => { if (best === null || better(e.v, best)) { prevBest = best; best = e.v; bestE = e; } });
+      return { cat, name: g.name, best, prev: prevBest, d: bestE.d, entries: g.entries };
+    }).sort((a, b) => a.d < b.d ? 1 : a.d > b.d ? -1 : 0);
+  }
+  function pgPRsView(root) {
+    const wu = pgUnit().toUpperCase();
+    PG_CATS.forEach(([cat, title]) => {
+      root.appendChild(el('div', 'wdsec', title));
+      const list = pgPRs(cat);
+      if (!list.length) root.appendChild(el('div', 'dpnote', cat === 'lift' ? 'No lift records yet. Add one, or log lifts in Overview → Volume and your best shows up here.' : 'No records yet.'));
+      list.forEach(pr => {
+        const card = el('button', 'prcard'), ic = el('span', 'pgic ' + (cat === 'lift' ? 'volume' : cat === 'endurance' ? 'time' : 'bolt')); ic.innerHTML = pgSvg(PG_ICON_FOR[cat]);
+        const mid = el('span', 'prmid'); mid.append(el('span', 'prago', pgAgo(pr.d)), el('span', 'prname', pr.name));
+        const right = el('span', 'prright'), val = el('span', 'prval');
+        let delta = '';
+        if (cat === 'lift') { val.append(String(pgRound(pr.best * pgK())), el('small', null, wu)); if (pr.prev != null) delta = '+' + pgRound((pr.best - pr.prev) * pgK()) + wu; }
+        else if (cat === 'endurance') { val.append(pgFmtDur(pr.best), el('small', null, 'TIME')); if (pr.prev != null) delta = '-' + pgFmtDelta(Math.round(pr.prev - pr.best)); }
+        else { val.append(String(pr.best), el('small', null, 'REPS')); if (pr.prev != null) delta = '+' + (pr.best - pr.prev); }
+        right.appendChild(val); if (delta) right.appendChild(el('span', 'prdelta', delta.toUpperCase()));
+        card.append(ic, mid, right); card.onclick = () => openPRDetail(pr); root.appendChild(card);
+      });
+    });
+    const add = el('button', 'wdsave', 'Add new record'); add.onclick = () => openAddRecord(); root.appendChild(add);
+  }
+  function openPRDetail(pr) {
+    const wu = pgUnit();
+    openSheet(pr.name, 'Every entry, newest first', (body) => {
+      const fmt = (v) => pr.cat === 'lift' ? pgRound(v * pgK()) + ' ' + wu : pr.cat === 'endurance' ? pgFmtDur(v) : v + ' reps';
+      pr.entries.slice().reverse().forEach(e => {
+        const row = el('div', 'lrow'), l = el('div'), acts = el('div', 'racts');
+        l.append(el('div', null, fmt(e.v)), el('div', 'lm', pgDate(e.d, { month: 'short', day: 'numeric', year: 'numeric' }) + (e.src === 'lift' ? ' · from a logged lift' : '')));
+        const x = el('button', 'pgx', '✕'); x.setAttribute('aria-label', 'Delete');
+        x.onclick = () => { if (!confirm('Delete this entry?')) return; const P = appData.prefs; if (e.src === 'rec') P.records = P.records.filter(r => r.id !== e.id); else P.lifts = P.lifts.filter(r => r.id !== e.id); saveAppData(); closeSheet(); renderProgress(); };
+        acts.appendChild(x); row.append(l, acts); body.appendChild(row);
+      });
+    }, closeBtn);
+  }
+
+  // ---- streaks ----
+  const PG_MILESTONES = [3, 5, 7, 10, 14, 15, 21, 30, 45, 60, 75, 100, 150, 200, 250, 365, 500, 1000];
+  function pgStreaksView(root) {
+    const days = [...new Set(logs.map(l => l.performed_on))].sort(), cur = logStreak();
+    let best = 0, run = 0, prev = null;
+    days.forEach(d => { run = prev && ymd(new Date(new Date(prev + 'T12:00:00').getTime() + 86400000)) === d ? run + 1 : 1; best = Math.max(best, run); prev = d; });
+    best = Math.max(best, cur);
+    const c1 = el('div', 'stk cur'); c1.appendChild(el('div', 'k', 'Current streak'));
+    const big = el('div', 'bigd', String(cur)); big.appendChild(el('small', null, cur === 1 ? 'DAY' : 'DAYS')); c1.appendChild(big);
+    const next = PG_MILESTONES.find(n => n > cur);
+    c1.appendChild(el('div', 'msg2', cur ? 'You’re on fire! Keep it up for another ' + (next - cur) + (next - cur === 1 ? ' day' : ' days') + ' to hit ' + next + '.' : 'Complete a workout today to start a streak.'));
+    root.appendChild(c1);
+    const c2 = el('div', 'stk best'), l = el('div'); l.appendChild(el('div', 'k', 'Longest streak'));
+    const b2 = el('div', 'bigd', String(best)); b2.appendChild(el('small', null, best === 1 ? 'DAY' : 'DAYS')); l.appendChild(b2);
+    const tr = el('span', 'pgic volume'); tr.innerHTML = pgSvg('trophy'); c2.append(l, tr); root.appendChild(c2);
+    root.appendChild(el('div', 'wdsec', 'Last 7 days'));
+    const row = el('div', 'stkdays'), have = new Set(days), n = new Date(); n.setHours(12, 0, 0, 0);
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(n); d.setDate(n.getDate() - i); const k = ymd(d), on = have.has(k);
+      const cell = el('div', 'stkcell'), sq = el('span', 'sq' + (on ? ' on' : '')); sq.innerHTML = on ? pgSvg('bolt') : '';
+      sq.setAttribute('title', pgDate(k, { weekday: 'long', month: 'short', day: 'numeric' }) + (on ? ' · workout done' : ' · no workout'));
+      cell.append(sq, el('span', 'dn', String(d.getDate()))); row.appendChild(cell);
+    }
+    root.appendChild(row);
+    root.appendChild(el('div', 'dpnote', 'A streak is days in a row with at least one completed workout.'));
+  }
+
+  // ---- entry sheets ----
+  let pgErr = null;
+  const pgMsg = (text) => { if (pgErr) pgErr.textContent = text; };
+  const pgField = (body, label, input) => { body.appendChild(el('label', null, label)); body.appendChild(input); return input; };
+  const pgDateInput = (v) => { const i = mkInput('date', v || todayLocal()); i.max = todayLocal(); return i; };
+  function openLogSteps() {
+    let di, ni;
+    openSheet('Log steps', 'Type in the steps from your phone or watch', (body) => {
+      di = pgField(body, 'Day', pgDateInput());
+      ni = pgField(body, 'Steps', mkInput('number', String(appData.prefs.steps[todayLocal()] || ''), 'e.g. 8200')); ni.inputMode = 'numeric';
+      di.onchange = () => { ni.value = appData.prefs.steps[di.value] || ''; };
+      pgErr = el('div', 'okmsg'); pgErr.style.color = 'var(--danger-t)'; body.appendChild(pgErr);
+      body.appendChild(el('div', 'sheet-note', 'One number per day. Saving again for the same day replaces it.'));
+    }, [['Save', '', () => {
+      const v = Math.round(Number(ni.value));
+      if (!di.value || di.value > todayLocal()) return pgMsg('Pick today or an earlier day.');
+      if (ni.value.trim() === '' || !(v >= 0 && v <= 200000)) return pgMsg('Enter steps between 0 and 200,000.');
+      if (v === 0) delete appData.prefs.steps[di.value]; else appData.prefs.steps[di.value] = v;
+      saveAppData(); closeSheet(); renderProgress();
+    }], ['Cancel', 'secondary', closeSheet]]);
+  }
+  function openLogLift() {
+    let sel, other, w, s, r, di;
+    openSheet('Log a lift', 'Adds to your volume and your PRs', (body) => {
+      sel = mkSelect(PG_PRESETS.lift.concat(['Barbell row', 'Other…']).map(n => [n, n]), 'Bench press', () => { other.style.display = sel.value === 'Other…' ? '' : 'none'; });
+      body.appendChild(el('label', null, 'Exercise')); body.appendChild(sel);
+      other = mkInput('text', '', 'Exercise name'); other.maxLength = 40; other.style.display = 'none'; other.style.marginTop = '8px'; body.appendChild(other);
+      w = pgField(body, 'Weight (' + pgUnit() + ')', mkInput('number', '', 'e.g. 135')); w.inputMode = 'decimal';
+      s = pgField(body, 'Sets', mkInput('number', '3')); s.inputMode = 'numeric';
+      r = pgField(body, 'Reps per set', mkInput('number', '10')); r.inputMode = 'numeric';
+      di = pgField(body, 'Day', pgDateInput());
+      pgErr = el('div', 'okmsg'); pgErr.style.color = 'var(--danger-t)'; body.appendChild(pgErr);
+    }, [['Save', '', () => {
+      const name = (sel.value === 'Other…' ? other.value : sel.value).trim().slice(0, 40), wv = Number(w.value), sv = Math.round(Number(s.value)), rv = Math.round(Number(r.value));
+      if (!name) return pgMsg('Enter the exercise name.');
+      if (!(wv > 0 && wv <= 2000)) return pgMsg('Enter the weight you lifted.');
+      if (!(sv >= 1 && sv <= 50) || !(rv >= 1 && rv <= 200)) return pgMsg('Sets and reps must be whole numbers.');
+      if (!di.value || di.value > todayLocal()) return pgMsg('Pick today or an earlier day.');
+      const P = appData.prefs; P.lifts.unshift({ id: pgId(), d: di.value, ex: name, w: Math.round(wv / pgK() * 10) / 10, s: sv, r: rv }); P.lifts = P.lifts.slice(0, 1500);
+      saveAppData(); closeSheet(); renderProgress();
+    }], ['Cancel', 'secondary', closeSheet]]);
+  }
+  let rf = null;
+  function openAddRecord() {
+    rf = { cat: 'lift', name: PG_PRESETS.lift[0], other: '', val: '', d: todayLocal() };
+    openSheet('Add new record', 'Your best result for an exercise', (body) => {
+      body.appendChild(mkChips('mus-wrap', PG_CATS, k => rf.cat === k, (k) => { rf.cat = k; rf.name = PG_PRESETS[k][0]; rf.val = ''; refreshSheet(); }));
+      const sel = mkSelect(PG_PRESETS[rf.cat].concat(['Other…']).map(n => [n, n]), rf.name, v => { rf.name = v; refreshSheet(); });
+      body.appendChild(el('label', null, 'Exercise')); body.appendChild(sel);
+      if (rf.name === 'Other…') { const o = mkInput('text', rf.other, 'Name'); o.maxLength = 40; o.oninput = () => { rf.other = o.value; }; o.style.marginTop = '8px'; body.appendChild(o); }
+      const lab = rf.cat === 'lift' ? 'Weight (' + pgUnit() + ')' : rf.cat === 'endurance' ? 'Time (mm:ss or h:mm:ss)' : 'Reps';
+      const v = pgField(body, lab, mkInput(rf.cat === 'endurance' ? 'text' : 'number', rf.val, rf.cat === 'endurance' ? '21:45' : rf.cat === 'lift' ? 'e.g. 225' : 'e.g. 20')); v.inputMode = rf.cat === 'endurance' ? 'text' : 'decimal'; v.oninput = () => { rf.val = v.value; };
+      const d = pgField(body, 'Day', pgDateInput(rf.d)); d.onchange = () => { rf.d = d.value; };
+      pgErr = el('div', 'okmsg'); pgErr.style.color = 'var(--danger-t)'; body.appendChild(pgErr);
+    }, [['Save', '', () => {
+      const name = (rf.name === 'Other…' ? rf.other : rf.name).trim().slice(0, 40);
+      if (!name) return pgMsg('Enter the exercise name.');
+      let v;
+      if (rf.cat === 'lift') { v = Number(rf.val) / pgK(); if (!(v > 0 && v <= 4000)) return pgMsg('Enter the weight.'); v = Math.round(v * 10) / 10; }
+      else if (rf.cat === 'endurance') { v = pgParseDur(rf.val); if (!(v > 0)) return pgMsg('Enter a time like 21:45.'); }
+      else { v = Math.round(Number(rf.val)); if (!(v >= 1 && v <= 5000)) return pgMsg('Enter the number of reps.'); }
+      if (!rf.d || rf.d > todayLocal()) return pgMsg('Pick today or an earlier day.');
+      const P = appData.prefs; P.records.unshift({ id: pgId(), d: rf.d, cat: rf.cat, name, v }); P.records = P.records.slice(0, 500);
+      saveAppData(); closeSheet(); renderProgress();
+    }], ['Cancel', 'secondary', closeSheet]]);
+  }
 
   // ----- guided workouts: step builders -----
   const gWork = (name, secs, detail, say) => ({ kind: 'work', name, secs: secs || 0, detail: detail || '', say });
