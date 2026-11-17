@@ -240,6 +240,19 @@
   .eqhead .c { font-size:11px; color:var(--muted); font-weight:700; }
   .eqhead button { width:auto; margin:0 0 0 auto; padding:4px; background:none; color:var(--muted); font-size:12px; font-weight:700; text-decoration:underline; }
   .wdsave { margin-top:26px; }
+  .dpnote { font-size:12.5px; line-height:1.5; color:var(--muted); margin:12px 2px 0; }
+  .dpdesc { font-size:13px; color:var(--soft); margin:10px 2px 6px; line-height:1.45; }
+  .dprow { display:flex; align-items:center; gap:14px; padding:14px 0; }
+  .dprow + .dprow, .dprow + .togrow { border-top:1px solid var(--line); }
+  .dprow .sti { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; flex:none; background:color-mix(in srgb, var(--accent) 20%, transparent); color:var(--accent2); }
+  .dprow svg, .dptile svg, .togrow .tic svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .dprow .tt { font-weight:700; font-size:15px; } .dprow .ts { font-size:12px; color:var(--muted); margin-top:2px; }
+  .dptiles { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
+  .dptile { display:flex; flex-direction:column; align-items:center; gap:8px; margin:0; padding:18px 10px; border-radius:16px; background:var(--inset); color:var(--text); font-size:12px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+  .dptile svg { width:26px; height:26px; color:var(--accent2); }
+  .dpdanger { margin:0 0 10px; }
+  .lgl h2 { font-size:15px; margin:18px 0 6px; } .lgl p { font-size:14px; line-height:1.55; color:var(--soft); margin:0 0 8px; }
+  .lgl ul { margin:0 0 8px; padding-left:20px; color:var(--soft); font-size:14px; line-height:1.55; }
   .wdlink { width:100%; margin:8px 0 0; background:none; color:var(--muted); font-size:12px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
   .calnav { display:flex; align-items:center; gap:8px; }
   .calnav button { width:44px; height:44px; margin:0; padding:0; border-radius:12px; background:var(--chip); font-size:20px; flex:none; }
@@ -993,6 +1006,15 @@
         <div><h1>Workout defaults</h1><div class="wdsub">Session preferences</div></div>
       </div>
       <div id="wdBody"></div>
+    </section>
+
+    <!-- DATA & PRIVACY (opened from Settings) -->
+    <section id="view-dprivacy" data-view="dprivacy" class="hidden">
+      <div class="calpg-top">
+        <button id="dpBack" class="backbtn" aria-label="Back to Settings">‹</button>
+        <div><h1>Data &amp; privacy</h1><div class="wdsub">Manage your data</div></div>
+      </div>
+      <div id="dpBody"></div>
     </section>
 
     <!-- GUIDED WORKOUT -->
@@ -2895,6 +2917,9 @@
     P.defSets = Math.min(10, Math.max(1, Math.round(Number(P.defSets)) || 3));
     P.defReps = Math.min(50, Math.max(1, Math.round(Number(P.defReps)) || 10));
     P.demos = P.demos === undefined ? true : !!P.demos;
+    if (!['public', 'friends', 'private'].includes(P.visibility)) P.visibility = 'private';
+    P.shareActivity = !!P.shareActivity; P.analytics = !!P.analytics;
+    P.cloudBackup = P.cloudBackup === undefined ? true : !!P.cloudBackup;
     P.smartEquip = P.smartEquip === undefined ? true : !!P.smartEquip;
     const eqKeys = Object.keys(EQUIP);
     const cleanEq = (a, dflt) => Array.isArray(a) ? a.filter(k => eqKeys.includes(k)) : dflt;
@@ -2936,6 +2961,8 @@
     appData = cleanData(local);
     logs = lsGet('logs', []);
     renderHomeUI();
+    // Cloud backup switched off: keep everything on this device and don't talk to the cloud
+    if (appData.prefs.cloudBackup === false) { cloud.data = false; cloud.logs = false; return; }
     try {
       const { data, error } = await sb.from('user_data').select('*').eq('user_id', uid).maybeSingle();
       if (error) throw error;
@@ -3508,7 +3535,16 @@
     shieldcheck: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
     chev: '<path d="M9 6l6 6-6 6"/>',
-    cam: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'
+    cam: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+    doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+    cookie: '<path d="M21 12a9 9 0 11-9-9 4 4 0 005 5 3 3 0 004 4z"/><path d="M8.5 11h.01M12 16h.01M15.5 13h.01M9 15.5h.01"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    dl: '<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+    json: '<path d="M9 4C6 4 7 8 5 9c2 1 1 5 4 5M15 4c3 0 2 4 4 5-2 1-1 5-4 5"/>',
+    csv: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 15h6M9 18h6"/>',
+    pulse: '<path d="M3 12h4l2-6 4 12 2-6h6"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+    share: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>'
   };
   const setSvg = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + SET_ICONS[k] + '</svg>';
   const SET_GROUPS = [
@@ -3901,13 +3937,26 @@
   }
 
   function csvCell(v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function downloadFile(name, text, type) {
+    const blob = new Blob([text], { type });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  const sortedLogs = () => logs.slice().sort((a, b) => a.performed_on < b.performed_on ? -1 : a.performed_on > b.performed_on ? 1 : 0);
   function exportLogs() {
     const rows = [['date', 'type', 'title', 'minutes', 'calories', 'lifts']].concat(
-      logs.slice().sort((a, b) => a.performed_on < b.performed_on ? -1 : a.performed_on > b.performed_on ? 1 : 0)
-        .map(l => [l.performed_on, l.wtype, l.title, l.minutes, l.calories, l.lifts]));
-    const blob = new Blob([rows.map(r => r.map(csvCell).join(',')).join('\n')], { type: 'text/csv' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'fitpulse-workouts-' + todayLocal() + '.csv';
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      sortedLogs().map(l => [l.performed_on, l.wtype, l.title, l.minutes, l.calories, l.lifts]));
+    downloadFile('fitpulse-workouts-' + todayLocal() + '.csv', rows.map(r => r.map(csvCell).join(',')).join('\n'), 'text/csv');
+  }
+  function exportArchive() {
+    const P = Object.assign({}, appData.prefs); delete P.avatar;
+    const archive = {
+      app: 'FitPulse', exported_at: new Date().toISOString(), account_email: (currentUser && currentUser.email) || null,
+      profile: { name: appData.name, weight_lb: appData.weight, age: P.age, height_cm: P.heightCm, sex: P.sex, has_profile_photo: !!appData.prefs.avatar },
+      settings: P, weekly_schedule: appData.schedule, challenges: appData.challenges,
+      workouts: sortedLogs().map(l => ({ date: l.performed_on, type: l.wtype, title: l.title, minutes: l.minutes, calories: l.calories, lifts: l.lifts }))
+    };
+    downloadFile('fitpulse-archive-' + todayLocal() + '.json', JSON.stringify(archive, null, 2), 'application/json');
   }
   async function clearHistory() {
     logs = []; lsSet('logs', logs);
@@ -3917,21 +3966,135 @@
   function resetEverything() {
     appData = cleanData(null); lsSet('data', appData); saveAppData(); renderHomeUI();
   }
-  function openDataPrivacy() {
-    openSheet('Data & Privacy', 'You own your workout data', (body) => {
-      body.appendChild(kv('Where it’s saved', isSynced() ? 'Your account (synced)' : 'This device only'));
-      body.appendChild(kv('Workouts logged', String(logs.length)));
-      const ex = el('button', '', 'Download my workouts (CSV)');
-      ex.onclick = exportLogs; body.appendChild(ex);
-      const h = el('button', 'danger', 'Delete my workout history');
-      h.onclick = async () => { if (confirm('Delete all ' + logs.length + ' logged workouts? This can’t be undone.')) { await clearHistory(); refreshSheet(); } };
-      body.appendChild(h);
-      const r = el('button', 'danger', 'Reset profile, schedule & goals');
-      r.onclick = () => { if (confirm('Reset your profile, weekly schedule, goals and settings? Your workout history stays.')) { resetEverything(); refreshSheet(); } };
-      body.appendChild(r);
-      body.appendChild(el('div', 'sheet-note', 'Only you can see your data. To remove your account completely, use Delete account in Settings → Account.'));
+
+  // ----- legal text (plain language, written from what the app actually does) -----
+  const LEGAL_CONTACT = '';   // put your support email here, e.g. 'help@yourdomain.com'
+  const LEGAL_DATE = 'November 17, 2026';
+  const LEGAL = {
+    privacy: ['Privacy Policy', [
+      ['The short version', 'FitPulse is a personal workout app. We use your information to run the app for you. We don’t sell it, we don’t show ads, and we don’t share it with advertisers.'],
+      ['What we collect', ['Your email address and password (the password is handled by our sign-in provider and is stored scrambled, so we can’t read it). If you sign in with Google, we receive your Google name and email.',
+        'Your profile: username, and optionally age, height, weight, sex and a profile photo.',
+        'Your activity: workouts you complete, your weekly schedule, goals and challenges, and your app settings.']],
+      ['Where it is stored', 'On your device (in the browser’s storage) and, if Cloud backup is on, in our cloud database provided by Supabase. Each account can only read and change its own rows. The app is delivered through GitHub Pages and a code library is loaded from the jsDelivr network, so those services may see standard technical details such as your IP address when the page loads.'],
+      ['How we use it', 'To sign you in, show your history and stats, build your workouts, and sync your data between your devices. We don’t use it for anything else.'],
+      ['Sharing', 'We don’t sell or rent your data. It is processed by the services that run the app (Supabase for the database and sign-in, GitHub for hosting, Google only if you choose Google sign-in). Your profile visibility and sharing choices in Data & Privacy are saved now and will apply if friends and sharing features are added.'],
+      ['Your choices', ['Download a copy of your data any time (Data & Privacy → Export your data).',
+        'Turn Cloud backup off to keep your data on this device only.',
+        'Delete your workout history, or permanently delete your account, in Data & Privacy.']],
+      ['Children', 'FitPulse is not meant for children under 13, and we don’t knowingly collect their information.'],
+      ['Changes', 'If this policy changes, the updated version will appear here with a new date.']]],
+    terms: ['Terms of Service', [
+      ['Using FitPulse', 'FitPulse is provided for your personal, non-commercial use. By creating an account or using the app you agree to these terms. If you don’t agree, please don’t use it.'],
+      ['Not medical advice', 'Workout plans, calorie numbers and other suggestions are general information, not medical advice. Calories are estimates. Talk to a doctor before starting a new exercise program, especially if you have a health condition, and stop if something hurts or feels wrong. You exercise at your own risk.'],
+      ['Your account', 'Keep your sign-in details safe. You are responsible for what happens under your account. Give accurate information and don’t use the app to break the law or to disrupt the service or other people.'],
+      ['Your content', 'The workouts, profile details and photo you add stay yours. You let us store and display them to you so the app can work.'],
+      ['Availability', 'FitPulse is provided “as is”, without promises that it will always be available or error-free. Features may change or be removed, and data could be lost, so use the export option to keep your own copy.'],
+      ['Limits of responsibility', 'To the fullest extent the law allows, we aren’t liable for injuries, losses or damages that result from using the app.'],
+      ['Ending things', 'You can stop using the app and delete your account at any time. We may suspend accounts that misuse the service.'],
+      ['Changes', 'We may update these terms. Continuing to use the app after an update means you accept it.']]],
+    cookies: ['Cookie Policy', [
+      ['The short version', 'FitPulse doesn’t use advertising or tracking cookies.'],
+      ['What is stored in your browser', ['Your sign-in session, so you stay logged in.',
+        'Your data and settings (profile, workout history, schedule, theme and color), so the app works quickly and offline-friendly on your device.']],
+      ['Why', 'These are needed for the app to work. We don’t use them to follow you around the web, and we have no third-party analytics or ad tools.'],
+      ['Controlling it', 'You can clear this storage in your browser or phone settings. Doing so signs you out and removes anything that wasn’t backed up to your account. Removing the app from your Home Screen does not by itself delete your account.']]],
+    retention: ['Data Retention Policy', [
+      ['How long we keep things', ['Account, profile and settings: until you delete your account.',
+        'Workout history: until you delete it or delete your account.',
+        'Data on your device: until you clear your browser data or reset the app.']],
+      ['When you delete your history', 'Choosing “Delete my workout history” removes your logged workouts from this device and from your account.'],
+      ['When you delete your account', 'Choosing “Permanently delete account” removes your login and your profile, schedule, goals and workout history from our database. It can’t be undone. Copies on your own device are cleared at the same time. The hosting providers may keep routine backups or server logs for a short period before they are overwritten.'],
+      ['Inactive accounts', 'We don’t currently delete inactive accounts automatically.']]]
+  };
+  function openLegal(key) {
+    const [title, secs] = LEGAL[key];
+    openSheet(title, 'Updated ' + LEGAL_DATE, (body) => {
+      const wrap = el('div', 'lgl');
+      secs.forEach(([h, content]) => {
+        wrap.appendChild(el('h2', null, h));
+        if (Array.isArray(content)) { const ul = el('ul'); content.forEach(t => ul.appendChild(el('li', null, t))); wrap.appendChild(ul); }
+        else wrap.appendChild(el('p', null, content));
+      });
+      if (LEGAL_CONTACT) wrap.appendChild(el('p', null, 'Questions? Contact ' + LEGAL_CONTACT + '.'));
+      body.appendChild(wrap);
     }, closeBtn);
   }
+
+  // ----- data & privacy page -----
+  const VIS_TEXT = {
+    public: 'Anyone could see your profile details and workout history.',
+    friends: 'Only friends you approve could see your profile details and workout history.',
+    private: 'Only you can see your profile details and workout history.'
+  };
+  async function setCloudBackup(on) {
+    const P = appData.prefs; P.cloudBackup = on;
+    if (!on) { await pushAppData(); lsSet('data', appData); cloud.data = false; cloud.logs = false; }   // last sync records the choice, then stop
+    else { lsSet('data', appData); cloud.data = true; await pushAppData(); await loadAppData(); }
+    renderDataPrivacy();
+  }
+  function renderDataPrivacy() {
+    if (!appData) appData = cleanData(null);
+    const root = $('dpBody'), P = appData.prefs, top = window.scrollY; root.replaceChildren();
+    const sec = (t) => root.appendChild(el('div', 'wdsec', t));
+    const card = () => root.appendChild(el('div', 'wdcard'));
+    const icon = (k) => { const s = el('span', 'sti'); s.innerHTML = setSvg(k); return s; };
+
+    sec('Profile visibility');
+    let c = card();
+    c.appendChild(mkSeg([['public', 'Public'], ['friends', 'Friends'], ['private', 'Private']], k => P.visibility === k, k => { P.visibility = k; saveAppData(); renderDataPrivacy(); }));
+    c.appendChild(el('div', 'dpdesc', VIS_TEXT[P.visibility]));
+
+    sec('Social sharing');
+    c = card();
+    c.appendChild(mkToggle('Share workout activity', 'Broadcast completed sessions to your friends feed', P.shareActivity, v => { P.shareActivity = v; saveAppData(); }));
+    root.appendChild(el('div', 'dpnote', 'Friends and a feed aren’t part of FitPulse yet. These choices are saved now and will apply when they arrive. Nothing is shared today.'));
+
+    sec('Export your data');
+    c = card();
+    const head = el('div', 'dprow'), txt = el('div');
+    txt.append(el('div', 'tt', 'Download archive'), el('div', 'ts', 'Get a copy of your settings, profile and history · ' + logs.length + ' workouts'));
+    head.append(icon('dl'), txt); c.appendChild(head);
+    const tiles = el('div', 'dptiles');
+    [['json', 'JSON format', exportArchive], ['csv', 'CSV format', exportLogs]].forEach(([ic, label, fn]) => {
+      const b = el('button', 'dptile'); const s = el('span'); s.innerHTML = setSvg(ic); b.append(s, el('span', null, label));
+      b.onclick = fn; tiles.appendChild(b);
+    });
+    c.appendChild(tiles);
+    c.appendChild(el('div', 'dpnote', 'JSON has everything. CSV is your workout list only, for spreadsheets. Your profile photo isn’t included.'));
+
+    sec('Privacy controls');
+    c = card();
+    c.appendChild(mkToggle('Anonymous analytics', 'Help improve FitPulse by sharing anonymous usage data', P.analytics, v => { P.analytics = v; saveAppData(); }));
+    const cb = mkToggle('Cloud backup', 'Securely sync your data across devices', P.cloudBackup, v => { setCloudBackup(v); });
+    c.appendChild(cb);
+    root.appendChild(el('div', 'dpnote', (P.cloudBackup ? (isSynced() ? 'Your data is saved to your account and on this device.' : 'Backup is on, but the cloud isn’t reachable right now, so data is saved on this device for now.') : 'Backup is off. Your data stays on this device only, so clearing your browser data would erase it.') + ' FitPulse doesn’t collect any analytics today; that choice is remembered for the future.'));
+
+    sec('Legal & policies');
+    [['Privacy Policy', 'Read our privacy policy', 'shieldcheck', 'privacy'], ['Terms of Service', 'Read our terms of service', 'doc', 'terms'],
+     ['Cookie Policy', 'Read our cookie policy', 'cookie', 'cookies'], ['Data Retention Policy', 'Read our data retention policy', 'clock', 'retention']].forEach(([t, sub, ic, key]) => {
+      const r = el('button', 'setrow'), ti = el('span', 'sti'), ch = el('span', 'chev'), mid = el('span', 'lab');
+      ti.innerHTML = setSvg(ic); ti.style.color = 'var(--accent2)'; ti.style.background = 'color-mix(in srgb, var(--accent) 20%, transparent)'; ch.innerHTML = setSvg('chev');
+      mid.append(el('div', null, t), Object.assign(el('div', null, sub), { style: 'font-size:12px;font-weight:600;color:var(--muted);margin-top:2px' }));
+      r.append(ti, mid, ch); r.onclick = () => openLegal(key); root.appendChild(r);
+    });
+
+    sec('Danger zone');
+    const h = el('button', 'danger dpdanger', 'Delete my workout history');
+    h.onclick = async () => { if (confirm('Delete all ' + logs.length + ' logged workouts? This can’t be undone.')) { await clearHistory(); renderDataPrivacy(); } };
+    const r = el('button', 'danger dpdanger', 'Reset profile, schedule & goals');
+    r.onclick = () => { if (confirm('Reset your profile, weekly schedule, goals and settings? Your workout history stays.')) { resetEverything(); renderDataPrivacy(); } };
+    const d = el('button', 'dangerfill', 'Permanently delete account'); d.onclick = () => openDeleteAccount();
+    root.append(h, r, d);
+    const back = el('button', 'wdlink', 'Back to settings'); back.onclick = openSettingsPage; root.appendChild(back);
+    window.scrollTo(0, top);
+  }
+  function openDataPrivacy() {
+    showTab('dprivacy');
+    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === 'home'));
+    renderDataPrivacy(); window.scrollTo(0, 0);
+  }
+  $('dpBack').onclick = () => openSettingsPage();
 
   function openPermissions() {
     openSheet('Permissions', 'What FitPulse can access on this device', (body) => {
