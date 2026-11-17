@@ -2736,6 +2736,10 @@
     if (!['beginner', 'intermediate', 'advanced'].includes(P.level)) P.level = 'intermediate';
     if (!['muscle', 'fat', 'fit', 'flex'].includes(P.goal)) P.goal = '';
     P.units = P.units === 'kg' ? 'kg' : 'lb';
+    P.age = Number.isInteger(Number(P.age)) && Number(P.age) >= 10 && Number(P.age) <= 100 && P.age !== '' ? Number(P.age) : '';
+    P.heightCm = Number(P.heightCm) >= 90 && Number(P.heightCm) <= 250 ? Math.round(Number(P.heightCm) * 10) / 10 : '';
+    if (!['male', 'female'].includes(P.sex)) P.sex = '';
+    P.weightSet = P.weightSet === undefined ? Number(out.weight) !== 170 : !!P.weightSet;
     P.reduceMotion = !!P.reduceMotion; P.contrast = !!P.contrast;
     if (typeof P.avatar !== 'string' || !P.avatar.startsWith('data:image/') || P.avatar.length > 80000) P.avatar = '';
     const N = Object.assign({ reminders: false, time: '18:00', streak: false, weekly: false }, P.notif && typeof P.notif === 'object' ? P.notif : {});
@@ -3190,6 +3194,48 @@
   const kv = (k, v) => { const r = el('div', 'kv'); r.append(el('span', null, k), el('span', null, v)); return r; };
   const closeBtn = [['Done', '', closeSheet]];
 
+  const weightShown = () => appData.prefs.units === 'kg' ? Math.round(appData.weight * 0.4536 * 10) / 10 : appData.weight;
+  // blank = not provided (calorie estimates fall back to a default weight)
+  function saveWeightInput(text) {
+    const kg = appData.prefs.units === 'kg';
+    if (text.trim() === '') { appData.weight = defaultAppData().weight; appData.prefs.weightSet = false; saveAppData(); return; }
+    const v = Number(text), lb = kg ? v / 0.4536 : v;
+    if (lb >= 60 && lb <= 600) { appData.weight = Math.round(lb * 10) / 10; appData.prefs.weightSet = true; saveAppData(); }
+  }
+  function buildAboutYou(body) {
+    const P = appData.prefs, kg = P.units === 'kg';
+    body.appendChild(el('h2', null, 'About you (optional)'));
+    body.appendChild(el('div', 'sheet-note', 'Share as much or as little as you like. You can leave any of these blank.'));
+    body.appendChild(el('label', null, 'Sex'));
+    body.appendChild(mkChips('mus-wrap', [['male', 'Male'], ['female', 'Female']], k => P.sex === k, (k) => { P.sex = P.sex === k ? '' : k; saveAppData(); refreshSheet(); }));
+    body.appendChild(el('label', null, 'Age'));
+    const age = mkInput('number', P.age === '' ? '' : String(P.age), 'Years'); age.inputMode = 'numeric'; age.min = '10'; age.max = '100';
+    age.oninput = () => { if (age.value.trim() === '') { P.age = ''; saveAppData(); } else { const v = Number(age.value); if (Number.isInteger(v) && v >= 10 && v <= 100) { P.age = v; saveAppData(); } } };
+    body.appendChild(age);
+    body.appendChild(el('label', null, kg ? 'Height (cm)' : 'Height (ft / in)'));
+    if (kg) {
+      const h = mkInput('number', P.heightCm === '' ? '' : String(Math.round(P.heightCm)), 'cm'); h.inputMode = 'numeric';
+      h.oninput = () => { if (h.value.trim() === '') { P.heightCm = ''; saveAppData(); } else { const v = Number(h.value); if (v >= 90 && v <= 250) { P.heightCm = v; saveAppData(); } } };
+      body.appendChild(h);
+    } else {
+      const totalIn = P.heightCm === '' ? null : Math.round(P.heightCm / 2.54);
+      const ft = mkInput('number', totalIn == null ? '' : String(Math.floor(totalIn / 12)), 'ft'), inch = mkInput('number', totalIn == null ? '' : String(totalIn % 12), 'in');
+      ft.inputMode = inch.inputMode = 'numeric';
+      const row = el('div'); row.style.display = 'flex'; row.style.gap = '10px';
+      const upd = () => {
+        if (ft.value.trim() === '' && inch.value.trim() === '') { P.heightCm = ''; saveAppData(); return; }
+        const f = Number(ft.value || 0), i = Number(inch.value || 0), cm = (f * 12 + i) * 2.54;
+        if (f >= 3 && f <= 8 && i >= 0 && i < 12) { P.heightCm = Math.round(cm * 10) / 10; saveAppData(); }
+      };
+      ft.oninput = inch.oninput = upd; row.append(ft, inch); body.appendChild(row);
+    }
+    body.appendChild(el('label', null, 'Weight (' + (kg ? 'kg' : 'lb') + ')'));
+    const w = mkInput('number', P.weightSet ? String(weightShown()) : '', 'Optional'); w.inputMode = 'decimal'; w.step = 'any';
+    w.oninput = () => saveWeightInput(w.value);
+    body.appendChild(w);
+    body.appendChild(el('div', 'sheet-note', 'Weight is also used to estimate calories burned. If you leave it blank, FitPulse assumes ' + (kg ? Math.round(defaultAppData().weight * 0.4536) + ' kg' : defaultAppData().weight + ' lb') + '. Age, height and sex are only shown on your profile.'));
+  }
+
   function openEditProfile() {
     openSheet('Edit Profile', 'How you appear in FitPulse', (body) => {
       const wrap = el('div', 'setprof'); wrap.appendChild(avatarNode()); body.appendChild(wrap);
@@ -3208,6 +3254,7 @@
       body.appendChild(mkChips('mus-wrap', Object.entries(SPLIT_GOALS).map(([k, g]) => [k, g.label]), k => appData.prefs.goal === k,
         (k) => { appData.prefs.goal = appData.prefs.goal === k ? '' : k; if (appData.prefs.goal) { autoGoal = k; autoGoalSet = true; } saveAppData(); refreshSheet(); }));
       body.appendChild(el('div', 'sheet-note', 'Your main goal is the starting choice when you Auto-build your weekly split.'));
+      buildAboutYou(body);
     }, closeBtn);
   }
 
@@ -3271,8 +3318,8 @@
     openSheet('Health & Integration', 'Body stats used for your estimates', (body) => {
       const kg = appData.prefs.units === 'kg';
       body.appendChild(el('label', null, 'Body weight (' + (kg ? 'kg' : 'lb') + ') — used to estimate calories burned'));
-      const w = mkInput('number', String(kg ? Math.round(appData.weight * 0.4536 * 10) / 10 : appData.weight)); w.inputMode = 'decimal'; w.step = 'any';
-      w.oninput = () => { const v = Number(w.value), lb = kg ? v / 0.4536 : v; if (lb >= 60 && lb <= 600) { appData.weight = Math.round(lb * 10) / 10; saveAppData(); } };
+      const w = mkInput('number', appData.prefs.weightSet ? String(weightShown()) : '', 'Optional'); w.inputMode = 'decimal'; w.step = 'any';
+      w.oninput = () => saveWeightInput(w.value);
       body.appendChild(w);
       body.appendChild(el('div', 'sheet-note', 'Calories are an estimate from workout type, length, intensity and your weight.'));
       body.appendChild(el('h2', null, 'Connected apps'));
