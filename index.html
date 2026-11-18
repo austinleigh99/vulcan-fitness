@@ -339,7 +339,15 @@
   .gringw { display:block; width:54px; height:54px; } .gringw .gring { display:block; width:54px; height:54px; margin:0; }
   .gringw .gring .t { fill:none; stroke:var(--line); stroke-width:5; } .gringw .gring .p { fill:none; stroke:var(--accent2); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset .5s; }
   .gringw .gring text { fill:var(--text); font-size:13px; font-weight:900; } .gringw .gring.done .p { stroke:#34d399; } .gringw .gring.done text { fill:#34d399; font-size:18px; }
-  .gname.solo { margin-top:56px; }
+  .gname.solo { margin-top:40px; }
+  .gtgt { display:flex; gap:10px; width:100%; margin:18px 0 4px; }
+  .gtile { flex:1; min-width:0; background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:10px 6px 12px; text-align:center; }
+  .gtile .gl { font-size:11px; font-weight:900; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; }
+  .gtile .gv { display:flex; align-items:center; justify-content:center; gap:2px; margin-top:6px; }
+  .gtile input { width:72px; min-width:0; margin:0; padding:6px 2px; text-align:center; font-size:26px; font-weight:900; background:transparent; border:0; border-bottom:2px solid var(--line); border-radius:0; color:var(--text); }
+  .gtile input.r { width:78px; }
+  .gtile button { width:32px; height:32px; margin:0; padding:0; border-radius:10px; background:var(--chip); color:var(--text); font-size:18px; flex:none; }
+  .gtile .gu { font-size:12px; font-weight:800; color:var(--muted); margin-top:4px; }
   .gdots { grid-column:1 / -1; display:flex; gap:6px; }
   .gd { flex:1; height:30px; border-radius:9px; background:var(--inset); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:var(--muted); }
   .gd.on { background:#34d399; color:#06281c; font-size:13px; } .gd.now:not(.on) { outline:2px solid var(--accent); outline-offset:-2px; color:var(--text); }
@@ -4191,8 +4199,10 @@
     const rated = (x) => rate && x.item.weighted;
     const gRate = (x) => ({ kind: 'rate', name: 'How was ' + x.name + '?', ex: x.name, item: x.item, secs: 0, detail: '', say: 'How did ' + x.name + ' feel?' });
     const setStep = (x, s) => {
-      const base = 'Set ' + s + ' of ' + x.sets + ' · ' + x.what, st = gWork(x.name, x.hold, base, x.name + '. Set ' + s + ' of ' + x.sets + '. ' + x.what.replace(/\s*each side/, ', each side'));
-      if (rated(x)) st.det = () => base + (x.item.wt > 0 ? ' · ' + wFmt(x.item.wt) + ' ' + pgUnit() : (x.hold ? ' · pick a weight you can keep for the full time' : ' · pick a weight you can lift for every rep'));
+      // reps and weight are shown (and editable) as tiles under the name; the detail line keeps the set count
+      const base = 'Set ' + s + ' of ' + x.sets + (x.hold ? ' · ' + x.what : ''), st = gWork(x.name, x.hold, base, x.name + '. Set ' + s + ' of ' + x.sets + '. ' + x.what.replace(/\s*each side/, ', each side'));
+      st.item = x.item; st.what = x.what;
+      if (rated(x)) st.det = () => base + (x.item.wt > 0 ? '' : (x.hold ? ' · enter a weight you can keep for the full time' : ' · enter the weight you are using'));
       return st;
     };
     if (sup) {
@@ -4385,6 +4395,7 @@
       ring.appendChild(tm); box.appendChild(ring);
     }
     box.appendChild(el('div', 'gname' + (timed ? '' : ' solo'), st.kind === 'rest' ? 'Rest' : st.name));
+    guidedTargets(box, st);
     const dt = st.det ? st.det() : st.detail;
     if (dt) box.appendChild(el('div', 'gdetail', dt));
     if (nx) { const n = el('div', 'gnext'); n.append('Next: ', el('b', null, nx.name === 'Rest' ? 'Rest ' + clock(nx.secs) : nx.name)); box.appendChild(n); }
@@ -4395,6 +4406,32 @@
     main.onclick = timed ? (Guided.paused ? guidedResume : guidedPause) : guidedNext;
     ctl.append(back, main, skip); box.appendChild(ctl);
     guidedTime();
+  }
+  // weight and reps for the current exercise, shown as two tiles the user can change mid-workout
+  function guidedTargets(box, st) {
+    const it = st.item; if (!it || st.kind !== 'work') return;
+    const showW = !!it.weighted, showR = !st.secs; if (!showW && !showR) return;
+    const row = el('div', 'gtgt'), step = appData.prefs.incStep;
+    const tile = (label, dn, inp, up, unit) => {
+      const t = el('div', 'gtile'), v = el('div', 'gv'), d = el('button', null, '−'), u = el('button', null, '+');
+      d.setAttribute('aria-label', 'Lower ' + label.toLowerCase()); u.setAttribute('aria-label', 'Raise ' + label.toLowerCase());
+      d.onclick = dn; u.onclick = up; v.append(d, inp, u);
+      t.append(el('div', 'gl', label), v, el('div', 'gu', unit)); row.appendChild(t);
+    };
+    if (showW) {
+      const inp = mkInput('number', it.wt > 0 ? wFmt(it.wt) : '', '—'); inp.inputMode = 'decimal'; inp.step = 'any'; inp.min = '0'; inp.max = '2000'; inp.setAttribute('aria-label', 'Weight');
+      const clr = () => { const d = document.querySelector('#gBox .gdetail'); if (d && it.wt > 0) d.textContent = d.textContent.replace(/ · enter .*$/, ''); };
+      inp.oninput = () => { const n = Number(inp.value); it.wt = inp.value.trim() !== '' && n > 0 && n <= 2000 ? n : null; clr(); };
+      const move = (d) => { const n = it.wt > 0 ? Math.max(wGran(), it.wt + d) : (d > 0 ? step : 0); if (n) { it.wt = n; inp.value = wFmt(n); clr(); } };
+      tile('Weight', () => move(-step), inp, () => move(step), pgUnit());
+    }
+    if (showR) {
+      const inp = mkInput('text', it.reps != null ? it.reps : st.what, '8-10'); inp.maxLength = 14; inp.classList.add('r'); inp.setAttribute('aria-label', 'Reps');
+      inp.oninput = () => { const s = inp.value.trim(); if (/^[\w\s\-]{1,14}$/.test(s)) it.reps = s; };
+      const move = (d) => { let s = inp.value.trim(); const g = /^(\d+)\s*-\s*(\d+)$/.exec(s); if (g) s = g[2]; if (!/\d/.test(s)) return; s = s.replace(/(\d+)(?!.*\d)/, m => String(Math.min(200, Math.max(1, Number(m) + d)))); inp.value = s; it.reps = s; };
+      tile('Reps', () => move(-1), inp, () => move(1), 'per set');
+    }
+    box.appendChild(row);
   }
   // the "how did it go?" step: weight used + how it felt, then the rules set the next weight
   function guidedRate(box, st) {
