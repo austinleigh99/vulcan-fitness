@@ -4071,13 +4071,21 @@
   const isWeighted = (e) => e[2] !== 'bodyweight' && e[3] !== true && !NOWT.has(e[0]);
   const wFmt = (v) => String(Number(Number(v).toFixed(1)));
   const wGran = () => pgUnit() === 'kg' ? 1 : 2.5;
-  const wSnap = (v) => Math.max(wGran(), Math.round(v / wGran()) * wGran());
+  const wSnap = (v, g) => { g = g || wGran(); return Math.max(g, Math.round(v / g) * g); };
+  // weight jumps: dumbbells, kettlebells and machines move 5 lb (2.5 kg); barbells and anything plate-loaded move 2.5 lb (1 kg)
+  const PLATE_EQ = new Set(['barbell', 'ezbar', 'trapbar', 'landmine', 'plates', 'smith']);
+  const EX_REQ = new Map(EXERCISES.map(e => [e[0], e[2]]));
+  const reqKeys = (q) => q === 'bodyweight' ? [] : typeof q === 'string' ? [q] : Array.isArray(q) ? q.flatMap(reqKeys) : q.all.flatMap(reqKeys);
+  function wStep(name) {
+    const keys = reqKeys(EX_REQ.get(name) || 'dumbbells'), plate = keys.some(k => PLATE_EQ.has(k));
+    return pgUnit() === 'kg' ? (plate ? 1 : 2.5) : (plate ? 2.5 : 5);
+  }
   const FEELS = [['fail', 'Too heavy'], ['hard', 'Hard'], ['good', 'Just right'], ['easy', 'Easy']];
   // the weight to use next time, in the unit the user sees (after 4+ weeks away it starts 10% lighter)
   function progSuggest(name) {
     const r = appData.prefs.prog[name]; if (!r || !(r.w > 0)) return null;
     let v = r.w * pgK();
-    if (r.d && (Date.now() - new Date(r.d + 'T12:00:00').getTime()) / 86400000 >= 28) v = wSnap(v * 0.9);
+    if (r.d && (Date.now() - new Date(r.d + 'T12:00:00').getTime()) / 86400000 >= 28) v = wSnap(v * 0.9, wStep(name));
     return Number(v.toFixed(1));
   }
   function progLast(name) {
@@ -4085,12 +4093,12 @@
     return Number((r.h[r.h.length - 1].w * pgK()).toFixed(1));
   }
   // pure rule: what happens to the weight after one session. used = the weight lifted (display unit)
-  function progCalc(r, used, feel) {
-    const P = appData.prefs, step = P.incStep, g = wGran(), need = P.level === 'beginner' ? 1 : 2;
+  function progCalc(r, used, feel, name) {
+    const P = appData.prefs, step = wStep(name), g = step, need = P.level === 'beginner' ? 1 : 2;
     let w = used, ok = r.ok || 0, hard = r.hard || 0;
     if (feel === 'easy') { w = used + (r.f === 'easy' ? 2 * step : step); ok = 0; hard = 0; }
     else if (feel === 'good') { ok++; hard = 0; if (ok >= need) { w = used + step; ok = 0; } }
-    else if (feel === 'hard') { ok = 0; hard++; if (hard >= 3) { w = wSnap(used * 0.9); if (w >= used) w = Math.max(g, used - g); hard = 0; } }
+    else if (feel === 'hard') { ok = 0; hard++; if (hard >= 3) { w = wSnap(used * 0.9, g); if (w >= used) w = Math.max(g, used - g); hard = 0; } }
     else { ok = 0; hard = 0; w = Math.max(g, Math.min(used - g, Math.round(used * 0.9 / g) * g)); }
     return { w, ok, hard };
   }
@@ -4105,7 +4113,7 @@
   }
   function progRecord(name, used, feel) {
     if (!(used > 0)) return null;
-    const k = pgK(), r = progRec(name), c = progCalc(r, used, feel);
+    const k = pgK(), r = progRec(name), c = progCalc(r, used, feel, name);
     r.h = (r.h || []).concat([{ d: todayLocal(), w: Math.round(used / k * 1000) / 1000, f: feel }]).slice(-12);
     r.w = Math.round(c.w / k * 1000) / 1000; r.ok = c.ok; r.hard = c.hard; r.n = (r.n || 0) + 1; r.d = todayLocal(); r.f = feel;
     saveAppData();
@@ -4122,13 +4130,13 @@
     info._progDone = true;
     info.items.forEach(m => { if (m.weighted && m.wt > 0 && !(info.rated && info.rated.has(m.name))) { progRecord(m.name, m.wt, 'good'); if (info.rated) info.rated.add(m.name); } });
   }
-  function weightPicker(start, onChange) {
+  function weightPicker(start, onChange, step) {
     const node = el('div', 'wpick'), minus = el('button', null, '−'), plus = el('button', null, '+');
     const inp = mkInput('number', start > 0 ? wFmt(start) : '', '0'); inp.inputMode = 'decimal'; inp.step = 'any'; inp.min = '0'; inp.max = '2000';
     minus.setAttribute('aria-label', 'Lower weight'); plus.setAttribute('aria-label', 'Raise weight'); inp.setAttribute('aria-label', 'Weight used');
     const get = () => { const v = Number(inp.value); return inp.value.trim() !== '' && v > 0 && v <= 2000 ? v : 0; };
-    const bump = (d) => { const v = get(), n = v ? Math.max(wGran(), v + d) : (d > 0 ? appData.prefs.incStep : 0); if (n) { inp.value = wFmt(n); onChange(); } };
-    minus.onclick = () => bump(-appData.prefs.incStep); plus.onclick = () => bump(appData.prefs.incStep); inp.oninput = onChange;
+    const bump = (d) => { const v = get(), n = v ? Math.max(step, v + d) : (d > 0 ? step : 0); if (n) { inp.value = wFmt(n); onChange(); } };
+    minus.onclick = () => bump(-step); plus.onclick = () => bump(step); inp.oninput = onChange;
     node.append(minus, inp, el('span', 'wun', pgUnit()), plus);
     return { node, get };
   }
@@ -4141,7 +4149,7 @@
       FEELS.forEach(([k]) => {
         const b = btns[k], s = b.querySelector('small'); b.classList.remove('up', 'dn');
         if (!(w > 0)) { s.textContent = ' '; return; }
-        const c = progCalc(r, w, k).w;
+        const c = progCalc(r, w, k, name).w;
         s.textContent = c > w ? '↑ ' + wFmt(c) + ' ' + pgUnit() : c < w ? '↓ ' + wFmt(c) + ' ' + pgUnit() : 'Keep ' + wFmt(w) + ' ' + pgUnit();
         if (c > w) b.classList.add('up'); else if (c < w) b.classList.add('dn');
       });
@@ -4160,7 +4168,7 @@
     };
     openSheet(m.name, 'Use the same way every time (for dumbbells, per dumbbell).', (body) => {
       body.appendChild(el('div', 'wdlab', 'Weight'));
-      pick = weightPicker(m.wt, () => { err.textContent = ''; fb.refresh(); });
+      pick = weightPicker(m.wt, () => { err.textContent = ''; fb.refresh(); }, wStep(m.name));
       body.appendChild(pick.node);
       body.appendChild(el('div', 'wdlab', 'Already done it? How did it feel (optional)'));
       fb = feelButtons(m.name, () => pick.get(), (k) => { st.feel = st.feel === k ? null : k; Object.keys(fb.btns).forEach(x => fb.btns[x].classList.toggle('sel', x === st.feel)); });
@@ -4175,8 +4183,8 @@
       names.forEach(n => {
         const row = el('div', 'wlrow'), v = el('span', 'wv', wFmt(progSuggest(n)) + ' ' + pgUnit());
         const mk = (t, cls, fn, label) => { const b = el('button', cls, t); b.setAttribute('aria-label', label); b.onclick = fn; return b; };
-        const nudge = (d) => { progSetWeight(n, Math.max(wGran(), progSuggest(n) + d)); refreshSheet(); };
-        row.append(el('span', 'wn', n), mk('−', '', () => nudge(-P.incStep), 'Lower ' + n), v, mk('+', '', () => nudge(P.incStep), 'Raise ' + n), mk('✕', 'wx', () => { delete P.prog[n]; saveAppData(); refreshSheet(); }, 'Forget ' + n));
+        const sp = wStep(n), nudge = (d) => { progSetWeight(n, Math.max(sp, progSuggest(n) + d)); refreshSheet(); };
+        row.append(el('span', 'wn', n), mk('−', '', () => nudge(-sp), 'Lower ' + n), v, mk('+', '', () => nudge(sp), 'Raise ' + n), mk('✕', 'wx', () => { delete P.prog[n]; saveAppData(); refreshSheet(); }, 'Forget ' + n));
         body.appendChild(row);
       });
     }, closeBtn);
@@ -4411,7 +4419,7 @@
   function guidedTargets(box, st) {
     const it = st.item; if (!it || st.kind !== 'work') return;
     const showW = !!it.weighted, showR = !st.secs; if (!showW && !showR) return;
-    const row = el('div', 'gtgt'), step = appData.prefs.incStep;
+    const row = el('div', 'gtgt'), step = wStep(it.name);
     const tile = (label, dn, inp, up, unit) => {
       const t = el('div', 'gtile'), v = el('div', 'gv'), d = el('button', null, '−'), u = el('button', null, '+');
       d.setAttribute('aria-label', 'Lower ' + label.toLowerCase()); u.setAttribute('aria-label', 'Raise ' + label.toLowerCase());
@@ -4422,7 +4430,7 @@
       const inp = mkInput('number', it.wt > 0 ? wFmt(it.wt) : '', '—'); inp.inputMode = 'decimal'; inp.step = 'any'; inp.min = '0'; inp.max = '2000'; inp.setAttribute('aria-label', 'Weight');
       const clr = () => { const d = document.querySelector('#gBox .gdetail'); if (d && it.wt > 0) d.textContent = d.textContent.replace(/ · enter .*$/, ''); };
       inp.oninput = () => { const n = Number(inp.value); it.wt = inp.value.trim() !== '' && n > 0 && n <= 2000 ? n : null; clr(); };
-      const move = (d) => { const n = it.wt > 0 ? Math.max(wGran(), it.wt + d) : (d > 0 ? step : 0); if (n) { it.wt = n; inp.value = wFmt(n); clr(); } };
+      const move = (d) => { const n = it.wt > 0 ? Math.max(step, it.wt + d) : (d > 0 ? step : 0); if (n) { it.wt = n; inp.value = wFmt(n); clr(); } };
       tile('Weight', () => move(-step), inp, () => move(step), pgUnit());
     }
     if (showR) {
@@ -4441,7 +4449,7 @@
     if (st.w == null) st.w = (st.item && st.item.wt) || 0;
     let fb;
     const err = el('div', 'okmsg'); err.style.color = 'var(--danger-t)';
-    const pick = weightPicker(st.w, () => { st.w = pick.get(); err.textContent = ''; fb.refresh(); });
+    const pick = weightPicker(st.w, () => { st.w = pick.get(); err.textContent = ''; fb.refresh(); }, wStep(st.ex));
     fb = feelButtons(st.ex, () => pick.get(), (k) => {
       const w = pick.get(); if (!(w > 0)) { err.textContent = 'Enter the weight you used first.'; return; }
       progRecord(st.ex, w, k);
@@ -4834,9 +4842,7 @@
       r.appendChild(right); c.appendChild(r);
     }
     c.appendChild(mkToggle('Auto-start rest', 'In a guided workout, start the rest countdown as soon as you finish a set', P.autoRest, v => { P.autoRest = v; saveAppData(); }));
-    c.appendChild(el('div', 'wdlab', 'Weight increment steps'));
-    c.appendChild(mkSeg([[2.5, '2.5 ' + wu], [5, '5 ' + wu], [10, '10 ' + wu]], k => P.incStep === k, k => { P.incStep = k; saveAppData(); redraw(); }));
-    c.appendChild(mkToggle('Smart weights', 'Lowers an exercise after a miss and raises it as you get stronger, using the increment above', P.progOn, v => { P.progOn = v; saveAppData(); redraw(); }));
+    c.appendChild(mkToggle('Smart weights', 'Lowers an exercise after a miss and raises it as you get stronger. Dumbbells, kettlebells and machines move ' + (pgUnit() === 'kg' ? '2.5 kg' : '5 lb') + ' at a time; barbells and plate lifts move ' + (pgUnit() === 'kg' ? '1 kg' : '2.5 lb'), P.progOn, v => { P.progOn = v; saveAppData(); redraw(); }));
     if (P.progOn) {
       const mw = el('button', 'wdlink', 'View & edit working weights (' + Object.keys(P.prog).length + ')');
       mw.onclick = openMyWeights; c.appendChild(mw);
