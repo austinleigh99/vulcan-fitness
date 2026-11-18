@@ -340,6 +340,10 @@
   .gringw .gring .t { fill:none; stroke:var(--line); stroke-width:5; } .gringw .gring .p { fill:none; stroke:var(--accent2); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset .5s; }
   .gringw .gring text { fill:var(--text); font-size:13px; font-weight:900; } .gringw .gring.done .p { stroke:#34d399; } .gringw .gring.done text { fill:#34d399; font-size:18px; }
   .gname.solo { margin-top:40px; }
+  .gsets { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:14px 0 2px; }
+  .gs { width:40px; height:40px; border-radius:12px; background:var(--chip); color:var(--muted); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; }
+  .gs.done { background:var(--green); color:#04230f; }
+  .gs.now { background:var(--accent); color:var(--on-accent); }
   .gtgt { display:flex; gap:10px; width:100%; margin:18px 0 4px; }
   .gtile { flex:1; min-width:0; background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:10px 6px 12px; text-align:center; }
   .gtile .gl { font-size:11px; font-weight:900; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; }
@@ -4273,7 +4277,12 @@
         const n = Math.min(A.sets, B.sets);
         for (let s = 1; s <= n; s++) { out.push(setStep(A, s)); out.push(gRest(30)); out.push(setStep(B, s)); if (s === n) { if (rated(A)) out.push(gRate(A)); if (rated(B)) out.push(gRate(B)); } out.push(gRest(90)); }
       }
-    } else P.forEach(x => { for (let s = 1; s <= x.sets; s++) { out.push(setStep(x, s)); if (s === x.sets && rated(x)) out.push(gRate(x)); out.push(gRest(rest)); } });
+    } else {
+      // every exercise is one page: its sets, rests and rating are tagged with a shared group so the screen stays put until the last set
+      const grp = (x) => x._g || (x._g = { name: x.name, item: x.item, sets: x.sets, hold: x.hold, what: x.what });
+      const tag = (st, x, s) => { st.g = grp(x); st.gset = s; return st; };
+      P.forEach(x => { for (let s = 1; s <= x.sets; s++) { out.push(tag(setStep(x, s), x, s)); if (s === x.sets && rated(x)) out.push(tag(gRate(x), x, s)); out.push(tag(gRest(rest), x, s)); } });
+    }
     while (out.length && out[out.length - 1].kind === 'rest') out.pop();
     return out;
   }
@@ -4386,6 +4395,7 @@
     if (!steps || !steps.length) return;
     clearInterval(Guided.timer);
     Object.assign(Guided, { steps, title, info, done: false, paused: false });
+    Guided.gl = []; steps.forEach(s => { if (s.g && !Guided.gl.includes(s.g)) Guided.gl.push(s.g); });
     Cue.prime(); LockTimer.begin();
     $('guidedModal').classList.remove('hidden');
     guidedEnter(0);
@@ -4397,7 +4407,7 @@
     Object.assign(Guided, { i, paused: false, remaining: st.secs, endAt: st.secs ? Date.now() + st.secs * 1000 : 0, lastTick: -1 });
     // Auto-start rest off: the rest countdown waits for a tap on Resume
     if (st.kind === 'rest' && st.secs && appData && appData.prefs && appData.prefs.autoRest === false) { Guided.paused = true; Guided.pausedMs = st.secs * 1000; }
-    const say = st.kind === 'rest' ? 'Rest. ' + secsWords(st.secs) + (nx ? '. Next: ' + nx.name : '') : (st.say || st.name);
+    const say = st.kind === 'rest' ? 'Rest. ' + secsWords(st.secs) + (nx ? '. Next: ' + (nx.g && nx.g === st.g ? 'set ' + nx.gset : nx.name) : '') : (st.say || st.name);
     Cue.play(st.kind === 'rest' ? 'rest' : 'work', say);
     guidedRender(); LockTimer.update();
   }
@@ -4413,7 +4423,13 @@
     if (rem <= 0) guidedNext();
   }
   function guidedNext() { if (!Guided.done) guidedEnter(Guided.i + 1); }
-  function guidedBack() { if (!Guided.done) guidedEnter(Guided.i - 1); }
+  // going back inside an exercise page skips the rest countdowns, so you land on the previous set instead of restarting a rest
+  function guidedBack() {
+    if (Guided.done) return;
+    let i = Guided.i - 1;
+    while (i > 0 && Guided.steps[i].kind === 'rest' && Guided.steps[i].g) i--;
+    guidedEnter(i);
+  }
   function guidedPause() {
     const st = Guided.steps[Guided.i]; if (Guided.done || Guided.paused || !st || !st.secs) return;
     Guided.paused = true; Guided.pausedMs = Math.max(0, Guided.endAt - Date.now()); guidedRender(); LockTimer.update();
@@ -4443,9 +4459,10 @@
     const top = el('div', 'gtop'), x = el('button', 'gx', '✕'), gt = el('div', 'gt');
     x.setAttribute('aria-label', 'End workout');
     x.onclick = () => { if (confirm('End this workout?')) guidedClose(); };
-    gt.append(el('b', null, Guided.title), el('span', null, 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length));
+    gt.append(el('b', null, Guided.title), el('span', null, st.g ? 'Exercise ' + (Guided.gl.indexOf(st.g) + 1) + ' of ' + Guided.gl.length : 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length));
     top.append(x, gt); box.appendChild(top);
     const prog = el('div', 'gprog'), bar = el('i'); bar.style.width = Math.round(Guided.i / Guided.steps.length * 100) + '%'; prog.appendChild(bar); box.appendChild(prog);
+    if (st.g) return guidedGroup(box, st, nx);
     if (st.kind === 'rate') return guidedRate(box, st);
     box.appendChild(el('div', 'gkind' + (st.kind === 'rest' ? ' rest' : ''), st.kind === 'rest' ? 'REST' : st.kind === 'info' ? 'GET READY' : 'GO'));
     // only timed steps (rests, holds, carries) get the countdown ring; rep sets just show the exercise
@@ -4468,10 +4485,50 @@
     ctl.append(back, main, skip); box.appendChild(ctl);
     guidedTime();
   }
+  // one page per exercise: the sets sit in a row, "Complete set" starts the rest on the same page, and the page only changes after the last set
+  function guidedSets(box, st) {
+    const G = st.g, cur = st.kind === 'rate' ? G.sets + 1 : st.kind === 'rest' ? st.gset + 1 : st.gset, row = el('div', 'gsets');
+    row.setAttribute('aria-label', G.sets + ' sets');
+    for (let k = 1; k <= G.sets; k++) {
+      const c = el('span', 'gs' + (k < cur ? ' done' : k === cur ? ' now' : ''), k < cur ? '✓' : String(k));
+      c.setAttribute('aria-label', 'Set ' + k + (k < cur ? ' done' : k === cur ? ' next' : ''));
+      row.appendChild(c);
+    }
+    box.appendChild(row);
+  }
+  function guidedGroup(box, st, nx) {
+    if (st.kind === 'rate') return guidedRate(box, st);
+    const G = st.g, rest = st.kind === 'rest', timed = !!st.secs, last = st.gset >= G.sets;
+    box.appendChild(el('div', 'gkind' + (rest ? ' rest' : ''), rest ? 'REST' : 'GO'));
+    if (timed) {
+      const ring = el('div', 'gring' + (rest ? ' rest' : ''));
+      ring.innerHTML = '<svg viewBox="0 0 200 200" aria-hidden="true"><circle class="gbg" cx="100" cy="100" r="88"/><circle class="gfg" id="gArc" cx="100" cy="100" r="88" stroke-dasharray="' + RING + '" stroke-dashoffset="0"/></svg>';
+      const tm = el('div', 'gtime', clock(Guided.remaining)); tm.id = 'gTime';
+      ring.appendChild(tm); box.appendChild(ring);
+    }
+    box.appendChild(el('div', 'gname' + (timed ? '' : ' solo'), G.name));
+    guidedSets(box, st);
+    guidedTargets(box, st);
+    const dt = rest ? '' : (st.det ? st.det() : st.detail);
+    if (dt) box.appendChild(el('div', 'gdetail', dt));
+    let nextTxt = '';
+    if (nx) nextTxt = nx.g && nx.g === G ? (nx.kind === 'rate' ? 'Rate this exercise' : nx.kind === 'rest' ? 'Rest ' + clock(nx.secs) : 'Set ' + nx.gset + ' of ' + G.sets) : (nx.g ? nx.g.name : nx.name);
+    else nextTxt = 'Finish workout';
+    const n = el('div', 'gnext'); n.append('Next: ', el('b', null, nextTxt)); box.appendChild(n);
+    const ctl = el('div', 'gctl'), back = el('button', 'sm', '⏮'), skip = el('button', 'sm', '⏭');
+    back.setAttribute('aria-label', 'Previous set'); skip.setAttribute('aria-label', rest ? 'Skip rest' : 'Skip set');
+    back.onclick = guidedBack; skip.onclick = guidedNext;
+    const label = timed ? (Guided.paused ? (rest && Guided.pausedMs === st.secs * 1000 ? 'Start rest' : 'Resume') : 'Pause') : 'Complete set ' + st.gset + ' ✓';
+    const main = el('button', 'big', label);
+    main.onclick = timed ? (Guided.paused ? guidedResume : guidedPause) : guidedNext;
+    ctl.append(back, main, skip); box.appendChild(ctl);
+    guidedTime();
+  }
   // weight and reps for the current exercise, shown as two tiles the user can change mid-workout
   function guidedTargets(box, st) {
-    const it = st.item; if (!it || st.kind !== 'work') return;
-    const showW = !!it.weighted, showR = !st.secs; if (!showW && !showR) return;
+    const it = st.item || (st.g && st.g.item); if (!it || (st.kind !== 'work' && !st.g)) return;
+    const what = st.what || (st.g && st.g.what), isHold = st.g ? st.g.hold > 0 : !!st.secs;
+    const showW = !!it.weighted, showR = !isHold; if (!showW && !showR) return;
     const row = el('div', 'gtgt'), step = wStep(it.name); let wInp = null;
     // changing the reps also shifts the weight (fewer reps = a bit heavier, more reps = lighter) until the user types their own weight
     const syncW = () => { const n = repsNum(it.reps); if (it.weighted && !it.wtTouched && it.w0 > 0 && it.r0 > 0 && n > 0) { it.wt = repAdjust(it.w0, it.r0, n, step); if (wInp) { wInp.value = wFmt(it.wt); const d = document.querySelector('#gBox .gdetail'); if (d) d.textContent = d.textContent.replace(/ · enter .*$/, ''); } } };
@@ -4490,7 +4547,7 @@
       tile('Weight', () => move(-step), inp, () => move(step), pgUnit());
     }
     if (showR) {
-      const inp = mkInput('text', it.reps != null ? it.reps : st.what, '8-10'); inp.maxLength = 14; inp.classList.add('r'); inp.setAttribute('aria-label', 'Reps');
+      const inp = mkInput('text', it.reps != null ? it.reps : what, '8-10'); inp.maxLength = 14; inp.classList.add('r'); inp.setAttribute('aria-label', 'Reps');
       inp.oninput = () => { const s = inp.value.trim(); if (/^[\w\s\-]{1,14}$/.test(s)) { it.reps = s; syncW(); } };
       const move = (d) => { let s = inp.value.trim(); const g = /^(\d+)\s*-\s*(\d+)$/.exec(s); if (g) s = g[2]; if (!/\d/.test(s)) return; s = s.replace(/(\d+)(?!.*\d)/, m => String(Math.min(200, Math.max(1, Number(m) + d)))); inp.value = s; it.reps = s; syncW(); };
       tile('Reps', () => move(-1), inp, () => move(1), 'per set');
@@ -4501,6 +4558,7 @@
   function guidedRate(box, st) {
     box.appendChild(el('div', 'gkind', 'HOW DID IT GO?'));
     box.appendChild(el('div', 'gname', st.ex));
+    if (st.g) guidedSets(box, st);
     box.appendChild(el('div', 'gdetail', 'Enter the weight you used and tap how it felt. Your next workout adjusts from this.'));
     if (st.w == null) st.w = (st.item && st.item.wt) || 0;
     let fb;
