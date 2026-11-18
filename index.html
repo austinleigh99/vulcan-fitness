@@ -580,6 +580,18 @@
   #calisCfg .opt-tag { color: var(--accent); background: rgba(79,227,167,.15); }
   #calisCfg .opt-ico { background: rgba(79,227,167,.2); }
 
+  /* Abs configuration */
+  #absCfg { --accent: #ff9f43; }
+  #absCfg .cfg-title .s { color: var(--accent); }
+  #absCfg .dur.active { background: var(--accent); color:#2b1600; border-color: var(--accent); }
+  #absCfg .ctype { padding: 22px 24px; font-size: 17px; }
+  #absCfg .ctype.active { background: rgba(255,159,67,.14); }
+  #absBuild { background: var(--accent); color:#2b1600; border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(255,159,67,.35); margin-top: 26px; }
+  #absOut { margin-top: 18px; }
+  #absCfg .opt-tag { color: var(--accent); background: rgba(255,159,67,.16); }
+  #absCfg .opt-ico { background: rgba(255,159,67,.2); }
+  #absCfg .switch.on { background: var(--accent); }
+
   /* HIIT configuration */
   #hiitCfg { --accent: #a21cff; }
   #hiitCfg .cfg-title .s { color: #b45cff; }
@@ -808,6 +820,7 @@
           <button class="type" data-type="strength">Strength</button>
           <button class="type" data-type="cardio">Cardio</button>
           <button class="type" data-type="calisthenics">Calisthenics</button>
+          <button class="type" data-type="abs">Abs</button>
           <button class="type" data-type="hiit">HIIT</button>
           <button class="type" data-type="recovery">Recovery</button>
           <button class="type" data-type="pilates">Pilates</button>
@@ -923,6 +936,33 @@
         <button id="calBuild">Build Workout</button>
         <div id="calMsg" class="msg"></div>
         <div id="calOut"></div>
+      </div>
+
+      <!-- ABS CONFIGURATION -->
+      <div id="absCfg" class="hidden">
+        <div class="cfg-top">
+          <button id="absBack" class="backbtn" aria-label="Back">←</button>
+          <div class="cfg-title"><div class="t">ABS</div><div class="s">CONFIGURATION</div></div>
+        </div>
+
+        <h2>Duration (minutes)</h2>
+        <div id="absDurRow" class="dur-row"></div>
+
+        <h2>Focus</h2>
+        <div class="sub">SELECT ONE OR MORE</div>
+        <div id="absFocusRow" class="cat-list"></div>
+
+        <h2>Intensity Level</h2>
+        <div id="absIntRow" class="seg3"></div>
+
+        <div class="toggle-card">
+          <div><div class="tt">Add Weights</div><div class="ts">TWISTS, PLANKS, CRUNCHES &amp; MORE</div></div>
+          <button id="absWtSwitch" class="switch" aria-pressed="false" aria-label="Add weights"></button>
+        </div>
+
+        <button id="absBuild">Build Workout</button>
+        <div id="absMsg" class="msg"></div>
+        <div id="absOut"></div>
       </div>
 
       <!-- HIIT CONFIGURATION -->
@@ -1518,6 +1558,7 @@
     if (planType === 'strength') return openStrengthConfig();
     if (planType === 'cardio') return openCardioConfig();
     if (planType === 'calisthenics') return openCalisConfig();
+    if (planType === 'abs') return openAbsConfig();
     if (planType === 'hiit') return openHiitConfig();
     if (planType === 'recovery') return openRecoveryConfig();
     if (planType === 'yoga') return openYogaConfig();
@@ -2209,6 +2250,167 @@
     card.appendChild(actions);
 
     $('calOut').replaceChildren(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- ABS CONFIGURATION ----------
+  const ABS_DURS = [10, 15, 20, 25, 30, 40, 50, 60];
+  const ABS_FOCUS = [['upper', 'Upper Abs'], ['lower', 'Lower Abs'], ['obliques', 'Obliques'], ['core', 'Deep Core'], ['full', 'Full Core']];
+  const ABS_LABEL = Object.fromEntries(ABS_FOCUS);
+  const ABS_ORDER = ['upper', 'lower', 'obliques', 'core'];
+  const ABS_INT = {
+    light:    { label:'Light',    per:4.5, sets:[2,3], rest:45, hold:-10, rep:-3, wrep:2,  tier:1 },
+    moderate: { label:'Moderate', per:4,   sets:[3,3], rest:40, hold:0,   rep:0,  wrep:0,  tier:2 },
+    intense:  { label:'Intense',  per:3.5, sets:[3,4], rest:30, hold:10,  rep:3,  wrep:-2, tier:3 }
+  };
+  // [name, focus, where, tier (1 easy - 3 advanced), kind, weight (0 none, 1 optional weighted move, 2 needs a cable/weight), equipment for the weight step, starting weight in lb]
+  // kinds: reps, each (per side), hold, holdeach. Weighted moves only appear when "Add Weights" is on.
+  const ABS_EX = [
+    ['Crunch','upper','both',1,'reps'], ['Sit-Up','upper','both',1,'reps'], ['Long-Arm Crunch','upper','both',2,'reps'], ['Toe Touch Crunch','upper','both',1,'reps'], ['V-Up','upper','both',2,'reps'], ['Decline Sit-Up','upper','gym',2,'reps'],
+    ['Weighted Crunch','upper','both',1,'reps',1,'plates',10], ['Weighted Sit-Up','upper','both',2,'reps',1,'plates',10], ['Weighted Decline Sit-Up','upper','gym',3,'reps',1,'plates',10], ['Cable Crunch','upper','gym',2,'reps',2,'cable',30],
+    ['Reverse Crunch','lower','both',1,'reps'], ['Lying Leg Raise','lower','both',2,'reps'], ['Flutter Kicks','lower','both',1,'reps'], ['Scissor Kicks','lower','both',1,'reps'], ['Leg Raise Hip Lift','lower','both',2,'reps'], ['Mountain Climbers','lower','both',1,'reps'],
+    ['Hanging Knee Raise','lower','gym',2,'reps'], ['Hanging Leg Raise','lower','gym',3,'reps'], ['Toes-to-Bar','lower','gym',3,'reps'],
+    ['Ankle-Weight Leg Raise','lower','both',2,'reps',1,'plates',2.5], ['Ankle-Weight Flutter Kicks','lower','both',2,'reps',1,'plates',2.5],
+    ['Bicycle Crunch','obliques','both',1,'reps'], ['Russian Twist','obliques','both',1,'reps'], ['Heel Taps','obliques','both',1,'reps'], ['Side Plank','obliques','both',1,'holdeach'], ['Side Plank Hip Dips','obliques','both',2,'each'], ['Oblique Crunch','obliques','both',1,'each'], ['Standing Oblique Crunch','obliques','both',1,'each'], ['Side Plank Reach-Through','obliques','both',2,'each'], ['Plank Hip Twists','obliques','both',2,'reps'], ['Windshield Wipers','obliques','both',3,'reps'],
+    ['Weighted Russian Twist','obliques','both',1,'reps',1,'dumbbells',10], ['Dumbbell Side Bend','obliques','both',1,'each',1,'dumbbells',20], ['Dumbbell Woodchop','obliques','both',2,'each',1,'dumbbells',10], ['Weighted Side Plank','obliques','both',2,'holdeach',1,'plates',10], ['Weighted Oblique Crunch','obliques','both',2,'each',1,'dumbbells',10], ['Cable Woodchop','obliques','gym',2,'each',2,'cable',20],
+    ['Plank','core','both',1,'hold'], ['Forearm Plank','core','both',1,'hold'], ['Dead Bug','core','both',1,'each'], ['Bird Dog','core','both',1,'each'], ['Hollow Body Hold','core','both',2,'hold'], ['Hollow Body Rock','core','both',2,'reps'], ['Plank Shoulder Taps','core','both',1,'each'], ['Plank Up-Downs','core','both',2,'reps'], ['Bear Plank Hold','core','both',2,'hold'], ['Plank Jacks','core','both',1,'reps'], ['Ab Wheel Rollout','core','gym',2,'reps'],
+    ['Weighted Plank','core','both',1,'hold',1,'plates',10], ['Weighted Dead Bug','core','both',2,'each',1,'dumbbells',5], ['Weighted Hollow Hold','core','both',3,'hold',1,'dumbbells',5], ['Dumbbell Plank Drag-Through','core','both',2,'each',1,'dumbbells',10], ['Pallof Press','core','gym',2,'each',2,'cable',15]
+  ];
+  const ABS_GYMREPS = new Set(['Hanging Knee Raise', 'Hanging Leg Raise', 'Toes-to-Bar', 'Ab Wheel Rollout']);
+  const absCfg = { dur: 20, focus: new Set(), intensity: 'moderate', wt: false };
+
+  function syncAbs() {
+    mark($('absDurRow'), k => k === String(absCfg.dur));
+    mark($('absFocusRow'), k => absCfg.focus.has(k));
+    mark($('absIntRow'), k => k === absCfg.intensity);
+    $('absWtSwitch').classList.toggle('on', absCfg.wt);
+    $('absWtSwitch').setAttribute('aria-pressed', String(absCfg.wt));
+  }
+  buildChips($('absDurRow'), 'dur', ABS_DURS.map(d => [d, String(d)]), k => { absCfg.dur = Number(k); syncAbs(); });
+  buildChips($('absFocusRow'), 'ctype', ABS_FOCUS, k => {
+    if (k === 'full') absCfg.focus = new Set(['full']);
+    else { absCfg.focus.delete('full'); toggleIn(absCfg.focus, k); }
+    syncAbs();
+  });
+  buildChips($('absIntRow'), '', Object.entries(ABS_INT).map(([k, v]) => [k, v.label]), k => { absCfg.intensity = k; syncAbs(); });
+  $('absWtSwitch').onclick = () => { absCfg.wt = !absCfg.wt; syncAbs(); };
+  $('absBuild').onclick = buildAbs;
+  $('absBack').onclick = () => {
+    $('absCfg').classList.add('hidden');
+    $('builderMain').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  };
+  function openAbsConfig() {
+    syncAbs();
+    $('absOut').replaceChildren();
+    say($('absMsg'), '');
+    $('builderMain').classList.add('hidden');
+    $('absCfg').classList.remove('hidden');
+    window.scrollTo(0, 0);
+    const row = $('absDurRow'), sel = row.querySelectorAll('.active')[0];
+    if (sel && typeof sel.offsetLeft === 'number') row.scrollLeft = sel.offsetLeft - (row.clientWidth - sel.offsetWidth) / 2;
+  }
+
+  // one rep number from the user's goal (same rotating phases as strength); weighted moves use the lower isolation reps
+  function absReps(e, I) {
+    const ph = (REP_PHASES[userGoal()] || REP_PHASES.fit)[repPhase()], wtd = e[5] > 0;
+    let n = wtd ? Math.min(20, Math.max(6, ph[1] + I.wrep)) : Math.min(30, Math.max(8, ph[2] + I.rep));
+    if (ABS_GYMREPS.has(e[0])) n = Math.min(n, 15);
+    if (e[3] === 3 && !wtd) n = Math.max(6, Math.round(n / 2));
+    return e[4] === 'each' ? (wtd ? Math.min(n, 12) : Math.max(6, Math.round(n / 2))) : n;
+  }
+  function absRx(e, I, sets) {
+    const wtd = e[5] > 0;
+    if (e[4] === 'hold' || e[4] === 'holdeach') {
+      const s = Math.min(90, Math.max(20, holdSecs() + I.hold - (wtd ? 10 : 0)));
+      return { rx: sets + ' × ' + s + 's' + (e[4] === 'holdeach' ? ' each side' : ' hold'), reps: 0 };
+    }
+    const n = absReps(e, I);
+    return { rx: sets + ' × ' + n + (e[4] === 'each' ? ' each side' : ''), reps: n };
+  }
+  // a first-time weight to start from: gentle by default, lighter for beginners, heavier for advanced
+  function absStart(e) {
+    const m = { beginner: 0.5, intermediate: 1, advanced: 1.5 }[appData && appData.prefs && appData.prefs.level] || 1;
+    return wSnap(e[7] * m * pgK(), wStep(e[0]));
+  }
+
+  function buildAbs() {
+    const fail = (m) => { $('absOut').replaceChildren(); return say($('absMsg'), m, 'err'); };
+    if (!absCfg.focus.size) return fail('Pick at least one focus area.');
+    say($('absMsg'), '');
+    const I = ABS_INT[absCfg.intensity], P = appData.prefs;
+    const want = absCfg.focus.has('full') ? ABS_ORDER : ABS_ORDER.filter(c => absCfg.focus.has(c));
+    const n = Math.max(3, Math.min(12, Math.round(absCfg.dur / I.per)));
+    const r = rng(Math.floor(Math.random() * 4294967296));
+    const cap = P.level === 'beginner' ? 2 : I.tier + 1;
+
+    const bk = {};
+    want.forEach(c => {
+      let pool = ABS_EX.filter(e => e[1] === c && (e[2] === 'both' || e[2] === planLoc) && (!(e[5] > 0) || absCfg.wt));
+      const lo = pool.filter(e => e[3] <= cap); if (lo.length) pool = lo;
+      const s = pickN(r, pool, pool.length).sort((a, b) => Math.abs(a[3] - I.tier) - Math.abs(b[3] - I.tier));
+      bk[c] = { w: s.filter(e => e[5] > 0), b: s.filter(e => !(e[5] > 0)), k: 0 };
+    });
+    // with weights on, every other pick from each area is a weighted move
+    const left = (c) => bk[c].w.length + bk[c].b.length;
+    const take = (c) => { const x = bk[c], w = x.k++ % 2 === 0, a = w ? x.w : x.b, b = w ? x.b : x.w; return a.length ? a.shift() : b.shift(); };
+    const order = pickN(r, Object.keys(bk), Object.keys(bk).length), picked = [];
+    while (picked.length < n && order.some(c => left(c))) {
+      for (const c of order) { if (picked.length >= n) break; if (left(c)) picked.push(take(c)); }
+    }
+    picked.sort((a, b) => ABS_ORDER.indexOf(a[1]) - ABS_ORDER.indexOf(b[1]));
+
+    const items = picked.map(e => {
+      const sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1)), x = absRx(e, I, sets);
+      const it = { name: e[0], focus: e[1], rx: x.rx };
+      if (e[5] > 0) it.wtd = true;
+      if (e[5] > 0 && progOn()) { it.weighted = true; it.wt = progSuggest(e[0], x.reps) || absStart(e); it.last = progLast(e[0]); it.w0 = it.wt; it.r0 = x.reps; }
+      return it;
+    });
+
+    const names = ABS_FOCUS.filter(c => absCfg.focus.has(c[0]) && c[0] !== 'full').map(c => c[1]);
+    const title = absCfg.focus.has('full') ? 'Full Core' : names.length <= 2 ? names.join(' + ') : 'Custom Core';
+
+    const card = el('div', 'opt'), head = el('div', 'opt-head'), info = el('div', 'opt-info');
+    head.style.cursor = 'default';
+    info.append(el('span', 'opt-tag', 'YOUR WORKOUT'), el('div', 'opt-title', title),
+      el('div', 'opt-meta', absCfg.dur + 'm • ' + items.length + (items.length === 1 ? ' Exercise' : ' Exercises') + ' • ' + I.label + (absCfg.wt ? ' • Weighted' : '') + ' • ' + LOC_LABEL[planLoc]));
+    const ico = el('div', 'opt-ico'); ico.innerHTML = iconSvg('core'); ico.firstChild.style.cssText = 'width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round';
+    head.append(ico, info);
+    card.appendChild(head);
+
+    const body = el('div', 'opt-body');
+    body.appendChild(el('div', 'rest-note', 'Rest ' + restFor(I) + 's between sets. Move slowly, keep your lower back steady and breathe out on the hard part. Stop a set when your form slips, and never pull on your neck.'));
+    if (items.length < n) body.appendChild(el('div', 'rest-note', 'Only ' + items.length + ' exercise' + (items.length === 1 ? '' : 's') + ' match your choices. Add more focus areas for a fuller workout.'));
+    if (items.some(m => m.weighted)) body.appendChild(el('div', 'rest-note', 'Start light. Core work is about control, not load. Weights adjust from how your last workouts went. Tap a weight to set or change it.'));
+    else if (items.some(m => m.wtd)) body.appendChild(el('div', 'rest-note', 'Pick a weight you can control for every rep.'));
+    items.forEach(m => {
+      const row = el('div', 'mv'), left = el('div'), sub = el('div', 'mr', m.rx + ' • ' + ABS_LABEL[m.focus]);
+      left.append(el('div', 'mn', m.name), sub);
+      row.appendChild(left);
+      if (m.weighted) {
+        const d = m.wt > 0 && m.last > 0 ? Math.round((m.wt - m.last) * 10) / 10 : 0;
+        if (d) sub.appendChild(el('span', 'wchg ' + (d > 0 ? 'up' : 'dn'), (d > 0 ? '↑ +' : '↓ −') + wFmt(Math.abs(d))));
+        const pill = el('button', 'wpill');
+        const paint = () => { pill.textContent = m.wt > 0 ? wFmt(m.wt) + ' ' + pgUnit() + ' ›' : 'Set weight ›'; };
+        pill.onclick = () => openWeightSheet(m, gi, () => { paint(); const c = sub.querySelector('.wchg'); if (c) c.remove(); });
+        paint(); row.appendChild(pill);
+      }
+      body.appendChild(row);
+    });
+    card.appendChild(body);
+
+    const actions = el('div', 'plan-actions');
+    const shuffle = el('button', 'secondary', 'Shuffle');
+    shuffle.onclick = buildAbs;
+    const edit = el('button', 'secondary', 'Edit settings');
+    edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    const gi = { type:'abs', title:'Abs', mins:absCfg.dur, lifts:items.length, intensity:absCfg.intensity, items, rated: new Set() };
+    actions.append(shuffle, edit, makeCompleteBtn(gi));
+    addGuide(actions, title, repSteps(items, restFor(I), false, progOn()), gi);
+    card.appendChild(actions);
+
+    $('absOut').replaceChildren(card);
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -3090,6 +3292,7 @@
     strength:     { label:'Strength',     color:'#4a3cff', met:5,   icon:'dumb' },
     cardio:       { label:'Cardio',       color:'#2f6bff', met:7,   icon:'pulse' },
     calisthenics: { label:'Calisthenics', color:'#2fae78', met:6,   icon:'body' },
+    abs:          { label:'Abs',          color:'#ff9f43', met:4,   icon:'core' },
     hiit:         { label:'HIIT',         color:'#d81e5b', met:9,   icon:'bolt' },
     yoga:         { label:'Yoga',         color:'#e08a14', met:3,   icon:'lotus' },
     pilates:      { label:'Pilates',      color:'#c04fc0', met:3.5, icon:'ring' },
@@ -3105,6 +3308,7 @@
     flame: '<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/>',
     ring:  '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
     lotus: '<circle cx="12" cy="5" r="2"/><path d="M12 8v5M5 21l7-8 7 8M4 12h16"/>',
+    core:  '<rect x="6.5" y="3" width="11" height="18" rx="5"/><path d="M12 3v18M6.8 8.5h10.4M6.5 13h11M7.2 17.5h9.6"/>',
     body:  '<circle cx="12" cy="5" r="2"/><path d="M12 8v6M7 10l5-2 5 2M9 21l3-7 3 7"/>',
     trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/>',
     gear:  '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'
@@ -4136,6 +4340,7 @@
   // weight jumps: dumbbells, kettlebells and machines move 5 lb (2.5 kg); barbells and anything plate-loaded move 2.5 lb (1 kg)
   const PLATE_EQ = new Set(['barbell', 'ezbar', 'trapbar', 'landmine', 'plates', 'smith']);
   const EX_REQ = new Map(EXERCISES.map(e => [e[0], e[2]]));
+  ABS_EX.forEach(e => { if (e[6]) EX_REQ.set(e[0], e[6]); });   // plate-style abs weights move 2.5 lb like other plate work
   const reqKeys = (q) => q === 'bodyweight' ? [] : typeof q === 'string' ? [q] : Array.isArray(q) ? q.flatMap(reqKeys) : q.all.flatMap(reqKeys);
   function wStep(name) {
     const keys = reqKeys(EX_REQ.get(name) || 'dumbbells'), plate = keys.some(k => PLATE_EQ.has(k));
@@ -5479,9 +5684,9 @@
     if (!d || d.type === 'rest') return;
     const loc = appData.prefs.loc, lv = appData.prefs.intensity;
     showTab('workout'); setMode('custom');
-    ['strengthCfg', 'cardioCfg', 'calisCfg', 'hiitCfg', 'recoveryCfg', 'yogaCfg'].forEach(id => $(id).classList.add('hidden'));
+    ['strengthCfg', 'cardioCfg', 'calisCfg', 'absCfg', 'hiitCfg', 'recoveryCfg', 'yogaCfg'].forEach(id => $(id).classList.add('hidden'));
     $('builderMain').classList.remove('hidden');
-    ['cfgOut', 'cOut', 'calOut', 'hOut', 'recOut', 'yOut', 'planOut'].forEach(id => $(id).replaceChildren());
+    ['cfgOut', 'cOut', 'calOut', 'absOut', 'hOut', 'recOut', 'yOut', 'planOut'].forEach(id => $(id).replaceChildren());
     planLoc = loc; planType = d.type;
     document.querySelectorAll('.loc').forEach(x => x.classList.toggle('active', x.dataset.loc === loc));
     document.querySelectorAll('.type').forEach(x => x.classList.toggle('active', x.dataset.type === d.type));
@@ -5505,6 +5710,10 @@
         openCalisConfig();
         calCfg.dur = nearest(CAL_DURS, d.dur); calCfg.intensity = pick({ light:'light', moderate:'moderate', hard:'intense' }); calCfg.cats = new Set(['full']);
         syncCal(); buildCalis(); break;
+      case 'abs':
+        openAbsConfig();
+        absCfg.dur = nearest(ABS_DURS, d.dur); absCfg.intensity = pick({ light:'light', moderate:'moderate', hard:'intense' }); absCfg.focus = new Set(['full']);
+        syncAbs(); buildAbs(); break;
       case 'hiit':
         openHiitConfig();
         hcfg.dur = nearest(HIIT_DURS, d.dur); hcfg.intensity = pick({ light:'light', moderate:'moderate', hard:'hard' });
