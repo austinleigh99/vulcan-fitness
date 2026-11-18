@@ -336,9 +336,10 @@
   .gt { font-size:16px; font-weight:800; line-height:1.25; overflow-wrap:anywhere; }
   .gsub { font-size:12.5px; color:var(--muted); font-weight:600; line-height:1.35; }
   .gmeta { font-size:11px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); margin-top:2px; } .gmeta.late { color:var(--danger-t); }
-  .gringw { display:block; width:54px; height:54px; } .gring { display:block; width:54px; height:54px; }
-  .gring .t { fill:none; stroke:var(--line); stroke-width:5; } .gring .p { fill:none; stroke:var(--accent2); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset .5s; }
-  .gring text { fill:var(--text); font-size:13px; font-weight:900; } .gring.done .p { stroke:#34d399; } .gring.done text { fill:#34d399; font-size:18px; }
+  .gringw { display:block; width:54px; height:54px; } .gringw .gring { display:block; width:54px; height:54px; margin:0; }
+  .gringw .gring .t { fill:none; stroke:var(--line); stroke-width:5; } .gringw .gring .p { fill:none; stroke:var(--accent2); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset .5s; }
+  .gringw .gring text { fill:var(--text); font-size:13px; font-weight:900; } .gringw .gring.done .p { stroke:#34d399; } .gringw .gring.done text { fill:#34d399; font-size:18px; }
+  .gname.solo { margin-top:56px; }
   .gdots { grid-column:1 / -1; display:flex; gap:6px; }
   .gd { flex:1; height:30px; border-radius:9px; background:var(--inset); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:var(--muted); }
   .gd.on { background:#34d399; color:#06281c; font-size:13px; } .gd.now:not(.on) { outline:2px solid var(--accent); outline-offset:-2px; color:var(--text); }
@@ -4376,11 +4377,14 @@
     const prog = el('div', 'gprog'), bar = el('i'); bar.style.width = Math.round(Guided.i / Guided.steps.length * 100) + '%'; prog.appendChild(bar); box.appendChild(prog);
     if (st.kind === 'rate') return guidedRate(box, st);
     box.appendChild(el('div', 'gkind' + (st.kind === 'rest' ? ' rest' : ''), st.kind === 'rest' ? 'REST' : st.kind === 'info' ? 'GET READY' : 'GO'));
-    const ring = el('div', 'gring' + (st.kind === 'rest' ? ' rest' : ''));
-    ring.innerHTML = '<svg viewBox="0 0 200 200" aria-hidden="true"><circle class="gbg" cx="100" cy="100" r="88"/><circle class="gfg" id="gArc" cx="100" cy="100" r="88" stroke-dasharray="' + RING + '" stroke-dashoffset="0"/></svg>';
-    const tm = el('div', 'gtime' + (timed ? '' : ' small'), timed ? clock(Guided.remaining) : 'Tap Done when finished'); tm.id = 'gTime';
-    ring.appendChild(tm); box.appendChild(ring);
-    box.appendChild(el('div', 'gname', st.kind === 'rest' ? 'Rest' : st.name));
+    // only timed steps (rests, holds, carries) get the countdown ring; rep sets just show the exercise
+    if (timed) {
+      const ring = el('div', 'gring' + (st.kind === 'rest' ? ' rest' : ''));
+      ring.innerHTML = '<svg viewBox="0 0 200 200" aria-hidden="true"><circle class="gbg" cx="100" cy="100" r="88"/><circle class="gfg" id="gArc" cx="100" cy="100" r="88" stroke-dasharray="' + RING + '" stroke-dashoffset="0"/></svg>';
+      const tm = el('div', 'gtime', clock(Guided.remaining)); tm.id = 'gTime';
+      ring.appendChild(tm); box.appendChild(ring);
+    }
+    box.appendChild(el('div', 'gname' + (timed ? '' : ' solo'), st.kind === 'rest' ? 'Rest' : st.name));
     const dt = st.det ? st.det() : st.detail;
     if (dt) box.appendChild(el('div', 'gdetail', dt));
     if (nx) { const n = el('div', 'gnext'); n.append('Next: ', el('b', null, nx.name === 'Rest' ? 'Rest ' + clock(nx.secs) : nx.name)); box.appendChild(n); }
