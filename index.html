@@ -1534,11 +1534,11 @@
   }
 
   // ---------- STRENGTH CONFIGURATION ----------
-  const MUSCLES = ['shoulders','biceps','triceps','back','chest','abs','lower back','glutes','quadriceps','hamstrings'];
+  const MUSCLES = ['shoulders','biceps','triceps','forearms','traps','back','chest','abs','lower back','glutes','quadriceps','hamstrings','calves'];
   const AREAS = {
-    full:  { label:'Full Body',  groups: MUSCLES },
-    upper: { label:'Upper Body', groups: ['shoulders','biceps','triceps','back','chest'] },
-    lower: { label:'Lower Body', groups: ['lower back','glutes','quadriceps','hamstrings'] }
+    full:  { label:'Full Body',  groups: MUSCLES.filter(m => m !== 'forearms') },
+    upper: { label:'Upper Body', groups: ['shoulders','biceps','triceps','traps','back','chest'] },
+    lower: { label:'Lower Body', groups: ['lower back','glutes','quadriceps','hamstrings','calves'] }
   };
   const DURS = [20, 30, 40, 50, 60, 75, 90];
   const INTENSITY = {
@@ -1549,10 +1549,10 @@
   const A = (...k) => ({ all: k });
   const EQUIP_GROUPS = [
     { name:'Free Weights', items:[['barbell','Barbell'],['dumbbells','Dumbbells'],['ezbar','EZ-Bar'],['kettlebell','Kettlebells'],['landmine','Landmine'],['plates','Plates'],['trapbar','Trap Bar']] },
-    { name:'Weight Machines', items:[['cable','Cable Machines'],['absmachine','Abs Crunch Machine'],['bicepsmachine','Biceps Machine'],['chestpress','Chest Press'],['deltmachine','Delt Machine'],['flymachine','Fly Machine'],['hipabduction','Hip Abduction Machine'],['hipadduction','Hip Adduction Machine'],['legcurl','Leg Curl'],['legextension','Leg Extension'],['legpress','Leg Press'],['legpress45','Leg Press 45°'],['seatedlegcurl','Seated Leg Curl'],['seatedrow','Seated Row Machine'],['shoulderpress','Shoulder Press Machine'],['smith','Smith Machine'],['tbarrow','T-Bar Row'],['tricepsdip','Triceps Dip Machine']] },
-    { name:'Bars & Benches', items:[['bench','Bench'],['crunchbench','Crunch Bench'],['inclinebench','Incline Bench'],['preacherbench','Preacher Curl Bench'],['pullupbar','Pull-Up Bar'],['rack','Rack']] },
+    { name:'Weight Machines', items:[['hacksquat','Hack Squat Machine'],['calfmachine','Calf Raise Machine'],['assistedpull','Assisted Pull-Up Machine'],['chestrow','Chest-Supported Row'],['glutemachine','Glute Kickback Machine'],['cable','Cable Machines'],['absmachine','Abs Crunch Machine'],['bicepsmachine','Biceps Machine'],['chestpress','Chest Press'],['deltmachine','Delt Machine'],['flymachine','Fly Machine'],['hipabduction','Hip Abduction Machine'],['hipadduction','Hip Adduction Machine'],['legcurl','Leg Curl'],['legextension','Leg Extension'],['legpress','Leg Press'],['legpress45','Leg Press 45°'],['seatedlegcurl','Seated Leg Curl'],['seatedrow','Seated Row Machine'],['shoulderpress','Shoulder Press Machine'],['smith','Smith Machine'],['tbarrow','T-Bar Row'],['tricepsdip','Triceps Dip Machine']] },
+    { name:'Bars & Benches', items:[['bench','Bench'],['crunchbench','Crunch Bench'],['inclinebench','Incline Bench'],['preacherbench','Preacher Curl Bench'],['declinebench','Decline Bench'],['dipstation','Dip Station'],['ghd','Glute-Ham Developer'],['hyperbench','Back Extension Bench'],['pullupbar','Pull-Up Bar'],['rack','Rack']] },
     { name:'Cardio', items:[['assaultbike','Assault Bike'],['elliptical','Elliptical'],['rower','Rowing Machine'],['stairclimber','Stair Climber'],['bike','Stationary Bike'],['treadmill','Treadmill']] },
-    { name:'Miscellaneous', items:[['medball','Medicine Ball'],['jumprope','Jump Rope'],['boxjump','Box Jump'],['stabilityball','Stability Ball'],['abwheel','Ab Wheel Carver'],['bands','Resistance Bands']] }
+    { name:'Miscellaneous', items:[['medball','Medicine Ball'],['jumprope','Jump Rope'],['boxjump','Box Jump'],['stabilityball','Stability Ball'],['abwheel','Ab Wheel Carver'],['bands','Resistance Bands'],['rings','Rings / TRX'],['sled','Sled'],['battleropes','Battle Ropes']] }
   ];
   const EQUIP = Object.fromEntries(EQUIP_GROUPS.flatMap(g => g.items));
   // [name, muscle, requirement, isTimedHold]
@@ -1567,7 +1567,34 @@
     ['Superman Hold','lower back','bodyweight',true], ['Bird Dog','lower back','bodyweight'], ['Barbell Deadlift','lower back','barbell'], ['Trap Bar Deadlift','lower back','trapbar'], ['Good Morning','lower back',A('barbell','rack')], ['Kettlebell Swings','lower back','kettlebell'], ['Stability Ball Back Extension','lower back','stabilityball'],
     ['Barbell Hip Thrust','glutes',A('barbell','bench')], ['Plate Hip Thrust','glutes',A('plates','bench')], ['Glute Bridge','glutes','bodyweight'], ['Dumbbell Glute Bridge','glutes','dumbbells'], ['Cable Kickback','glutes','cable'], ['Hip Abduction Machine','glutes','hipabduction'], ['Hip Adduction Machine','glutes','hipadduction'], ['Bulgarian Split Squat','glutes','dumbbells'], ['Banded Glute Bridge','glutes','bands'], ['Kettlebell Sumo Squat','glutes','kettlebell'],
     ['Barbell Back Squat','quadriceps',A('barbell','rack')], ['Smith Machine Squat','quadriceps','smith'], ['Dumbbell Goblet Squat','quadriceps','dumbbells'], ['Leg Press','quadriceps',['legpress','legpress45']], ['Leg Extension','quadriceps','legextension'], ['Walking Lunges','quadriceps','bodyweight'], ['Bodyweight Squats','quadriceps','bodyweight'], ['Kettlebell Goblet Squat','quadriceps','kettlebell'], ['Step-Ups','quadriceps','bench'], ['Box Jumps','quadriceps','boxjump'],
-    ['Romanian Deadlift','hamstrings','barbell'], ['Dumbbell Romanian Deadlift','hamstrings','dumbbells'], ['Lying Leg Curl','hamstrings','legcurl'], ['Seated Leg Curl','hamstrings','seatedlegcurl'], ['Cable Pull-Through','hamstrings','cable'], ['Banded Good Morning','hamstrings','bands'], ['Hamstring Walkouts','hamstrings','bodyweight'], ['Kettlebell Deadlift','hamstrings','kettlebell'], ['Stability Ball Hamstring Curl','hamstrings','stabilityball']
+    ['Romanian Deadlift','hamstrings','barbell'], ['Dumbbell Romanian Deadlift','hamstrings','dumbbells'], ['Lying Leg Curl','hamstrings','legcurl'], ['Seated Leg Curl','hamstrings','seatedlegcurl'], ['Cable Pull-Through','hamstrings','cable'], ['Banded Good Morning','hamstrings','bands'], ['Hamstring Walkouts','hamstrings','bodyweight'], ['Kettlebell Deadlift','hamstrings','kettlebell'], ['Stability Ball Hamstring Curl','hamstrings','stabilityball'],
+    // ---- library expansion: more barbell / dumbbell / cable / machine / bodyweight lifts, plus calves, traps and forearms ----
+    // chest
+    ['Decline Barbell Press','chest',A('barbell','declinebench')], ['Decline Dumbbell Press','chest',A('dumbbells','declinebench')], ['Incline Dumbbell Fly','chest',A('dumbbells','inclinebench')], ['Dumbbell Squeeze Press','chest','dumbbells'], ['Single-Arm Dumbbell Bench Press','chest',A('dumbbells','bench')], ['Cable Crossover','chest','cable'], ['Low-to-High Cable Fly','chest','cable'], ['Incline Cable Fly','chest',A('cable','inclinebench')], ['Single-Arm Cable Press','chest','cable'], ['Chest Dips','chest','dipstation'], ['Incline Push-Ups','chest','bench'], ['Decline Push-Ups','chest','bench'], ['Svend Press','chest','plates'], ['Ring Push-Ups','chest','rings'], ['Smith Machine Bench Press','chest',A('smith','bench')],
+    // back
+    ['Pendlay Row','back','barbell'], ['Dumbbell Bent-Over Row','back','dumbbells'], ['Chest-Supported Row Machine','back','chestrow'], ['Chest-Supported Dumbbell Row','back',A('dumbbells','inclinebench')], ['Straight-Arm Pulldown','back','cable'], ['Single-Arm Cable Row','back','cable'], ['Close-Grip Lat Pulldown','back','cable'], ['Reverse-Grip Lat Pulldown','back','cable'], ['Single-Arm Lat Pulldown','back','cable'], ['Wide-Grip Seated Cable Row','back','cable'], ['Cable Pullover','back','cable'], ['Neutral-Grip Pull-Ups','back','pullupbar'], ['Wide-Grip Pull-Ups','back','pullupbar'], ['Assisted Pull-Ups','back','assistedpull'], ['Dumbbell Pullover','back',A('dumbbells','bench')], ['Meadows Row','back','landmine'], ['Renegade Row','back','dumbbells'], ['Inverted Row','back',[A('barbell','rack'),'smith']], ['Ring Row','back','rings'], ['Seal Row','back',A('barbell','bench')],
+    // shoulders
+    ['Arnold Press','shoulders','dumbbells'], ['Barbell Upright Row','shoulders','barbell'], ['Dumbbell Upright Row','shoulders','dumbbells'], ['Cable Upright Row','shoulders','cable'], ['Dumbbell Front Raise','shoulders','dumbbells'], ['Cable Front Raise','shoulders','cable'], ['Cable Lateral Raise','shoulders','cable'], ['Machine Lateral Raise','shoulders','deltmachine'], ['Dumbbell Rear Delt Fly','shoulders','dumbbells'], ['Cable Rear Delt Fly','shoulders','cable'], ['Push Press','shoulders','barbell'], ['Dumbbell Push Press','shoulders','dumbbells'], ['Z Press','shoulders','barbell'], ['Half-Kneeling Cable Press','shoulders','cable'], ['Dumbbell Y-Raise','shoulders','dumbbells'], ['Single-Arm Dumbbell Press','shoulders','dumbbells'], ['Battle Rope Waves','shoulders','battleropes','work'],
+    // biceps
+    ['Incline Dumbbell Curl','biceps',A('dumbbells','inclinebench')], ['Concentration Curl','biceps','dumbbells'], ['Spider Curl','biceps',A('dumbbells','inclinebench')], ['Zottman Curl','biceps','dumbbells'], ['Cross-Body Hammer Curl','biceps','dumbbells'], ['Alternating Dumbbell Curl','biceps','dumbbells'], ['Rope Hammer Curl','biceps','cable'], ['Cable Preacher Curl','biceps',A('cable','preacherbench')], ['High Cable Curl','biceps','cable'], ['Single-Arm Cable Curl','biceps','cable'], ['Bayesian Curl','biceps','cable'], ['Drag Curl','biceps','barbell'], ['Ring Biceps Curl','biceps','rings'],
+    // triceps
+    ['Triceps Dips','triceps','dipstation'], ['Ring Dips','triceps','rings'], ['Rope Pushdown','triceps','cable'], ['Single-Arm Cable Pushdown','triceps','cable'], ['Reverse-Grip Pushdown','triceps','cable'], ['Overhead Cable Extension','triceps','cable'], ['Cable Triceps Kickback','triceps','cable'], ['Dumbbell Kickback','triceps','dumbbells'], ['JM Press','triceps',A('barbell','bench')], ['Barbell Skull Crushers','triceps',A('barbell','bench')], ['Dumbbell Skull Crushers','triceps',A('dumbbells','bench')], ['Tate Press','triceps',A('dumbbells','bench')], ['Overhead Barbell Extension','triceps','barbell'], ['Single-Arm Overhead Dumbbell Extension','triceps','dumbbells'], ['Close-Grip Push-Ups','triceps','bodyweight'],
+    // forearms
+    ['Barbell Wrist Curl','forearms','barbell'], ['Dumbbell Wrist Curl','forearms','dumbbells'], ['Reverse Wrist Curl','forearms','dumbbells'], ['Reverse Barbell Curl','forearms','barbell'], ['Reverse EZ-Bar Curl','forearms','ezbar'], ['Reverse Dumbbell Curl','forearms','dumbbells'], ['Cable Reverse Curl','forearms','cable'], ['Cable Wrist Curl','forearms','cable'], ['Farmer’s Walk','forearms','dumbbells','carry'], ['Trap Bar Carry','forearms','trapbar','carry'], ['Dead Hang','forearms','pullupbar',true], ['Plate Pinch Hold','forearms','plates',true],
+    // traps
+    ['Barbell Shrug','traps','barbell'], ['Dumbbell Shrug','traps','dumbbells'], ['Cable Shrug','traps','cable'], ['Smith Machine Shrug','traps','smith'], ['Trap Bar Shrug','traps','trapbar'], ['Kettlebell Shrug','traps','kettlebell'], ['Incline Dumbbell Y-Raise','traps',A('dumbbells','inclinebench')], ['Face Pull (High)','traps','cable'],
+    // abs and obliques
+    ['Hanging Leg Raises','abs','pullupbar'], ['Toes-to-Bar','abs','pullupbar'], ['Side Plank','abs','bodyweight',true], ['Hollow Body Hold','abs','bodyweight',true], ['Pallof Press','abs','cable'], ['Cable Woodchop (High-to-Low)','abs','cable'], ['Cable Woodchop (Low-to-High)','abs','cable'], ['Cable Side Bend','abs','cable'], ['Dumbbell Side Bend','abs','dumbbells'], ['Reverse Crunch','abs','bodyweight'], ['Sit-Ups','abs','bodyweight'], ['Weighted Sit-Ups','abs','plates'], ['Decline Sit-Ups','abs','declinebench'], ['V-Ups','abs','bodyweight'], ['Lying Leg Raises','abs','bodyweight'], ['Flutter Kicks','abs','bodyweight'], ['Mountain Climbers','abs','bodyweight'], ['Landmine Rotation','abs','landmine'], ['Suitcase Carry','abs','dumbbells','carry'], ['Ring Fallout','abs','rings'], ['Battle Rope Slams','abs','battleropes','work'], ['Cable Rope Crunch','abs','cable'],
+    // lower back
+    ['Back Extension','lower back','hyperbench'], ['Weighted Back Extension','lower back',A('hyperbench','plates')], ['Rack Pull','lower back',A('barbell','rack')], ['Dumbbell Deadlift','lower back','dumbbells'], ['Reverse Plank','lower back','bodyweight',true],
+    // glutes
+    ['Sumo Deadlift','glutes','barbell'], ['Dumbbell Reverse Lunge','glutes','dumbbells'], ['Dumbbell Curtsy Lunge','glutes','dumbbells'], ['Dumbbell Sumo Squat','glutes','dumbbells'], ['Dumbbell Hip Thrust','glutes',A('dumbbells','bench')], ['Smith Machine Hip Thrust','glutes',A('smith','bench')], ['Single-Leg Hip Thrust','glutes','bench'], ['Single-Leg Glute Bridge','glutes','bodyweight'], ['Glute Kickback Machine','glutes','glutemachine'], ['Cable Hip Abduction','glutes','cable'], ['Cable Glute Kickback','glutes','cable'], ['Lateral Band Walk','glutes','bands'], ['Banded Clamshell','glutes','bands'], ['Donkey Kicks','glutes','bodyweight'], ['Fire Hydrants','glutes','bodyweight'], ['Frog Pumps','glutes','bodyweight'], ['Dumbbell Step-Ups','glutes',A('dumbbells','bench')], ['Reverse Lunges','glutes','bodyweight'], ['Curtsy Lunge','glutes','bodyweight'],
+    // quads
+    ['Barbell Front Squat','quadriceps',A('barbell','rack')], ['Pause Squat','quadriceps',A('barbell','rack')], ['Zercher Squat','quadriceps',A('barbell','rack')], ['Hack Squat','quadriceps','hacksquat'], ['Dumbbell Walking Lunges','quadriceps','dumbbells'], ['Dumbbell Split Squat','quadriceps','dumbbells'], ['Dumbbell Front Squat','quadriceps','dumbbells'], ['Barbell Lunge','quadriceps',A('barbell','rack')], ['Smith Machine Split Squat','quadriceps','smith'], ['Dumbbell Lateral Lunge','quadriceps','dumbbells'], ['Kettlebell Front Squat','quadriceps','kettlebell'], ['Landmine Squat','quadriceps','landmine'], ['Single-Leg Press','quadriceps',['legpress','legpress45']], ['Sissy Squat','quadriceps','bodyweight'], ['Jump Squats','quadriceps','bodyweight'], ['Lateral Lunges','quadriceps','bodyweight'], ['Wall Sit','quadriceps','bodyweight',true], ['Pistol Squat to Box','quadriceps','bench'], ['Ring Squat','quadriceps','rings'], ['Sled Push','quadriceps','sled','work'], ['Sled Drag','quadriceps','sled','work'],
+    // hamstrings
+    ['Stiff-Leg Deadlift','hamstrings','barbell'], ['Dumbbell Stiff-Leg Deadlift','hamstrings','dumbbells'], ['Single-Leg Romanian Deadlift','hamstrings','dumbbells'], ['Kettlebell Single-Leg Deadlift','hamstrings','kettlebell'], ['Smith Machine Romanian Deadlift','hamstrings','smith'], ['Nordic Curl','hamstrings',['ghd','bench']], ['Glute-Ham Raise','hamstrings','ghd'], ['Cable Leg Curl','hamstrings','cable'], ['Dumbbell Leg Curl','hamstrings',A('dumbbells','bench')], ['Slider Leg Curl','hamstrings','bodyweight'], ['Ring Hamstring Curl','hamstrings','rings'],
+    // calves
+    ['Standing Calf Raise','calves','calfmachine'], ['Seated Calf Raise','calves','calfmachine'], ['Leg Press Calf Raise','calves',['legpress','legpress45']], ['Hack Squat Calf Raise','calves','hacksquat'], ['Smith Machine Calf Raise','calves','smith'], ['Barbell Calf Raise','calves','barbell'], ['Dumbbell Calf Raise','calves','dumbbells'], ['Single-Leg Dumbbell Calf Raise','calves','dumbbells'], ['Seated Dumbbell Calf Raise','calves',A('dumbbells','bench')], ['Calf Raises','calves','bodyweight'], ['Single-Leg Calf Raise','calves','bodyweight'], ['Tibialis Raise','calves','bodyweight']
   ];
   function reqOk(req) {
     if (req === 'bodyweight') return true;
@@ -1702,7 +1729,8 @@
       const pool = e[2] === 'bodyweight' ? I.bw : I.reps;
       const pr = pool[Math.floor(r() * pool.length)];
       if (DP) sets = DP.defSets;
-      const rx = e[3] ? sets + ' × 30-45s hold' : sets + ' × ' + (DP ? DP.defReps : pr);
+      // e[3]: true = timed hold, 'carry' / 'work' = timed effort (carries, sleds, battle ropes)
+      const rx = e[3] ? sets + ' × 30-45s ' + (e[3] === true ? 'hold' : e[3]) : sets + ' × ' + (DP ? DP.defReps : pr);
       const it = { name: e[0], muscle: e[1], rx };
       if (progOn() && isWeighted(e)) { it.weighted = true; it.wt = progSuggest(e[0]); it.last = progLast(e[0]); }
       return it;
@@ -3085,6 +3113,10 @@
     P.smartEquip = P.smartEquip === undefined ? true : !!P.smartEquip;
     const eqKeys = Object.keys(EQUIP);
     const cleanEq = (a, dflt) => Array.isArray(a) ? a.filter(k => eqKeys.includes(k)) : dflt;
+    // equipment added in the library expansion: people who had every old item selected get the new ones too
+    const NEW_EQ = ['hacksquat', 'calfmachine', 'assistedpull', 'chestrow', 'glutemachine', 'declinebench', 'dipstation', 'ghd', 'hyperbench', 'rings', 'sled', 'battleropes'];
+    if (Array.isArray(P.equipGym) && !(P.eqVer >= 2) && eqKeys.filter(k => !NEW_EQ.includes(k)).every(k => P.equipGym.includes(k))) P.equipGym = P.equipGym.concat(NEW_EQ);
+    P.eqVer = 2;
     P.equipGym = cleanEq(P.equipGym, eqKeys.slice());
     P.equipHome = cleanEq(P.equipHome, ['dumbbells', 'bench', 'bands']);
     P.age = Number.isInteger(Number(P.age)) && Number(P.age) >= 10 && Number(P.age) <= 100 && P.age !== '' ? Number(P.age) : '';
@@ -4012,9 +4044,12 @@
 
   // ----- smart weights: simple progressive-overload rules (no AI) -----
   // Each exercise remembers a working weight. After you rate an exercise the rules below pick the next weight.
-  const NOWT = new Set(['Pull-Ups', 'Chin-Ups', 'Hanging Knee Raises', 'Bench Dips', 'Box Jumps', 'Ab Wheel Rollout', 'Step-Ups', 'Decline Crunch', 'Medicine Ball Push-Ups', 'Medicine Ball Slams', 'Stability Ball Crunch', 'Stability Ball Back Extension', 'Stability Ball Hamstring Curl', 'Band Chest Press', 'Band Row', 'Band Curl', 'Band Pushdown', 'Band Pull-Apart', 'Banded Good Morning', 'Banded Glute Bridge']);
+  const NOWT = new Set(['Pull-Ups', 'Chin-Ups', 'Hanging Knee Raises', 'Bench Dips', 'Box Jumps', 'Ab Wheel Rollout', 'Step-Ups', 'Decline Crunch', 'Medicine Ball Push-Ups', 'Medicine Ball Slams', 'Stability Ball Crunch', 'Stability Ball Back Extension', 'Stability Ball Hamstring Curl', 'Band Chest Press', 'Band Row', 'Band Curl', 'Band Pushdown', 'Band Pull-Apart', 'Banded Good Morning', 'Banded Glute Bridge',
+    'Chest Dips', 'Incline Push-Ups', 'Decline Push-Ups', 'Ring Push-Ups', 'Neutral-Grip Pull-Ups', 'Wide-Grip Pull-Ups', 'Assisted Pull-Ups', 'Inverted Row', 'Ring Row', 'Ring Biceps Curl', 'Triceps Dips', 'Ring Dips',
+    'Hanging Leg Raises', 'Toes-to-Bar', 'Decline Sit-Ups', 'Ring Fallout', 'Battle Rope Waves', 'Battle Rope Slams', 'Back Extension', 'Single-Leg Hip Thrust', 'Lateral Band Walk', 'Banded Clamshell',
+    'Pistol Squat to Box', 'Ring Squat', 'Nordic Curl', 'Glute-Ham Raise', 'Ring Hamstring Curl', 'Dead Hang']);
   const progOn = () => !!(appData && appData.prefs && appData.prefs.progOn);
-  const isWeighted = (e) => e[2] !== 'bodyweight' && !e[3] && !NOWT.has(e[0]);
+  const isWeighted = (e) => e[2] !== 'bodyweight' && e[3] !== true && !NOWT.has(e[0]);
   const wFmt = (v) => String(Number(Number(v).toFixed(1)));
   const wGran = () => pgUnit() === 'kg' ? 1 : 2.5;
   const wSnap = (v) => Math.max(wGran(), Math.round(v / wGran()) * wGran());
@@ -4146,7 +4181,7 @@
     const gRate = (x) => ({ kind: 'rate', name: 'How was ' + x.name + '?', ex: x.name, item: x.item, secs: 0, detail: '', say: 'How did ' + x.name + ' feel?' });
     const setStep = (x, s) => {
       const base = 'Set ' + s + ' of ' + x.sets + ' · ' + x.what, st = gWork(x.name, x.hold, base, x.name + '. Set ' + s + ' of ' + x.sets + '. ' + x.what.replace(/\s*each side/, ', each side'));
-      if (rated(x)) st.det = () => base + (x.item.wt > 0 ? ' · ' + wFmt(x.item.wt) + ' ' + pgUnit() : ' · pick a weight you can lift for every rep');
+      if (rated(x)) st.det = () => base + (x.item.wt > 0 ? ' · ' + wFmt(x.item.wt) + ' ' + pgUnit() : (x.hold ? ' · pick a weight you can keep for the full time' : ' · pick a weight you can lift for every rep'));
       return st;
     };
     if (sup) {
