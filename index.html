@@ -346,6 +346,9 @@
   .gtile .gv { display:flex; align-items:center; justify-content:center; gap:2px; margin-top:6px; }
   .gtile input { width:72px; min-width:0; margin:0; padding:6px 2px; text-align:center; font-size:26px; font-weight:900; background:transparent; border:0; border-bottom:2px solid var(--line); border-radius:0; color:var(--text); }
   .gtile input.r { width:78px; }
+  /* no browser spinner arrows: the + and - buttons are the only controls */
+  .gtile input[type=number], .wpick input[type=number] { -moz-appearance:textfield; appearance:textfield; }
+  .gtile input::-webkit-outer-spin-button, .gtile input::-webkit-inner-spin-button, .wpick input::-webkit-outer-spin-button, .wpick input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
   .gtile button { width:32px; height:32px; margin:0; padding:0; border-radius:10px; background:var(--chip); color:var(--text); font-size:18px; flex:none; }
   .gtile .gu { font-size:12px; font-weight:800; color:var(--muted); margin-top:4px; }
   .gdots { grid-column:1 / -1; display:flex; gap:6px; }
@@ -1713,6 +1716,50 @@
     window.scrollTo(0, 0);
   }
 
+  // ---- reps are decided by the app: one number per exercise, based on the user's main goal, experience and the workout intensity ----
+  // Each goal has three rep "phases" (higher reps / base / heavier) as [compound lifts, isolation lifts, bodyweight moves].
+  // The phase rotates by week and alternates by day, so a fat-loss plan might be 15 reps one day, 12 the next, 10 the week after.
+  const REP_PHASES = {
+    fat:    [[15, 20, 20], [12, 15, 15], [10, 12, 12]],
+    muscle: [[10, 15, 15], [8, 12, 12], [6, 10, 10]],
+    fit:    [[12, 15, 15], [10, 12, 12], [8, 10, 10]],
+    flex:   [[15, 20, 15], [12, 15, 12], [10, 12, 10]]
+  };
+  function repPhase(d) {
+    d = d || new Date();
+    const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000), week = Math.floor((day + 3) / 7), dow = (day + 3) % 7;   // Monday = 0
+    return (week + (dow % 2)) % 3;
+  }
+  // heavier with fewer reps, lighter with more (Epley-style estimate), kept within about 25-30% and rounded to the equipment's step
+  function repAdjust(w, fromReps, toReps, step) {
+    if (!(w > 0) || !(fromReps > 0) || !(toReps > 0) || fromReps === toReps) return w;
+    const f = Math.min(1.3, Math.max(0.75, (1 + fromReps / 30) / (1 + toReps / 30)));
+    return wSnap(w * f, step);
+  }
+  const repsNum = (s) => { const m = /\d+/.exec(String(s == null ? '' : s)); return m ? Number(m[0]) : 0; };
+  const itemReps = (it) => it.reps != null ? repsNum(it.reps) : repsNum((/×\s*(.+)$/.exec(it.rx || '') || [])[1]);
+  const ISO_GROUPS = new Set(['biceps', 'forearms', 'calves', 'abs', 'traps']);
+  const ISO_RE = /Fly|Raise|Curl|Extension|Kickback|Pullover|Crossover|Abduction|Adduction|Shrug|Face Pull|Pull-Apart|Rear Delt|Wrist|Crunch|Twist|Pallof|Woodchop|Side Bend|Pushdown|Skull|Walkout|Bird Dog|Dead Bug/;
+  const isCompound = (e) => {
+    if (ISO_GROUPS.has(e[1]) || ISO_RE.test(e[0])) return false;
+    return e[1] === 'triceps' ? /Dips|Close-Grip|JM Press|Push-Ups/.test(e[0]) : true;
+  };
+  const userGoal = () => (appData && appData.prefs && appData.prefs.goal) || 'fit';
+  function repsFor(e, intensity) {
+    const P = appData.prefs, b = (REP_PHASES[userGoal()] || REP_PHASES.fit)[repPhase()], kind = e[2] === 'bodyweight' ? 2 : isCompound(e) ? 0 : 1;
+    let n = b[kind] + (kind === 2 ? { basic: -2, moderate: 0, high: 3 }[intensity] : { basic: 2, moderate: 0, high: -2 }[intensity]);
+    if (P.level === 'beginner' && kind === 0) n = Math.max(n, 10);   // beginners practise form with lighter, higher-rep sets
+    return Math.min(kind === 2 ? 30 : 20, Math.max(3, n));
+  }
+  const holdSecs = () => ({ beginner: 30, intermediate: 40, advanced: 50 }[appData && appData.prefs && appData.prefs.level] || 40);
+  // turns a range like '8-12' or '30-45s' into one number that leans toward the user's goal
+  function oneOf(rg) {
+    const m = /^(\d+)-(\d+)(s?)$/.exec(rg); if (!m) return rg;
+    const a = Number(m[1]), z = Number(m[2]), t = { fat: 1, flex: 0.8, fit: 0.5, muscle: 0.3 }[userGoal()];
+    const v = a + (z - a) * (t === undefined ? 0.5 : t);
+    return (m[3] ? Math.round(v / 5) * 5 : Math.round(v)) + m[3];
+  }
+
   function buildStrength() {
     const I = INTENSITY[cfg.intensity];
     const groups = cfg.muscles.size ? MUSCLES.filter(m => cfg.muscles.has(m)) : AREAS[cfg.area].groups;
@@ -1741,15 +1788,14 @@
     const DP = appData && appData.prefs && appData.prefs.setsRepsOn ? appData.prefs : null;
     const items = picked.map(e => {
       let sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1));
-      const pool = e[2] === 'bodyweight' ? I.bw : I.reps;
-      const pr = pool[Math.floor(r() * pool.length)];
+      const pr = repsFor(e, cfg.intensity);
       if (DP) sets = DP.defSets;
       // e[3]: true = timed hold, 'carry' / 'work' = timed effort (carries, sleds, battle ropes)
       // olympic lifts are always low-rep, whatever the intensity or default reps
-      const rx = e[3] ? sets + ' × 30-45s ' + (e[3] === true ? 'hold' : e[3]) : e[4] === 'oly' ? sets + ' × 2-4' : sets + ' × ' + (DP ? DP.defReps : pr);
+      const rx = e[3] ? sets + ' × ' + holdSecs() + 's ' + (e[3] === true ? 'hold' : e[3]) : e[4] === 'oly' ? sets + ' × 3' : sets + ' × ' + (DP ? DP.defReps : pr);
       const it = { name: e[0], muscle: e[1], rx };
       if (e[4] === 'oly') it.oly = true;
-      if (progOn() && isWeighted(e)) { it.weighted = true; it.wt = progSuggest(e[0]); it.last = progLast(e[0]); }
+      if (progOn() && isWeighted(e)) { it.weighted = true; it.wt = progSuggest(e[0], e[3] ? 0 : e[4] === 'oly' ? 3 : Number(DP ? DP.defReps : pr)); it.last = progLast(e[0]); it.w0 = it.wt; it.r0 = e[3] ? 0 : itemReps(it); }
       return it;
     });
 
@@ -2075,8 +2121,9 @@
     if (e[3] === 3 && kind === 'reps') kind = 'skill';
     if (e[3] === 3 && kind === 'each') kind = 'skilleach';
     const s = sets + ' × ';
-    return { reps: s + I.reps + ' reps', each: s + I.each + ' each side', hold: s + I.hold + ' hold', holdeach: s + I.hold + ' each side',
-      skill: s + I.skill + ' reps', skilleach: s + I.skill + ' each side', timed: s + I.hold }[kind];
+    const R = oneOf(I.reps), Ea = oneOf(I.each), H = oneOf(I.hold), Sk = oneOf(I.skill);
+    return { reps: s + R + ' reps', each: s + Ea + ' each side', hold: s + H + ' hold', holdeach: s + H + ' each side',
+      skill: s + Sk + ' reps', skilleach: s + Sk + ' each side', timed: s + H }[kind];
   }
 
   function buildCalis() {
@@ -3125,7 +3172,7 @@
     Object.keys(pin).filter(okName).slice(0, 200).forEach(k => {
       const r = pin[k]; if (!r || !(r.w > 0 && r.w <= 5000)) return;
       pout[k] = { w: Number(r.w), ok: Math.min(5, Math.max(0, Math.round(r.ok) || 0)), hard: Math.min(5, Math.max(0, Math.round(r.hard) || 0)), n: Math.max(0, Math.round(r.n) || 0),
-        d: okDate(r.d) ? r.d : '', f: FEEL_OK.includes(r.f) ? r.f : '',
+        d: okDate(r.d) ? r.d : '', f: FEEL_OK.includes(r.f) ? r.f : '', rp: Math.min(100, Math.max(0, Math.round(r.rp) || 0)),
         h: (Array.isArray(r.h) ? r.h : []).filter(x => x && okDate(x.d) && x.w > 0 && x.w <= 5000).slice(-12).map(x => ({ d: x.d, w: Number(x.w), f: FEEL_OK.includes(x.f) ? x.f : 'good' })) };
     });
     P.prog = pout;
@@ -4082,10 +4129,13 @@
   }
   const FEELS = [['fail', 'Too heavy'], ['hard', 'Hard'], ['good', 'Just right'], ['easy', 'Easy']];
   // the weight to use next time, in the unit the user sees (after 4+ weeks away it starts 10% lighter)
-  function progSuggest(name) {
+  // reps = the reps the plan asks for; if that differs from the reps the weight was last used for, the weight shifts to match
+  function progSuggest(name, reps) {
     const r = appData.prefs.prog[name]; if (!r || !(r.w > 0)) return null;
-    let v = r.w * pgK();
-    if (r.d && (Date.now() - new Date(r.d + 'T12:00:00').getTime()) / 86400000 >= 28) v = wSnap(v * 0.9, wStep(name));
+    let v = r.w * pgK(), snap = false;
+    if (r.d && (Date.now() - new Date(r.d + 'T12:00:00').getTime()) / 86400000 >= 28) { v *= 0.9; snap = true; }
+    if (r.rp > 0 && reps > 0 && r.rp !== reps) { v = repAdjust(v, r.rp, reps, wStep(name)); snap = false; }
+    if (snap) v = wSnap(v, wStep(name));
     return Number(v.toFixed(1));
   }
   function progLast(name) {
@@ -4111,24 +4161,26 @@
     }
     return P.prog[name];
   }
-  function progRecord(name, used, feel) {
+  function progRecord(name, used, feel, reps) {
     if (!(used > 0)) return null;
     const k = pgK(), r = progRec(name), c = progCalc(r, used, feel, name);
+    if (reps > 0) r.rp = reps;
     r.h = (r.h || []).concat([{ d: todayLocal(), w: Math.round(used / k * 1000) / 1000, f: feel }]).slice(-12);
     r.w = Math.round(c.w / k * 1000) / 1000; r.ok = c.ok; r.hard = c.hard; r.n = (r.n || 0) + 1; r.d = todayLocal(); r.f = feel;
     saveAppData();
     return { from: used, to: c.w };
   }
-  function progSetWeight(name, disp) {
+  function progSetWeight(name, disp, reps) {
     if (!(disp > 0)) return;
     const r = progRec(name); r.w = Math.round(disp / pgK() * 1000) / 1000; r.d = todayLocal();
+    if (reps > 0) r.rp = reps;
     saveAppData();
   }
   // finishing a workout without rating an exercise counts as "completed as planned"
   function progImplicit(info) {
     if (!progOn() || !info || !info.items || info._progDone) return;
     info._progDone = true;
-    info.items.forEach(m => { if (m.weighted && m.wt > 0 && !(info.rated && info.rated.has(m.name))) { progRecord(m.name, m.wt, 'good'); if (info.rated) info.rated.add(m.name); } });
+    info.items.forEach(m => { if (m.weighted && m.wt > 0 && !(info.rated && info.rated.has(m.name))) { progRecord(m.name, m.wt, 'good', itemReps(m)); if (info.rated) info.rated.add(m.name); } });
   }
   function weightPicker(start, onChange, step) {
     const node = el('div', 'wpick'), minus = el('button', null, '−'), plus = el('button', null, '+');
@@ -4162,8 +4214,9 @@
     const err = el('div', 'okmsg'); err.style.color = 'var(--danger-t)';
     const save = () => {
       const w = pick.get(); if (!(w > 0)) { err.textContent = 'Enter a weight first.'; return; }
-      if (st.feel) { progRecord(m.name, w, st.feel); m.wt = progSuggest(m.name); if (gi && gi.rated) gi.rated.add(m.name); }
-      else { progSetWeight(m.name, w); m.wt = w; }
+      if (st.feel) { progRecord(m.name, w, st.feel, itemReps(m)); m.wt = progSuggest(m.name, itemReps(m)); if (gi && gi.rated) gi.rated.add(m.name); }
+      else { progSetWeight(m.name, w, itemReps(m)); m.wt = w; }
+      m.w0 = m.wt; m.r0 = itemReps(m); m.wtTouched = false;
       closeSheet(); after();
     };
     openSheet(m.name, 'Use the same way every time (for dumbbells, per dumbbell).', (body) => {
@@ -4419,7 +4472,9 @@
   function guidedTargets(box, st) {
     const it = st.item; if (!it || st.kind !== 'work') return;
     const showW = !!it.weighted, showR = !st.secs; if (!showW && !showR) return;
-    const row = el('div', 'gtgt'), step = wStep(it.name);
+    const row = el('div', 'gtgt'), step = wStep(it.name); let wInp = null;
+    // changing the reps also shifts the weight (fewer reps = a bit heavier, more reps = lighter) until the user types their own weight
+    const syncW = () => { const n = repsNum(it.reps); if (it.weighted && !it.wtTouched && it.w0 > 0 && it.r0 > 0 && n > 0) { it.wt = repAdjust(it.w0, it.r0, n, step); if (wInp) { wInp.value = wFmt(it.wt); const d = document.querySelector('#gBox .gdetail'); if (d) d.textContent = d.textContent.replace(/ · enter .*$/, ''); } } };
     const tile = (label, dn, inp, up, unit) => {
       const t = el('div', 'gtile'), v = el('div', 'gv'), d = el('button', null, '−'), u = el('button', null, '+');
       d.setAttribute('aria-label', 'Lower ' + label.toLowerCase()); u.setAttribute('aria-label', 'Raise ' + label.toLowerCase());
@@ -4429,14 +4484,15 @@
     if (showW) {
       const inp = mkInput('number', it.wt > 0 ? wFmt(it.wt) : '', '—'); inp.inputMode = 'decimal'; inp.step = 'any'; inp.min = '0'; inp.max = '2000'; inp.setAttribute('aria-label', 'Weight');
       const clr = () => { const d = document.querySelector('#gBox .gdetail'); if (d && it.wt > 0) d.textContent = d.textContent.replace(/ · enter .*$/, ''); };
-      inp.oninput = () => { const n = Number(inp.value); it.wt = inp.value.trim() !== '' && n > 0 && n <= 2000 ? n : null; clr(); };
-      const move = (d) => { const n = it.wt > 0 ? Math.max(step, it.wt + d) : (d > 0 ? step : 0); if (n) { it.wt = n; inp.value = wFmt(n); clr(); } };
+      wInp = inp;
+      inp.oninput = () => { const n = Number(inp.value); it.wt = inp.value.trim() !== '' && n > 0 && n <= 2000 ? n : null; it.wtTouched = true; clr(); };
+      const move = (d) => { const n = it.wt > 0 ? Math.max(step, it.wt + d) : (d > 0 ? step : 0); if (n) { it.wt = n; it.wtTouched = true; inp.value = wFmt(n); clr(); } };
       tile('Weight', () => move(-step), inp, () => move(step), pgUnit());
     }
     if (showR) {
       const inp = mkInput('text', it.reps != null ? it.reps : st.what, '8-10'); inp.maxLength = 14; inp.classList.add('r'); inp.setAttribute('aria-label', 'Reps');
-      inp.oninput = () => { const s = inp.value.trim(); if (/^[\w\s\-]{1,14}$/.test(s)) it.reps = s; };
-      const move = (d) => { let s = inp.value.trim(); const g = /^(\d+)\s*-\s*(\d+)$/.exec(s); if (g) s = g[2]; if (!/\d/.test(s)) return; s = s.replace(/(\d+)(?!.*\d)/, m => String(Math.min(200, Math.max(1, Number(m) + d)))); inp.value = s; it.reps = s; };
+      inp.oninput = () => { const s = inp.value.trim(); if (/^[\w\s\-]{1,14}$/.test(s)) { it.reps = s; syncW(); } };
+      const move = (d) => { let s = inp.value.trim(); const g = /^(\d+)\s*-\s*(\d+)$/.exec(s); if (g) s = g[2]; if (!/\d/.test(s)) return; s = s.replace(/(\d+)(?!.*\d)/, m => String(Math.min(200, Math.max(1, Number(m) + d)))); inp.value = s; it.reps = s; syncW(); };
       tile('Reps', () => move(-1), inp, () => move(1), 'per set');
     }
     box.appendChild(row);
@@ -4452,8 +4508,8 @@
     const pick = weightPicker(st.w, () => { st.w = pick.get(); err.textContent = ''; fb.refresh(); }, wStep(st.ex));
     fb = feelButtons(st.ex, () => pick.get(), (k) => {
       const w = pick.get(); if (!(w > 0)) { err.textContent = 'Enter the weight you used first.'; return; }
-      progRecord(st.ex, w, k);
-      if (st.item) st.item.wt = progSuggest(st.ex);
+      progRecord(st.ex, w, k, st.item ? itemReps(st.item) : 0);
+      if (st.item) st.item.wt = progSuggest(st.ex, itemReps(st.item));
       if (Guided.info) (Guided.info.rated = Guided.info.rated || new Set()).add(st.ex);
       guidedNext();
     });
