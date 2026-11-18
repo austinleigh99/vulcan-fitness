@@ -955,6 +955,22 @@
         <h2>Intensity Level</h2>
         <div id="absIntRow" class="seg3"></div>
 
+        <h2>Exercise Style</h2>
+        <div id="absModeRow" class="seg3"></div>
+        <div id="absWorkBox" class="hidden">
+          <h2>Time Per Exercise (seconds)</h2>
+          <div id="absWorkRow" class="dur-row"></div>
+        </div>
+
+        <div class="toggle-card">
+          <div><div class="tt">Circuit Sets</div><div class="ts">DO EACH MOVE ONCE, THEN REPEAT THE SET</div></div>
+          <button id="absCircSwitch" class="switch" aria-pressed="false" aria-label="Circuit sets"></button>
+        </div>
+        <div id="absSetsBox" class="hidden">
+          <h2>Number Of Sets</h2>
+          <div id="absSetsRow" class="dur-row"></div>
+        </div>
+
         <div class="toggle-card">
           <div><div class="tt">Add Weights</div><div class="ts">TWISTS, PLANKS, CRUNCHES &amp; MORE</div></div>
           <button id="absWtSwitch" class="switch" aria-pressed="false" aria-label="Add weights"></button>
@@ -2277,15 +2293,24 @@
     ['Weighted Plank','core','both',1,'hold',1,'plates',10], ['Weighted Dead Bug','core','both',2,'each',1,'dumbbells',5], ['Weighted Hollow Hold','core','both',3,'hold',1,'dumbbells',5], ['Dumbbell Plank Drag-Through','core','both',2,'each',1,'dumbbells',10], ['Pallof Press','core','gym',2,'each',2,'cable',15]
   ];
   const ABS_GYMREPS = new Set(['Hanging Knee Raise', 'Hanging Leg Raise', 'Toes-to-Bar', 'Ab Wheel Rollout']);
-  const absCfg = { dur: 20, focus: new Set(), intensity: 'moderate', wt: false };
+  const absCfg = { dur: 20, focus: new Set(), intensity: 'moderate', wt: false, mode: 'reps', work: 40, circuit: false, sets: 3 };
+  const ABS_WORK = [20, 30, 40, 45, 60], ABS_SETS = [2, 3, 4, 5];
 
   function syncAbs() {
     mark($('absDurRow'), k => k === String(absCfg.dur));
     mark($('absFocusRow'), k => absCfg.focus.has(k));
     mark($('absIntRow'), k => k === absCfg.intensity);
-    $('absWtSwitch').classList.toggle('on', absCfg.wt);
-    $('absWtSwitch').setAttribute('aria-pressed', String(absCfg.wt));
+    mark($('absModeRow'), k => k === absCfg.mode);
+    mark($('absWorkRow'), k => k === String(absCfg.work));
+    mark($('absSetsRow'), k => k === String(absCfg.sets));
+    $('absWorkBox').classList.toggle('hidden', absCfg.mode !== 'timed');
+    $('absSetsBox').classList.toggle('hidden', !absCfg.circuit);
+    [['absWtSwitch', absCfg.wt], ['absCircSwitch', absCfg.circuit]].forEach(([id, on]) => { $(id).classList.toggle('on', on); $(id).setAttribute('aria-pressed', String(on)); });
   }
+  buildChips($('absModeRow'), '', [['reps', 'Reps'], ['timed', 'Timed']], k => { absCfg.mode = k; syncAbs(); });
+  buildChips($('absWorkRow'), 'dur', ABS_WORK.map(d => [d, String(d)]), k => { absCfg.work = Number(k); syncAbs(); });
+  buildChips($('absSetsRow'), 'dur', ABS_SETS.map(d => [d, String(d)]), k => { absCfg.sets = Number(k); syncAbs(); });
+  $('absCircSwitch').onclick = () => { absCfg.circuit = !absCfg.circuit; syncAbs(); };
   buildChips($('absDurRow'), 'dur', ABS_DURS.map(d => [d, String(d)]), k => { absCfg.dur = Number(k); syncAbs(); });
   buildChips($('absFocusRow'), 'ctype', ABS_FOCUS, k => {
     if (k === 'full') absCfg.focus = new Set(['full']);
@@ -2321,6 +2346,10 @@
   }
   function absRx(e, I, sets) {
     const wtd = e[5] > 0;
+    if (absCfg.mode === 'timed') {   // every move runs for the same timer; one-sided moves switch sides halfway
+      const side = e[4] === 'each' || e[4] === 'holdeach';
+      return { rx: sets + ' × ' + absCfg.work + 's' + (side ? ' (switch sides halfway)' : ''), reps: 0 };
+    }
     if (e[4] === 'hold' || e[4] === 'holdeach') {
       const s = Math.min(90, Math.max(20, holdSecs() + I.hold - (wtd ? 10 : 0)));
       return { rx: sets + ' × ' + s + 's' + (e[4] === 'holdeach' ? ' each side' : ' hold'), reps: 0 };
@@ -2340,7 +2369,11 @@
     say($('absMsg'), '');
     const I = ABS_INT[absCfg.intensity], P = appData.prefs;
     const want = absCfg.focus.has('full') ? ABS_ORDER : ABS_ORDER.filter(c => absCfg.focus.has(c));
-    const n = Math.max(3, Math.min(12, Math.round(absCfg.dur / I.per)));
+    const timed = absCfg.mode === 'timed', circ = absCfg.circuit, S = absCfg.sets, work = timed ? absCfg.work : 40, restEx = 15, restSet = restFor(I);
+    let n;
+    if (circ) n = Math.max(3, Math.min(8, Math.round((absCfg.dur - (S - 1) * restSet / 60) / (S * (work + restEx) / 60))));
+    else if (timed) n = Math.max(3, Math.min(12, Math.round(absCfg.dur / (((I.sets[0] + I.sets[1]) / 2) * (work + restSet) / 60))));
+    else n = Math.max(3, Math.min(12, Math.round(absCfg.dur / I.per)));
     const r = rng(Math.floor(Math.random() * 4294967296));
     const cap = P.level === 'beginner' ? 2 : I.tier + 1;
 
@@ -2361,7 +2394,7 @@
     picked.sort((a, b) => ABS_ORDER.indexOf(a[1]) - ABS_ORDER.indexOf(b[1]));
 
     const items = picked.map(e => {
-      const sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1)), x = absRx(e, I, sets);
+      const sets = circ ? S : I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1)), x = absRx(e, I, sets);
       const it = { name: e[0], focus: e[1], rx: x.rx };
       if (e[5] > 0) it.wtd = true;
       if (e[5] > 0 && progOn()) { it.weighted = true; it.wt = progSuggest(e[0], x.reps) || absStart(e); it.last = progLast(e[0]); it.w0 = it.wt; it.r0 = x.reps; }
@@ -2374,18 +2407,18 @@
     const card = el('div', 'opt'), head = el('div', 'opt-head'), info = el('div', 'opt-info');
     head.style.cursor = 'default';
     info.append(el('span', 'opt-tag', 'YOUR WORKOUT'), el('div', 'opt-title', title),
-      el('div', 'opt-meta', absCfg.dur + 'm • ' + items.length + (items.length === 1 ? ' Exercise' : ' Exercises') + ' • ' + I.label + (absCfg.wt ? ' • Weighted' : '') + ' • ' + LOC_LABEL[planLoc]));
+      el('div', 'opt-meta', absCfg.dur + 'm • ' + items.length + (items.length === 1 ? ' Exercise' : ' Exercises') + ' • ' + I.label + (timed ? ' • Timed' : '') + (circ ? ' • ' + S + ' Sets' : '') + (absCfg.wt ? ' • Weighted' : '') + ' • ' + LOC_LABEL[planLoc]));
     const ico = el('div', 'opt-ico'); ico.innerHTML = iconSvg('core'); ico.firstChild.style.cssText = 'width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round';
     head.append(ico, info);
     card.appendChild(head);
 
     const body = el('div', 'opt-body');
-    body.appendChild(el('div', 'rest-note', 'Rest ' + restFor(I) + 's between sets. Move slowly, keep your lower back steady and breathe out on the hard part. Stop a set when your form slips, and never pull on your neck.'));
+    body.appendChild(el('div', 'rest-note', (circ ? 'Circuit: do each exercise once in order (' + restEx + 's to switch between them), then rest ' + restSet + 's and repeat for ' + S + ' sets. ' : 'Rest ' + restSet + 's between sets. ') + 'Move slowly, keep your lower back steady and breathe out on the hard part. Stop a set when your form slips, and never pull on your neck.'));
     if (items.length < n) body.appendChild(el('div', 'rest-note', 'Only ' + items.length + ' exercise' + (items.length === 1 ? '' : 's') + ' match your choices. Add more focus areas for a fuller workout.'));
     if (items.some(m => m.weighted)) body.appendChild(el('div', 'rest-note', 'Start light. Core work is about control, not load. Weights adjust from how your last workouts went. Tap a weight to set or change it.'));
     else if (items.some(m => m.wtd)) body.appendChild(el('div', 'rest-note', 'Pick a weight you can control for every rep.'));
     items.forEach(m => {
-      const row = el('div', 'mv'), left = el('div'), sub = el('div', 'mr', m.rx + ' • ' + ABS_LABEL[m.focus]);
+      const row = el('div', 'mv'), left = el('div'), sub = el('div', 'mr', (circ ? m.rx.replace(/^\d+ × /, '') : m.rx) + ' • ' + ABS_LABEL[m.focus]);
       left.append(el('div', 'mn', m.name), sub);
       row.appendChild(left);
       if (m.weighted) {
@@ -2407,7 +2440,7 @@
     edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
     const gi = { type:'abs', title:'Abs', mins:absCfg.dur, lifts:items.length, intensity:absCfg.intensity, items, rated: new Set() };
     actions.append(shuffle, edit, makeCompleteBtn(gi));
-    addGuide(actions, title, repSteps(items, restFor(I), false, progOn()), gi);
+    addGuide(actions, title, circ ? circuitSteps(items, S, restEx, restSet, progOn()) : repSteps(items, restSet, false, progOn()), gi);
     card.appendChild(actions);
 
     $('absOut').replaceChildren(card);
@@ -4501,6 +4534,23 @@
     while (out.length && out[out.length - 1].kind === 'rest') out.pop();
     return out;
   }
+  // circuit: every exercise once (a short pause between them), a longer rest, then the same exercises again for the next set
+  function circuitSteps(items, S, restEx, restSet, rate) {
+    const out = [], P = items.map(m => Object.assign({ name: m.name, item: m }, parseRx(m.rx)));
+    for (let s = 1; s <= S; s++) {
+      P.forEach((x, k) => {
+        const base = 'Set ' + s + ' of ' + S + ' · Exercise ' + (k + 1) + ' of ' + P.length + (x.hold ? ' · ' + x.what : '');
+        const st = gWork(x.name, x.hold, base, x.name + '. ' + (x.hold ? x.hold + ' seconds' : x.what.replace(/\s*each side/, ', each side')));
+        st.item = x.item; st.what = x.what;
+        if (rate && x.item.weighted) st.det = () => base + (x.item.wt > 0 ? '' : ' · enter the weight you are using');
+        out.push(st);
+        if (k < P.length - 1) out.push(gRest(restEx));
+      });
+      if (s < S) out.push(gRest(restSet, 'Set ' + s + ' done. Rest, then set ' + (s + 1) + ' starts with ' + P[0].name));
+    }
+    if (rate) P.filter(x => x.item.weighted).forEach(x => out.push({ kind: 'rate', name: 'How was ' + x.name + '?', ex: x.name, item: x.item, secs: 0, detail: '', say: 'How did ' + x.name + ' feel?' }));
+    return out;
+  }
   function cardioSteps(rows) {
     const out = [];
     rows.forEach(r => {
@@ -5713,6 +5763,7 @@
       case 'abs':
         openAbsConfig();
         absCfg.dur = nearest(ABS_DURS, d.dur); absCfg.intensity = pick({ light:'light', moderate:'moderate', hard:'intense' }); absCfg.focus = new Set(['full']);
+        absCfg.mode = 'reps'; absCfg.circuit = false; absCfg.wt = false;
         syncAbs(); buildAbs(); break;
       case 'hiit':
         openHiitConfig();
