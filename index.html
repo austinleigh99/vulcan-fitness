@@ -1594,7 +1594,12 @@
     // hamstrings
     ['Stiff-Leg Deadlift','hamstrings','barbell'], ['Dumbbell Stiff-Leg Deadlift','hamstrings','dumbbells'], ['Single-Leg Romanian Deadlift','hamstrings','dumbbells'], ['Kettlebell Single-Leg Deadlift','hamstrings','kettlebell'], ['Smith Machine Romanian Deadlift','hamstrings','smith'], ['Nordic Curl','hamstrings',['ghd','bench']], ['Glute-Ham Raise','hamstrings','ghd'], ['Cable Leg Curl','hamstrings','cable'], ['Dumbbell Leg Curl','hamstrings',A('dumbbells','bench')], ['Slider Leg Curl','hamstrings','bodyweight'], ['Ring Hamstring Curl','hamstrings','rings'],
     // calves
-    ['Standing Calf Raise','calves','calfmachine'], ['Seated Calf Raise','calves','calfmachine'], ['Leg Press Calf Raise','calves',['legpress','legpress45']], ['Hack Squat Calf Raise','calves','hacksquat'], ['Smith Machine Calf Raise','calves','smith'], ['Barbell Calf Raise','calves','barbell'], ['Dumbbell Calf Raise','calves','dumbbells'], ['Single-Leg Dumbbell Calf Raise','calves','dumbbells'], ['Seated Dumbbell Calf Raise','calves',A('dumbbells','bench')], ['Calf Raises','calves','bodyweight'], ['Single-Leg Calf Raise','calves','bodyweight'], ['Tibialis Raise','calves','bodyweight']
+    ['Standing Calf Raise','calves','calfmachine'], ['Seated Calf Raise','calves','calfmachine'], ['Leg Press Calf Raise','calves',['legpress','legpress45']], ['Hack Squat Calf Raise','calves','hacksquat'], ['Smith Machine Calf Raise','calves','smith'], ['Barbell Calf Raise','calves','barbell'], ['Dumbbell Calf Raise','calves','dumbbells'], ['Single-Leg Dumbbell Calf Raise','calves','dumbbells'], ['Seated Dumbbell Calf Raise','calves',A('dumbbells','bench')], ['Calf Raises','calves','bodyweight'], ['Single-Leg Calf Raise','calves','bodyweight'], ['Tibialis Raise','calves','bodyweight'],
+    ['Barbell Thruster','quadriceps',A('barbell','rack')], ['Dumbbell Thruster','quadriceps','dumbbells'],
+    // olympic lifts: only used when "Olympic lifts" is switched on in Workout Defaults (5th item 'oly')
+    ['Power Clean','traps','barbell',false,'oly'], ['Hang Power Clean','traps','barbell',false,'oly'], ['Hang Clean','traps','barbell',false,'oly'], ['Squat Clean','quadriceps',A('barbell','rack'),false,'oly'], ['Clean High Pull','traps','barbell',false,'oly'], ['Muscle Clean','traps','barbell',false,'oly'], ['Dumbbell Power Clean','traps','dumbbells',false,'oly'], ['Kettlebell Clean','traps','kettlebell',false,'oly'],
+    ['Clean and Jerk','shoulders','barbell',false,'oly'], ['Clean and Press','shoulders','barbell',false,'oly'], ['Power Snatch','shoulders','barbell',false,'oly'], ['Hang Power Snatch','shoulders','barbell',false,'oly'], ['Squat Snatch','shoulders','barbell',false,'oly'], ['Snatch High Pull','traps','barbell',false,'oly'], ['Push Jerk','shoulders','barbell',false,'oly'], ['Split Jerk','shoulders','barbell',false,'oly'], ['Snatch Balance','shoulders','barbell',false,'oly'], ['Dumbbell Snatch','shoulders','dumbbells',false,'oly'], ['Kettlebell Snatch','shoulders','kettlebell',false,'oly'], ['Overhead Squat','quadriceps','barbell',false,'oly'],
+    ['Clean Pull','lower back','barbell',false,'oly'], ['Snatch Pull','lower back','barbell',false,'oly']
   ];
   function reqOk(req) {
     if (req === 'bodyweight') return true;
@@ -1707,7 +1712,8 @@
     if (cfg.sup && n % 2) n += 1;
 
     const r = rng(Math.floor(Math.random() * 4294967296));
-    const avail = EXERCISES.filter(e => groups.includes(e[1]) && reqOk(e[2]));
+    const olyOn = !!(appData && appData.prefs && appData.prefs.olympic);
+    const avail = EXERCISES.filter(e => groups.includes(e[1]) && reqOk(e[2]) && (e[4] !== 'oly' || olyOn));
     if (!avail.length) { $('cfgOut').replaceChildren(); return say($('cfgMsg'), 'No exercises match. Add more equipment or muscle groups.', 'err'); }
     say($('cfgMsg'), '');
 
@@ -1730,8 +1736,10 @@
       const pr = pool[Math.floor(r() * pool.length)];
       if (DP) sets = DP.defSets;
       // e[3]: true = timed hold, 'carry' / 'work' = timed effort (carries, sleds, battle ropes)
-      const rx = e[3] ? sets + ' × 30-45s ' + (e[3] === true ? 'hold' : e[3]) : sets + ' × ' + (DP ? DP.defReps : pr);
+      // olympic lifts are always low-rep, whatever the intensity or default reps
+      const rx = e[3] ? sets + ' × 30-45s ' + (e[3] === true ? 'hold' : e[3]) : e[4] === 'oly' ? sets + ' × 2-4' : sets + ' × ' + (DP ? DP.defReps : pr);
       const it = { name: e[0], muscle: e[1], rx };
+      if (e[4] === 'oly') it.oly = true;
       if (progOn() && isWeighted(e)) { it.weighted = true; it.wt = progSuggest(e[0]); it.last = progLast(e[0]); }
       return it;
     });
@@ -1756,6 +1764,7 @@
     if (picked.length < n) {
       body.appendChild(el('div', 'rest-note', 'Only ' + picked.length + ' exercise' + (picked.length === 1 ? '' : 's') + ' match your equipment and muscle choices. Add more equipment or muscle groups for a fuller workout.'));
     }
+    if (items.some(m => m.oly)) body.appendChild(el('div', 'rest-note', 'Olympic lifts are technical: warm up, start light, and stop the set when your form slips.'));
     if (items.some(m => m.weighted)) body.appendChild(el('div', 'rest-note', 'Weights adjust from how your last workouts went. Tap a weight to set or change it.'));
     const addRow = (m) => {
       const row = el('div', 'mv');
@@ -3102,6 +3111,7 @@
       .map(x => ({ id: String(x.id || Math.random().toString(36).slice(2)), d: x.d, cat: x.cat, name: x.name.trim(), v: Number(x.v) }));
     // smart weights: the working weight the app has learned for each exercise (stored in lb)
     P.progOn = P.progOn === undefined ? true : !!P.progOn;
+    P.olympic = !!P.olympic;
     const FEEL_OK = ['easy', 'good', 'hard', 'fail'], pin = P.prog && typeof P.prog === 'object' && !Array.isArray(P.prog) ? P.prog : {}, pout = {};
     Object.keys(pin).filter(okName).slice(0, 200).forEach(k => {
       const r = pin[k]; if (!r || !(r.w > 0 && r.w <= 5000)) return;
@@ -4790,6 +4800,7 @@
       const mw = el('button', 'wdlink', 'View & edit working weights (' + Object.keys(P.prog).length + ')');
       mw.onclick = openMyWeights; c.appendChild(mw);
     }
+    c.appendChild(mkToggle('Olympic lifts', 'Add cleans, snatches and jerks to strength plans. They are technical, so use light weights and learn the form first', P.olympic, v => { P.olympic = v; saveAppData(); }));
     c.appendChild(mkToggle('Default sets & reps', 'Use the same sets and reps for new strength exercises', P.setsRepsOn, v => { P.setsRepsOn = v; saveAppData(); redraw(); }));
     if (P.setsRepsOn) {
       const pair = el('div', 'wdpair');
