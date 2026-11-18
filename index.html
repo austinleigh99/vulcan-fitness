@@ -340,6 +340,16 @@
   .gringw .gring .t { fill:none; stroke:var(--line); stroke-width:5; } .gringw .gring .p { fill:none; stroke:var(--accent2); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset .5s; }
   .gringw .gring text { fill:var(--text); font-size:13px; font-weight:900; } .gringw .gring.done .p { stroke:#34d399; } .gringw .gring.done text { fill:#34d399; font-size:18px; }
   .gname.solo { margin-top:40px; }
+  /* in-app confirm dialog (replaces the browser's own popup) */
+  .cfm { position:fixed; inset:0; z-index:3000; display:flex; align-items:center; justify-content:center; padding:24px; background:rgba(5,5,12,.68); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px); animation:cfmFade .16s ease; }
+  .cfmc { width:100%; max-width:340px; background:var(--card); border:1px solid var(--line); border-radius:24px; padding:24px 20px 18px; text-align:center; box-shadow:0 24px 70px rgba(0,0,0,.5); animation:cfmPop .18s ease; }
+  .cfmic { width:54px; height:54px; border-radius:18px; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:26px; background:rgba(248,113,113,.14); }
+  .cfmt { font-size:21px; font-weight:900; letter-spacing:-.01em; }
+  .cfmm { font-size:14px; line-height:1.45; font-weight:600; color:var(--muted); margin:8px 0 20px; }
+  .cfmb { display:flex; flex-direction:column; gap:9px; } .cfmb button { margin:0; }
+  @keyframes cfmFade { from { opacity:0; } to { opacity:1; } }
+  @keyframes cfmPop { from { opacity:0; transform:scale(.94) translateY(8px); } to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce) { .cfm, .cfmc { animation:none; } }
   .gsets { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:14px 0 2px; }
   .gs { width:40px; height:40px; border-radius:12px; background:var(--chip); color:var(--muted); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; }
   .gs.done { background:var(--green); color:#04230f; }
@@ -4388,6 +4398,25 @@
     };
   })();
 
+  // a confirm dialog styled like the rest of the app; "Keep going" is the safe default and Escape or a tap outside cancels
+  function appConfirm(o, onOk) {
+    if (document.querySelector('.cfm')) return;
+    const back = el('div', 'cfm'), card = el('div', 'cfmc'), btns = el('div', 'cfmb');
+    card.setAttribute('role', 'alertdialog'); card.setAttribute('aria-modal', 'true'); card.setAttribute('aria-label', o.title);
+    const prev = document.activeElement;
+    const close = () => { back.remove(); document.removeEventListener('keydown', onKey, true); if (prev && prev.focus) { try { prev.focus(); } catch (e) { /* ignore */ } } };
+    const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+    const keep = el('button', null, o.cancel || 'Cancel'), go = el('button', o.danger ? 'danger' : 'secondary', o.ok || 'OK');
+    keep.onclick = close; go.onclick = () => { close(); onOk(); };
+    back.onclick = (e) => { if (e.target === back) close(); };
+    btns.append(keep, go);
+    if (o.icon) card.appendChild(el('div', 'cfmic', o.icon));
+    card.append(el('div', 'cfmt', o.title), el('div', 'cfmm', o.msg || ''), btns);
+    back.appendChild(card); document.body.appendChild(back);
+    document.addEventListener('keydown', onKey, true);
+    keep.focus();
+  }
+
   // ----- guided workouts: the session -----
   const Guided = { steps: [], i: 0, title: '', info: null, paused: false, done: false, remaining: 0, endAt: 0, pausedMs: 0, lastTick: -1, timer: null };
   const RING = 2 * Math.PI * 88;
@@ -4458,7 +4487,7 @@
     box.replaceChildren();
     const top = el('div', 'gtop'), x = el('button', 'gx', '✕'), gt = el('div', 'gt');
     x.setAttribute('aria-label', 'End workout');
-    x.onclick = () => { if (confirm('End this workout?')) guidedClose(); };
+    x.onclick = () => appConfirm({ icon: '🏁', title: 'End this workout?', msg: 'Your place in this workout won’t be saved. You can start it again from your plan.', ok: 'End workout', cancel: 'Keep going', danger: true }, guidedClose);
     gt.append(el('b', null, Guided.title), el('span', null, st.g ? 'Exercise ' + (Guided.gl.indexOf(st.g) + 1) + ' of ' + Guided.gl.length : 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length));
     top.append(x, gt); box.appendChild(top);
     const prog = el('div', 'gprog'), bar = el('i'); bar.style.width = Math.round(Guided.i / Guided.steps.length * 100) + '%'; prog.appendChild(bar); box.appendChild(prog);
