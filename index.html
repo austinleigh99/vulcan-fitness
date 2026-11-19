@@ -190,6 +190,17 @@
   .sday.today::after { content:''; width:5px; height:5px; border-radius:50%; background:var(--accent2); margin-top:-3px; }
   .stoday { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; font-weight:700; }
   .stoday .tl { color:var(--muted); font-size:11px; letter-spacing:.1em; font-weight:800; }
+  .sday.sel .sl { color:var(--text); }
+  .sday.sel .sc { opacity:1; outline:2px solid var(--accent2); outline-offset:2px; }
+  .sdaywrap { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .sdnote { font-size:13px; font-weight:700; color:var(--muted); line-height:1.45; }
+  .sdnote b { color:var(--text); }
+  .sddone { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid rgba(63,191,133,.45); background:rgba(63,191,133,.08); border-radius:16px; }
+  .sddone .ck { width:30px; height:30px; border-radius:50%; background:#3fbf85; color:#06261a; font-weight:900; display:flex; align-items:center; justify-content:center; flex:none; }
+  .sddone .t { font-size:15px; font-weight:800; } .sddone .m { font-size:12px; font-weight:700; color:var(--muted); margin-top:2px; }
+  .dayw .opt { margin:0 0 12px; background:var(--bg); }
+  .dayw .plan-actions { padding:4px 14px 14px; }
+  .dayw .lock { font-size:12px; font-weight:700; color:var(--muted); padding:2px 16px 14px; }
   .mini { width:auto; margin:0; padding:9px 16px; border-radius:999px; font-size:12px; font-weight:900; letter-spacing:.06em; flex:none; }
   .sfoot { display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
   .autopill { width:auto; margin:0; padding:10px 16px; border-radius:999px; font-size:11px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; background:color-mix(in srgb, var(--accent) 25%, transparent); border:1px solid color-mix(in srgb, var(--accent) 60%, transparent); color:var(--accent2); }
@@ -535,8 +546,10 @@
 
   /* Cardio configuration */
   .dur-row { position: relative; }
-  #cardioCfg { --accent: #ff1a66; }
-  #cardioCfg .cfg-title .s { color: var(--accent); }
+  #cardioCfg,
+  .w-cardioCfg { --accent: #ff1a66; }
+  #cardioCfg .cfg-title .s,
+  .w-cardioCfg .cfg-title .s { color: var(--accent); }
   .wc-row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 22px; }
   .wc { margin:0; padding:18px; border-radius: 26px; background: var(--card); border:1px solid var(--line); color: var(--text); text-align:left; display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
   .wc .ico { width:40px; height:40px; border-radius:12px; background:var(--chip); display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:10px; }
@@ -545,8 +558,10 @@
   .dur-head { display:flex; justify-content:space-between; align-items:baseline; }
   .dur-head h2 { margin-bottom: 8px; }
   .durval { font-size:22px; font-weight:900; color: var(--accent); }
-  #cardioCfg .dur.active { background: var(--accent); color:#fff; border-color: var(--accent); }
-  #cardioCfg .area.active { box-shadow: 0 6px 18px rgba(255,26,102,.4); }
+  #cardioCfg .dur.active,
+  .w-cardioCfg .dur.active { background: var(--accent); color:#fff; border-color: var(--accent); }
+  #cardioCfg .area.active,
+  .w-cardioCfg .area.active { box-shadow: 0 6px 18px rgba(255,26,102,.4); }
   .ctype-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
   .ctype { margin:0; padding:18px 16px; border-radius:999px; background: var(--card); border:1px solid var(--line); color: var(--text); font-size:15px; font-weight:800; display:flex; align-items:center; justify-content:space-between; text-align:left; }
   .ctype::after { content:''; flex:none; width:18px; height:18px; border-radius:50%; border:2px solid var(--muted); }
@@ -560,48 +575,75 @@
   .zone::after { content: attr(data-name); font-size:13px; font-style:italic; font-weight:500; letter-spacing:0; text-transform:none; color: var(--muted); }
   .zone.active { background:var(--text); color:var(--bg); }
   .zone.active::after { color:#6b6b80; }
-  #cardioCfg .seg3 button.active { background: var(--accent); color:#fff; }
+  #cardioCfg .seg3 button.active,
+  .w-cardioCfg .seg3 button.active { background: var(--accent); color:#fff; }
   #cStyleRow button { font-size: 11px; letter-spacing: .04em; }
   #cBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(255,26,102,.45); margin-top: 26px; }
   #cOut { margin-top: 18px; }
-  #cardioCfg .opt-tag { color:#ff6b9a; background: rgba(255,26,102,.15); }
-  #cardioCfg .opt-ico { background: rgba(255,26,102,.2); }
+  #cardioCfg .opt-tag,
+  .w-cardioCfg .opt-tag { color:#ff6b9a; background: rgba(255,26,102,.15); }
+  #cardioCfg .opt-ico,
+  .w-cardioCfg .opt-ico { background: rgba(255,26,102,.2); }
   .mnote { font-size:12px; color:var(--muted); margin-top:3px; }
 
   /* Calisthenics configuration */
-  #calisCfg { --accent: #4fe3a7; }
-  #calisCfg .cfg-title .s { color: var(--accent); }
-  #calisCfg .dur.active { background: var(--accent); color:#06261a; border-color: var(--accent); }
+  #calisCfg,
+  .w-calisCfg { --accent: #4fe3a7; }
+  #calisCfg .cfg-title .s,
+  .w-calisCfg .cfg-title .s { color: var(--accent); }
+  #calisCfg .dur.active,
+  .w-calisCfg .dur.active { background: var(--accent); color:#06261a; border-color: var(--accent); }
   .cat-list { display:grid; gap:12px; }
-  #calisCfg .ctype { padding: 22px 24px; font-size: 17px; }
-  #calisCfg .ctype.active { background: rgba(79,227,167,.12); }
+  #calisCfg .ctype,
+  .w-calisCfg .ctype { padding: 22px 24px; font-size: 17px; }
+  #calisCfg .ctype.active,
+  .w-calisCfg .ctype.active { background: rgba(79,227,167,.12); }
   #calBuild { background: var(--accent); color:#06261a; border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(79,227,167,.35); margin-top: 26px; }
   #calOut { margin-top: 18px; }
-  #calisCfg .opt-tag { color: var(--accent); background: rgba(79,227,167,.15); }
-  #calisCfg .opt-ico { background: rgba(79,227,167,.2); }
+  #calisCfg .opt-tag,
+  .w-calisCfg .opt-tag { color: var(--accent); background: rgba(79,227,167,.15); }
+  #calisCfg .opt-ico,
+  .w-calisCfg .opt-ico { background: rgba(79,227,167,.2); }
 
   /* Abs configuration */
-  #absCfg { --accent: #ff9f43; }
-  #absCfg .cfg-title .s { color: var(--accent); }
-  #absCfg .dur.active { background: var(--accent); color:#2b1600; border-color: var(--accent); }
-  #absCfg .ctype { padding: 22px 24px; font-size: 17px; }
-  #absCfg .ctype.active { background: rgba(255,159,67,.14); }
+  #absCfg,
+  .w-absCfg { --accent: #ff9f43; }
+  #absCfg .cfg-title .s,
+  .w-absCfg .cfg-title .s { color: var(--accent); }
+  #absCfg .dur.active,
+  .w-absCfg .dur.active { background: var(--accent); color:#2b1600; border-color: var(--accent); }
+  #absCfg .ctype,
+  .w-absCfg .ctype { padding: 22px 24px; font-size: 17px; }
+  #absCfg .ctype.active,
+  .w-absCfg .ctype.active { background: rgba(255,159,67,.14); }
   #absBuild { background: var(--accent); color:#2b1600; border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 30px rgba(255,159,67,.35); margin-top: 26px; }
   #absOut { margin-top: 18px; }
-  #absCfg .opt-tag { color: var(--accent); background: rgba(255,159,67,.16); }
-  #absCfg .opt-ico { background: rgba(255,159,67,.2); }
-  #absCfg .switch.on { background: var(--accent); }
+  #absCfg .opt-tag,
+  .w-absCfg .opt-tag { color: var(--accent); background: rgba(255,159,67,.16); }
+  #absCfg .opt-ico,
+  .w-absCfg .opt-ico { background: rgba(255,159,67,.2); }
+  #absCfg .switch.on,
+  .w-absCfg .switch.on { background: var(--accent); }
 
   /* HIIT configuration */
-  #hiitCfg { --accent: #a21cff; }
-  #hiitCfg .cfg-title .s { color: #b45cff; }
-  #hiitCfg .dur.active { background: var(--accent); color:#fff; border-color: var(--accent); }
-  #hiitCfg .ctype.active { background: rgba(162,28,255,.15); }
-  #hiitCfg .mus.active { background: rgba(162,28,255,.3); }
-  #hiitCfg .seg3 button { font-size:11px; letter-spacing:.04em; padding:14px 0; }
-  #hiitCfg .opt-tag { color:#c27dff; background: rgba(162,28,255,.18); }
-  #hiitCfg .opt-ico { background: rgba(162,28,255,.22); }
-  #hiitCfg .ss-label { color:#c27dff; }
+  #hiitCfg,
+  .w-hiitCfg { --accent: #a21cff; }
+  #hiitCfg .cfg-title .s,
+  .w-hiitCfg .cfg-title .s { color: #b45cff; }
+  #hiitCfg .dur.active,
+  .w-hiitCfg .dur.active { background: var(--accent); color:#fff; border-color: var(--accent); }
+  #hiitCfg .ctype.active,
+  .w-hiitCfg .ctype.active { background: rgba(162,28,255,.15); }
+  #hiitCfg .mus.active,
+  .w-hiitCfg .mus.active { background: rgba(162,28,255,.3); }
+  #hiitCfg .seg3 button,
+  .w-hiitCfg .seg3 button { font-size:11px; letter-spacing:.04em; padding:14px 0; }
+  #hiitCfg .opt-tag,
+  .w-hiitCfg .opt-tag { color:#c27dff; background: rgba(162,28,255,.18); }
+  #hiitCfg .opt-ico,
+  .w-hiitCfg .opt-ico { background: rgba(162,28,255,.22); }
+  #hiitCfg .ss-label,
+  .w-hiitCfg .ss-label { color:#c27dff; }
   .hwc-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px; }
   .hwc { margin:0; padding:22px 8px; border-radius:22px; background:var(--card); border:1px solid var(--line); color:var(--text); font-size:13px; font-weight:800; letter-spacing:.1em; }
   .hwc.on { border-color: var(--accent); background: rgba(162,28,255,.2); }
@@ -652,8 +694,10 @@
   .rndbtn { width:100%; margin:12px 0 0; padding:13px; font-size:14px; border-radius:14px; background:transparent; border:1px solid var(--accent); color:#d9a6ff; }
 
   /* Recovery configuration */
-  #recoveryCfg { --accent: #35d7e6; }
-  #recoveryCfg .cfg-title .s { color: var(--accent); }
+  #recoveryCfg,
+  .w-recoveryCfg { --accent: #35d7e6; }
+  #recoveryCfg .cfg-title .s,
+  .w-recoveryCfg .cfg-title .s { color: var(--accent); }
   .rdur-row { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; }
   .rdur { margin:0; padding:22px 0; border-radius:18px; background:var(--chip); color:var(--text); font-size:17px; font-weight:800; }
   .rdur.active { background: var(--accent); color:#062a2f; box-shadow: 0 6px 18px rgba(53,215,230,.35); }
@@ -662,14 +706,20 @@
   .rgoal.active { border-color: var(--accent); background: rgba(53,215,230,.14); color:#7ff0f8; }
   #recBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; color:#062a2f; box-shadow: 0 10px 30px rgba(53,215,230,.4); margin-top: 26px; }
   #recOut { margin-top: 18px; }
-  #recoveryCfg .opt-tag { color: var(--accent); background: rgba(53,215,230,.15); }
-  #recoveryCfg .opt-ico { background: rgba(53,215,230,.2); }
-  #recoveryCfg .ss-label { color: var(--accent); }
+  #recoveryCfg .opt-tag,
+  .w-recoveryCfg .opt-tag { color: var(--accent); background: rgba(53,215,230,.15); }
+  #recoveryCfg .opt-ico,
+  .w-recoveryCfg .opt-ico { background: rgba(53,215,230,.2); }
+  #recoveryCfg .ss-label,
+  .w-recoveryCfg .ss-label { color: var(--accent); }
 
   /* Yoga configuration */
-  #yogaCfg { --accent: #f5b021; }
-  #yogaCfg .cfg-title .s { color: var(--accent); }
-  #yogaCfg .dur.active { background: var(--accent); color:#2b1d00; border-color: var(--accent); }
+  #yogaCfg,
+  .w-yogaCfg { --accent: #f5b021; }
+  #yogaCfg .cfg-title .s,
+  .w-yogaCfg .cfg-title .s { color: var(--accent); }
+  #yogaCfg .dur.active,
+  .w-yogaCfg .dur.active { background: var(--accent); color:#2b1d00; border-color: var(--accent); }
   .ygrid3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
   .ygrid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .ybtn { margin:0; padding:20px 10px; border-radius:18px; background:var(--chip); border:2px solid transparent; color:var(--text); font-size:15px; font-weight:800; text-align:center; }
@@ -677,9 +727,12 @@
   .ybtn.active { border-color: var(--accent); background: rgba(245,176,33,.14); color:#ffd166; }
   #yBuild { border-radius:999px; padding:20px; font-size:16px; letter-spacing:.1em; text-transform:uppercase; color:#2b1d00; box-shadow: 0 10px 30px rgba(245,176,33,.4); margin-top: 26px; }
   #yOut { margin-top: 18px; }
-  #yogaCfg .opt-tag { color: var(--accent); background: rgba(245,176,33,.15); }
-  #yogaCfg .opt-ico { background: rgba(245,176,33,.2); }
-  #yogaCfg .ss-label { color: var(--accent); }
+  #yogaCfg .opt-tag,
+  .w-yogaCfg .opt-tag { color: var(--accent); background: rgba(245,176,33,.15); }
+  #yogaCfg .opt-ico,
+  .w-yogaCfg .opt-ico { background: rgba(245,176,33,.2); }
+  #yogaCfg .ss-label,
+  .w-yogaCfg .ss-label { color: var(--accent); }
   .ypick { margin-top:12px; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:16px; }
   .ypick-top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .ypick-t { font-size:16px; font-weight:800; }
@@ -770,7 +823,7 @@
       </div>
       <div class="schedcard">
         <div id="schedDays" class="sdays"></div>
-        <div class="stoday"><span id="schedTodayText"></span><button id="schedBuild" class="mini">Build ›</button></div>
+        <div id="schedDay" class="sdaywrap"></div>
         <div class="sfoot"><button id="schedAuto" class="autopill">✨ Auto-build split</button><button id="schedEdit" class="slink">Edit schedule</button></div>
       </div>
 
@@ -1796,8 +1849,10 @@
     fit:    [[12, 15, 15], [10, 12, 12], [8, 10, 10]],
     flex:   [[15, 20, 15], [12, 15, 12], [10, 12, 10]]
   };
+  // while a future day's workout is being prepared (see "workouts made ahead"), these point at that day
+  let GEN = null, GEN_DATE = null;
   function repPhase(d) {
-    d = d || new Date();
+    d = d || GEN_DATE || new Date();
     const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000), week = Math.floor((day + 3) / 7), dow = (day + 3) % 7;   // Monday = 0
     return (week + (dow % 2)) % 3;
   }
@@ -3386,6 +3441,12 @@
     out.prefs.planned = (Array.isArray(out.prefs.planned) ? out.prefs.planned : [])
       .filter(p => p && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && p.date >= minDate && WTYPES[p.type] && p.type !== 'rest' && Number(p.dur) > 0 && p.id)
       .map(p => ({ id: String(p.id), date: p.date, type: p.type, dur: Number(p.dur) }));
+    // "shuffle" counts for days planned ahead (a different workout for that day); old days are dropped
+    const shufMin = ymd(new Date(Date.now() - 2 * 86400000)), shuf = {};
+    Object.entries(out.prefs.shuf && typeof out.prefs.shuf === 'object' ? out.prefs.shuf : {}).forEach(([k, v]) => {
+      if (/^\d{4}-\d{2}-\d{2}(\|[\w-]{1,40})?$/.test(k) && k.slice(0, 10) >= shufMin && Number(v) > 0 && Object.keys(shuf).length < 80) shuf[k] = Math.min(999, Math.round(Number(v)));
+    });
+    out.prefs.shuf = shuf;
     const P = out.prefs;
     if (!['beginner', 'intermediate', 'advanced'].includes(P.level)) P.level = 'intermediate';
     if (!['muscle', 'fat', 'fit', 'flex'].includes(P.goal)) P.goal = '';
@@ -3561,6 +3622,7 @@
   }
   function makeCompleteBtn(info) {
     // every button made for the same workout shares one log entry, so it can never be logged twice
+    if (GEN && !GEN.gi) GEN.gi = info;
     const b = el('button', 'complete');
     (info._btns = info._btns || []).push(b);
     const paint = () => info._btns.forEach(x => { const on = !!info._entry; x.textContent = on ? '✓ Logged • tap to undo' : '✓ Complete workout'; x.classList.toggle('done', on); });
@@ -3596,28 +3658,40 @@
     renderChallenges();
   }
 
+  let schedSel = null;   // day picked on the Home week row (0-6); null = today
   function renderSchedule() {
     const wrap = $('schedDays');
     wrap.replaceChildren();
-    const dates = weekDates(), ti = todayIdx(), doneDays = new Set(logs.map(l => l.performed_on));
+    const dates = weekDates(), ti = todayIdx(), doneDays = new Set(logs.map(l => l.performed_on)), sel = schedSel == null ? ti : schedSel;
     appData.schedule.forEach((d, i) => {
       const t = WTYPES[d.type];
-      const col = el('button', 'sday' + (i === ti ? ' today' : '') + (doneDays.has(dates[i]) ? ' done' : ''));
-      col.setAttribute('aria-label', DAY_NAMES[i] + ': ' + t.label);
+      const col = el('button', 'sday' + (i === ti ? ' today' : '') + (i === sel ? ' sel' : '') + (doneDays.has(dates[i]) ? ' done' : ''));
+      col.setAttribute('aria-label', DAY_NAMES[i] + ': ' + t.label); col.setAttribute('aria-pressed', String(i === sel));
       const circ = el('span', 'sc' + (d.type === 'rest' ? ' rest' : ''));
       if (t.color) circ.style.background = t.color;
       circ.innerHTML = iconSvg(t.icon);
       col.append(el('span', 'sl', 'MTWTFSS'[i]), circ);
-      col.onclick = () => openDaySheet(i);
+      col.onclick = () => { schedSel = i; renderSchedule(); };
       wrap.appendChild(col);
     });
-    const d = appData.schedule[ti], t = WTYPES[d.type];
-    const doneToday = logs.some(l => l.performed_on === dates[ti]);
-    if (d.type === 'rest') { $('schedTodayText').textContent = 'Today is a rest day'; $('schedBuild').classList.add('hidden'); }
-    else {
-      $('schedTodayText').textContent = (doneToday ? '✓ Done today · ' : 'Today · ') + t.label + ' · ' + d.dur + ' min';
-      $('schedBuild').classList.remove('hidden');
+    renderSchedDay(dates[sel], sel);
+  }
+  // the workout for the picked day: the real thing, made ahead of time, instead of a Build button
+  function renderSchedDay(key, i) {
+    const box = $('schedDay'), today = todayLocal();
+    box.replaceChildren();
+    const plans = plannedFor(key), dayLogs = logs.filter(l => l.performed_on === key);
+    if (key < today) {
+      if (!dayLogs.length) box.appendChild(el('div', 'sdnote', 'No workout was logged on ' + DAY_NAMES[i] + '.'));
+      dayLogs.forEach(l => box.appendChild(doneRow(l)));
+      return;
     }
+    if (!plans.length) {
+      const n = el('div', 'sdnote'); n.append(el('b', null, key === today ? 'Rest day today. ' : DAY_NAMES[i] + ' is a rest day. '), document.createTextNode('Recovery is part of the plan.'));
+      box.appendChild(n); dayLogs.forEach(l => box.appendChild(doneRow(l)));
+      return;
+    }
+    plans.forEach(p => box.appendChild(workoutNode(key, p, renderSchedule)));
   }
 
   function renderChallenges() {
@@ -5575,16 +5649,20 @@
       row.appendChild(left); panel.appendChild(row);
     });
     plans.forEach(p => {
+      if (daysFromToday(calSel) < PLAN_AHEAD) {   // workouts are made up to two weeks ahead, so show the real one
+        panel.appendChild(workoutNode(calSel, p, renderCalendarPage));
+        if (p.src === 'custom') {
+          const rm = el('button', 'secondary', 'Remove from calendar');
+          rm.onclick = () => { appData.prefs.planned = appData.prefs.planned.filter(q => q.id !== p.id); saveAppData(); renderCalendarPage(); };
+          panel.appendChild(rm);
+        }
+        return;
+      }
       const row = el('div', 'lrow'), left = el('div'), t = el('div', null, WTYPES[p.type].label);
       const missed = calSel < today;
       t.appendChild(el('span', 'tag' + (missed ? ' miss' : ''), missed ? 'MISSED' : p.src === 'weekly' ? 'WEEKLY PLAN' : 'SCHEDULED'));
-      left.append(t, el('div', 'lm', p.dur + ' min' + (p.src === 'weekly' ? ' · from your weekly schedule' : '')));
+      left.append(t, el('div', 'lm', p.dur + ' min' + (p.src === 'weekly' ? ' · from your weekly schedule' : '') + ' · workout appears 2 weeks before'));
       const acts = el('div', 'racts');
-      if (calSel === today) {
-        const go = el('button', 'rbtn', 'Start');
-        go.onclick = () => p.src === 'weekly' ? startScheduled(p.idx) : startScheduled(todayIdx(), { type: p.type, dur: p.dur });
-        acts.appendChild(go);
-      }
       if (p.src === 'custom') {
         const x = el('button', 'rbtn x', '✕'); x.setAttribute('aria-label', 'Remove scheduled workout');
         x.onclick = () => { appData.prefs.planned = appData.prefs.planned.filter(q => q.id !== p.id); saveAppData(); renderCalendarPage(); };
@@ -5595,7 +5673,7 @@
     if (calSel >= today) {
       const add = el('button', '', '+ Schedule a workout'); add.onclick = () => openAddPlanned(calSel);
       panel.appendChild(add);
-      if (plans.some(p => p.src === 'weekly')) panel.appendChild(el('div', 'sheet-note', 'Your weekly schedule fills in automatically. Change it from Home → Weekly Schedule.'));
+      if (plans.some(p => p.src === 'weekly')) panel.appendChild(el('div', 'sheet-note', 'Your weekly schedule fills in automatically, and each workout is made up to 2 weeks ahead. Change the schedule from Home → Weekly Schedule.'));
     } else if (calSel < today) panel.appendChild(el('div', 'sheet-note', 'Pick today or a future day to schedule a workout.'));
   }
 
@@ -5617,7 +5695,6 @@
   $('schedEdit').onclick = openScheduleEditor;
   $('schedGear').onclick = openSchedulePrefs;
   $('schedAuto').onclick = openAutoBuild;
-  $('schedBuild').onclick = () => startScheduled(todayIdx());
   $('chalManage').onclick = openGoals;
 
   function openScheduleEditor() {
@@ -5632,7 +5709,7 @@
         else row.appendChild(mkSelect(SCHED_DURS.map(m => [m, m + ' min']), SCHED_DURS.includes(d.dur) ? d.dur : 45, (v) => { d.dur = Number(v); saveAppData(); }));
         body.appendChild(row);
       });
-      body.appendChild(el('div', 'sheet-note', 'Tap any day on Home to build that day\'s workout. Workout length is matched as closely as each workout type allows.'));
+      body.appendChild(el('div', 'sheet-note', 'Each day\'s workout is made ahead of time, up to 2 weeks out. Tap a day on Home or in the calendar to see it. Workout length is matched as closely as each workout type allows.'));
     });
   }
 
@@ -5680,27 +5757,6 @@
     }, [['Cancel', 'secondary', closeSheet], ['Use this split', '', () => { appData.schedule = makeSplit(autoDays, autoGoal); saveAppData(); closeSheet(); }]]);
   }
 
-  function openDaySheet(i) {
-    const d = appData.schedule[i], t = WTYPES[d.type], date = weekDates()[i];
-    const actions = [];
-    if (d.type !== 'rest') actions.push(['Build workout', '', () => { closeSheet(); startScheduled(i); }]);
-    actions.push(['Edit schedule', 'secondary', () => openScheduleEditor()]);
-    openSheet(DAY_NAMES[i], d.type === 'rest' ? 'Rest day' : t.label + ' · ' + d.dur + ' min', (body) => {
-      body.appendChild(el('div', 'sheet-note', d.type === 'rest' ? 'Recovery is part of the plan. Take it easy today.' :
-        'Tap Build workout to generate a ' + t.label.toLowerCase() + ' session for this day using your schedule preferences.'));
-      const dayLogs = logs.filter(l => l.performed_on === date);
-      if (dayLogs.length) {
-        body.appendChild(el('h2', null, 'Completed'));
-        dayLogs.forEach(l => {
-          const row = el('div', 'lrow'), left = el('div');
-          left.append(el('div', null, l.title), el('div', 'lm', l.minutes + ' min · ' + l.calories + ' cal'));
-          row.appendChild(left);
-          body.appendChild(row);
-        });
-      }
-    }, actions);
-  }
-
   // ----- weekly challenge goals -----
   function openGoals() {
     openSheet('Weekly Challenge', 'Set goals for the week. Progress resets every Monday.', (body) => {
@@ -5727,19 +5783,22 @@
     });
   }
 
-  // ----- build a scheduled workout -----
+  // ----- workouts made ahead of time -----
+  // Every day on the schedule has its own workout for the next 2 weeks. A day's workout is worked out from its date (plus type, length
+  // and a shuffle count), so it stays the same every time you look at it, and the weights shown always come from your latest progress.
+  const PLAN_AHEAD = 14;
+  const GEN_OUT = { strength:['strengthCfg', 'cfgOut'], cardio:['cardioCfg', 'cOut'], calisthenics:['calisCfg', 'calOut'], abs:['absCfg', 'absOut'], hiit:['hiitCfg', 'hOut'], yoga:['yogaCfg', 'yOut'], recovery:['recoveryCfg', 'recOut'] };
   const nearest = (arr, v) => arr.reduce((a, b) => Math.abs(b - v) < Math.abs(a - v) ? b : a);
-  function startScheduled(i, override) {
-    const d = override || appData.schedule[i];
-    if (!d || d.type === 'rest') return;
+  const daysFromToday = (key) => Math.round((new Date(key + 'T12:00:00') - new Date(todayLocal() + 'T12:00:00')) / 86400000);
+  const cloneVal = (v) => v instanceof Set ? new Set([...v].map(cloneVal)) : Array.isArray(v) ? v.map(cloneVal)
+    : (v && typeof v === 'object') ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, cloneVal(x)])) : v;
+  const snapObj = (o) => Object.entries(o).map(([k, v]) => [k, cloneVal(v)]);
+  const restoreObj = (o, s) => { Object.keys(o).forEach(k => delete o[k]); s.forEach(([k, v]) => { o[k] = cloneVal(v); }); };
+
+  // sets up and builds one workout the way the Workout tab would for a scheduled day (i = weekday, Monday = 0)
+  function scheduledBuild(d, i) {
     const loc = appData.prefs.loc, lv = appData.prefs.intensity;
-    showTab('workout'); setMode('custom');
-    ['strengthCfg', 'cardioCfg', 'calisCfg', 'absCfg', 'hiitCfg', 'recoveryCfg', 'yogaCfg'].forEach(id => $(id).classList.add('hidden'));
-    $('builderMain').classList.remove('hidden');
-    ['cfgOut', 'cOut', 'calOut', 'absOut', 'hOut', 'recOut', 'yOut', 'planOut'].forEach(id => $(id).replaceChildren());
     planLoc = loc; planType = d.type;
-    document.querySelectorAll('.loc').forEach(x => x.classList.toggle('active', x.dataset.loc === loc));
-    document.querySelectorAll('.type').forEach(x => x.classList.toggle('active', x.dataset.type === d.type));
     const pick = (map) => map[lv];
     switch (d.type) {
       case 'strength': {
@@ -5785,6 +5844,65 @@
       default:
         buildPlan();
     }
+  }
+
+  // builds the workout for a date without touching the Workout tab: the builder runs with that date's seed, the card it makes is lifted out,
+  // and every bit of builder state (settings, screens, results) is put back exactly as it was
+  function genWorkout(key, d, shuffles) {
+    const SHOW = ['builderMain', 'strengthCfg', 'cardioCfg', 'calisCfg', 'absCfg', 'hiitCfg', 'recoveryCfg', 'yogaCfg'], OUTS = ['cfgOut', 'cOut', 'calOut', 'absOut', 'hOut', 'recOut', 'yOut', 'planOut'];
+    const hid = SHOW.map(id => $(id).classList.contains('hidden')), kept = OUTS.map(id => [...$(id).childNodes]);
+    const objs = [cfg, ccfg, calCfg, absCfg, hcfg, rcfg, ycfg], snaps = objs.map(snapObj);
+    const keep = { planLoc, planType, lastCardioRows, lastCalItems, lastHiit, tabDraft, amDraft: cloneVal(amDraft), lastRec, yTab, ySearchQ, lastYoga };
+    const rnd = Math.random, sti = Element.prototype.scrollIntoView, sto = window.scrollTo, ox = window.scrollX, oy = window.scrollY;
+    const outId = (GEN_OUT[d.type] || [0, 'planOut'])[1];
+    let card = null;
+    GEN = { gi: null }; GEN_DATE = new Date(key + 'T12:00:00');
+    Math.random = rng(hashStr([key, d.type, d.dur, shuffles || 0, (currentUser && currentUser.id) || '', 'fp1'].join('|')));
+    Element.prototype.scrollIntoView = function () {}; window.scrollTo = function () {};
+    try {
+      scheduledBuild(d, (GEN_DATE.getDay() + 6) % 7);
+      card = $(outId).firstElementChild;
+    } catch (e) { card = null; }
+    const gi = GEN.gi;
+    Math.random = rnd; Element.prototype.scrollIntoView = sti; window.scrollTo = sto; GEN = null; GEN_DATE = null;
+    SHOW.forEach((id, k) => $(id).classList.toggle('hidden', hid[k]));
+    OUTS.forEach((id, k) => $(id).replaceChildren(...kept[k]));
+    objs.forEach((o, k) => restoreObj(o, snaps[k]));
+    ({ planLoc, planType, lastCardioRows, lastCalItems, lastHiit, tabDraft, amDraft, lastRec, yTab, ySearchQ, lastYoga } = keep);
+    try { sto.call(window, ox, oy); } catch (e) { /* ignore */ }
+    return card ? { card, gi } : null;
+  }
+
+  const doneRow = (l) => {
+    const row = el('div', 'sddone'), tx = el('div');
+    tx.append(el('div', 't', l.title), el('div', 'm', 'Completed · ' + l.minutes + ' min · ' + l.calories + ' cal' + (l.lifts ? ' · ' + l.lifts + ' lifts' : '')));
+    row.append(el('div', 'ck', '✓'), tx);
+    return row;
+  };
+  // one planned workout as it appears on Home and in the calendar. Today's can be started; later days are a preview
+  function workoutNode(key, p, rerender) {
+    const wrap = el('div', 'dayw'), ahead = daysFromToday(key), t = WTYPES[p.type];
+    const log = logs.find(l => l.performed_on === key && l.wtype === p.type);
+    if (log) { wrap.appendChild(doneRow(log)); return wrap; }
+    const sk = key + (p.id ? '|' + p.id : ''), shuf = appData.prefs.shuf || (appData.prefs.shuf = {});
+    const g = ahead >= 0 && ahead < PLAN_AHEAD ? genWorkout(key, p, shuf[sk] || 0) : null;
+    if (!g) {
+      const n = el('div', 'sdnote'); n.append(el('b', null, t.label + ' · ' + p.dur + ' min. '), document.createTextNode('This workout couldn’t be prepared. You can still build one from the Workout tab.'));
+      wrap.appendChild(n); return wrap;
+    }
+    const card = g.card, isToday = ahead === 0;
+    const tag = card.querySelector('.opt-tag');
+    if (tag) tag.textContent = isToday ? 'TODAY' : ahead === 1 ? 'TOMORROW' : longDate(key).split(',')[0].toUpperCase();
+    card.querySelectorAll('.plan-actions button').forEach(b => {
+      const txt = b.textContent.trim();
+      if (txt === 'Edit settings') b.remove();
+      else if (txt === 'Shuffle') b.onclick = () => { shuf[sk] = (shuf[sk] || 0) + 1; saveAppData(); rerender(); };
+      else if (!isToday && (b.classList.contains('startg') || b.classList.contains('complete'))) b.remove();
+    });
+    if (!isToday) card.appendChild(el('div', 'lock', 'You can start this workout on ' + longDate(key) + '. Shuffle gives you a different one for that day.'));
+    const scope = el('div', 'w-' + ((GEN_OUT[p.type] || ['none'])[0]));
+    scope.appendChild(card); wrap.appendChild(scope);
+    return wrap;
   }
 
   // ---------- EXPORT ----------
