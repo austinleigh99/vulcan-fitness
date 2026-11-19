@@ -200,6 +200,14 @@
   .sddone .t { font-size:15px; font-weight:800; } .sddone .m { font-size:12px; font-weight:700; color:var(--muted); margin-top:2px; }
   .dayw .opt { margin:0 0 12px; background:var(--bg); }
   .dayw .plan-actions { padding:4px 14px 14px; }
+  .dwtop { display:flex; align-items:center; gap:10px; padding:2px 16px 16px; }
+  .dwtop .startg { flex:1; margin:0; padding:13px 0; font-size:15px; background:var(--accent); color:var(--on-accent); }
+  .dwtop.solo { justify-content:flex-end; padding-top:0; }
+  .dwtog { flex:none; width:48px; height:48px; margin:0; padding:0; border-radius:14px; background:var(--chip); border:1px solid var(--line); color:var(--text); display:flex; align-items:center; justify-content:center; }
+  .dwtog svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; transition:transform .2s; }
+  .dwtog.open svg { transform:rotate(180deg); }
+  .dwmore { border-top:1px solid var(--line); }
+  .dayw .lock { padding-top:12px; }
   .dayw .lock { font-size:12px; font-weight:700; color:var(--muted); padding:2px 16px 14px; }
   .mini { width:auto; margin:0; padding:9px 16px; border-radius:999px; font-size:12px; font-weight:900; letter-spacing:.06em; flex:none; }
   .sfoot { display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
@@ -3691,7 +3699,7 @@
       box.appendChild(n); dayLogs.forEach(l => box.appendChild(doneRow(l)));
       return;
     }
-    plans.forEach(p => box.appendChild(workoutNode(key, p, renderSchedule)));
+    plans.forEach(p => box.appendChild(workoutNode(key, p, renderSchedule, true)));
   }
 
   function renderChallenges() {
@@ -5879,8 +5887,9 @@
     row.append(el('div', 'ck', '✓'), tx);
     return row;
   };
+  const dayOpen = {};   // which days on Home have their exercise list open
   // one planned workout as it appears on Home and in the calendar. Today's can be started; later days are a preview
-  function workoutNode(key, p, rerender) {
+  function workoutNode(key, p, rerender, collapse) {
     const wrap = el('div', 'dayw'), ahead = daysFromToday(key), t = WTYPES[p.type];
     const log = logs.find(l => l.performed_on === key && l.wtype === p.type);
     if (log) { wrap.appendChild(doneRow(log)); return wrap; }
@@ -5900,6 +5909,17 @@
       else if (!isToday && (b.classList.contains('startg') || b.classList.contains('complete'))) b.remove();
     });
     if (!isToday) card.appendChild(el('div', 'lock', 'You can start this workout on ' + longDate(key) + '. Shuffle gives you a different one for that day.'));
+    const head = card.querySelector('.opt-head');
+    if (collapse && head) {   // just the top of the card and Start; an arrow opens the full exercise list
+      const start = card.querySelector('.startg'), more = el('div', 'dwmore'), top = el('div', 'dwtop'), tog = el('button', 'dwtog');
+      [...card.children].forEach(c => { if (c !== head) more.appendChild(c); });
+      const paint = () => { const o = !!dayOpen[sk]; more.classList.toggle('hidden', !o); tog.classList.toggle('open', o); tog.setAttribute('aria-expanded', String(o)); tog.setAttribute('aria-label', o ? 'Hide exercises' : 'Show all exercises'); };
+      tog.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
+      tog.onclick = head.onclick = () => { dayOpen[sk] = !dayOpen[sk]; paint(); };
+      head.style.cursor = 'pointer';
+      if (start) top.appendChild(start); else top.classList.add('solo');
+      top.appendChild(tog); card.append(top, more); paint();
+    }
     const scope = el('div', 'w-' + ((GEN_OUT[p.type] || ['none'])[0]));
     scope.appendChild(card); wrap.appendChild(scope);
     return wrap;
