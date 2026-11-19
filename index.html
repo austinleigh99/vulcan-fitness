@@ -190,6 +190,22 @@
   .sday.today::after { content:''; width:5px; height:5px; border-radius:50%; background:var(--accent2); margin-top:-3px; }
   .stoday { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; font-weight:700; }
   .stoday .tl { color:var(--muted); font-size:11px; letter-spacing:.1em; font-weight:800; }
+  .gswap { display:block; width:auto; margin:10px auto 0; padding:8px 16px; border-radius:999px; background:var(--chip); border:1px solid var(--line); color:var(--muted); font-size:12px; font-weight:800; letter-spacing:.04em; }
+  .swp { position:fixed; inset:0; z-index:3000; display:flex; align-items:flex-end; justify-content:center; background:rgba(5,5,12,.7); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); animation:cfmFade .16s ease; }
+  .swpc { width:100%; max-width:520px; height:82vh; max-height:82vh; display:flex; flex-direction:column; background:var(--sheet); border:1px solid var(--line); border-radius:26px 26px 0 0; padding:20px 18px 0; animation:swpUp .22s ease; }
+  .swph { position:relative; padding-right:46px; flex:none; }
+  .swpt { font-size:22px; font-weight:900; } .swps { font-size:13px; color:var(--muted); margin-top:6px; line-height:1.4; }
+  .swpx { position:absolute; top:-2px; right:0; width:36px; height:36px; margin:0; padding:0; border-radius:12px; background:var(--chip); font-size:16px; }
+  .swpq { margin:14px 0 2px; flex:none; }
+  .swpl { overflow-y:auto; flex:1; min-height:0; padding:4px 0 24px; }
+  .swpk { font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:12px 2px 2px; }
+  .swpn { font-size:13px; font-weight:600; color:var(--muted); line-height:1.5; margin:10px 2px; }
+  .swpr { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; margin:8px 0 0; padding:13px 16px; border-radius:14px; background:var(--card); border:1px solid var(--line); color:var(--text); text-align:left; font-size:15px; font-weight:800; }
+  .swpr small { display:block; font-size:12px; font-weight:700; color:var(--muted); margin-top:3px; }
+  .swpr::after { content:'⇄'; color:var(--accent2); font-size:17px; flex:none; }
+  .swpr.na { opacity:.65 }
+  @keyframes swpUp { from { transform:translateY(40px); opacity:0; } to { transform:none; opacity:1; } }
+  @media (prefers-reduced-motion: reduce) { .swp, .swpc { animation:none; } }
   .sday.sel .sl { color:var(--text); }
   .sday.sel .sc { opacity:1; outline:2px solid var(--accent2); outline-offset:2px; }
   .sdaywrap { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
@@ -1745,11 +1761,11 @@
     ['Clean and Jerk','shoulders','barbell',false,'oly'], ['Clean and Press','shoulders','barbell',false,'oly'], ['Power Snatch','shoulders','barbell',false,'oly'], ['Hang Power Snatch','shoulders','barbell',false,'oly'], ['Squat Snatch','shoulders','barbell',false,'oly'], ['Snatch High Pull','traps','barbell',false,'oly'], ['Push Jerk','shoulders','barbell',false,'oly'], ['Split Jerk','shoulders','barbell',false,'oly'], ['Snatch Balance','shoulders','barbell',false,'oly'], ['Dumbbell Snatch','shoulders','dumbbells',false,'oly'], ['Kettlebell Snatch','shoulders','kettlebell',false,'oly'], ['Overhead Squat','quadriceps','barbell',false,'oly'],
     ['Clean Pull','lower back','barbell',false,'oly'], ['Snatch Pull','lower back','barbell',false,'oly']
   ];
-  function reqOk(req) {
+  function reqOk(req, set) {
     if (req === 'bodyweight') return true;
-    if (typeof req === 'string') return cfg.equip.has(req);
-    if (Array.isArray(req)) return req.some(reqOk);
-    return req.all.every(reqOk);
+    if (typeof req === 'string') return (set || cfg.equip).has(req);
+    if (Array.isArray(req)) return req.some(r => reqOk(r, set));
+    return req.all.every(r => reqOk(r, set));
   }
   const cfg = { dur: 40, area: 'full', muscles: new Set(), intensity: 'moderate', sup: false, equip: new Set() };
   // rest between sets: the user's default if they turned it on, otherwise it follows the workout's intensity
@@ -1894,6 +1910,19 @@
     return (m[3] ? Math.round(v / 5) * 5 : Math.round(v)) + m[3];
   }
 
+  // one exercise as it appears in a strength workout (also used when an exercise is swapped mid-workout)
+  function strengthItem(e, sets, intensity) {
+    const DP = appData && appData.prefs && appData.prefs.setsRepsOn ? appData.prefs : null;
+    const pr = repsFor(e, intensity);
+    if (DP) sets = DP.defSets;
+    // e[3]: true = timed hold, 'carry' / 'work' = timed effort (carries, sleds, battle ropes)
+    // olympic lifts are always low-rep, whatever the intensity or default reps
+    const rx = e[3] ? sets + ' × ' + holdSecs() + 's ' + (e[3] === true ? 'hold' : e[3]) : e[4] === 'oly' ? sets + ' × 3' : sets + ' × ' + (DP ? DP.defReps : pr);
+    const it = { name: e[0], muscle: e[1], rx };
+    if (e[4] === 'oly') it.oly = true;
+    if (progOn() && isWeighted(e)) { it.weighted = true; it.wt = progSuggest(e[0], e[3] ? 0 : e[4] === 'oly' ? 3 : Number(DP ? DP.defReps : pr)); it.last = progLast(e[0]); it.w0 = it.wt; it.r0 = e[3] ? 0 : itemReps(it); }
+    return it;
+  }
   function buildStrength() {
     const I = INTENSITY[cfg.intensity];
     const groups = cfg.muscles.size ? MUSCLES.filter(m => cfg.muscles.has(m)) : AREAS[cfg.area].groups;
@@ -1919,19 +1948,7 @@
     }
     picked.sort((a, b) => groups.indexOf(a[1]) - groups.indexOf(b[1]));
 
-    const DP = appData && appData.prefs && appData.prefs.setsRepsOn ? appData.prefs : null;
-    const items = picked.map(e => {
-      let sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1));
-      const pr = repsFor(e, cfg.intensity);
-      if (DP) sets = DP.defSets;
-      // e[3]: true = timed hold, 'carry' / 'work' = timed effort (carries, sleds, battle ropes)
-      // olympic lifts are always low-rep, whatever the intensity or default reps
-      const rx = e[3] ? sets + ' × ' + holdSecs() + 's ' + (e[3] === true ? 'hold' : e[3]) : e[4] === 'oly' ? sets + ' × 3' : sets + ' × ' + (DP ? DP.defReps : pr);
-      const it = { name: e[0], muscle: e[1], rx };
-      if (e[4] === 'oly') it.oly = true;
-      if (progOn() && isWeighted(e)) { it.weighted = true; it.wt = progSuggest(e[0], e[3] ? 0 : e[4] === 'oly' ? 3 : Number(DP ? DP.defReps : pr)); it.last = progLast(e[0]); it.w0 = it.wt; it.r0 = e[3] ? 0 : itemReps(it); }
-      return it;
-    });
+    const items = picked.map(e => strengthItem(e, I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1)), cfg.intensity));
 
     const title = cfg.muscles.size
       ? (groups.length <= 3 ? groups.map(cap).join(groups.length === 2 ? ' & ' : ', ') : 'Custom Split')
@@ -1986,9 +2003,11 @@
     shuffle.onclick = buildStrength;
     const edit = el('button', 'secondary', 'Edit settings');
     edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-    const gi = { type:'strength', title:'Strength', mins:cfg.dur, lifts:items.length, intensity:cfg.intensity, items, rated: new Set() };
+    const gi = { type:'strength', title:'Strength', mins:cfg.dur, lifts:items.length, intensity:cfg.intensity, items, rated: new Set(), equip: new Set(cfg.equip), loc: planLoc };
+    const sup = cfg.sup, rest = restFor(I);
+    gi.rebuild = () => repSteps(items, rest, sup, progOn());
     actions.append(shuffle, edit, makeCompleteBtn(gi));
-    addGuide(actions, title, repSteps(items, restFor(I), cfg.sup, progOn()), gi);
+    addGuide(actions, title, repSteps(items, rest, sup, progOn()), gi);
     card.appendChild(actions);
 
     $('cfgOut').replaceChildren(card);
@@ -2260,6 +2279,7 @@
       skill: s + Sk + ' reps', skilleach: s + Sk + ' each side', timed: s + H }[kind];
   }
 
+  const calisItem = (e, I, sets) => ({ name: e[0], cat: e[1], rx: calRx(e, I, sets) });
   function buildCalis() {
     const fail = (m) => { $('calOut').replaceChildren(); return say($('calMsg'), m, 'err'); };
     if (!calCfg.cats.size) return fail('Pick at least one target category.');
@@ -2288,10 +2308,7 @@
     }
     picked.sort((a, b) => (CAL_ORDER.indexOf(a[1]) - CAL_ORDER.indexOf(b[1])) || (b[3] - a[3]));
 
-    const items = picked.map(e => {
-      const sets = I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1));
-      return { name: e[0], cat: e[1], rx: calRx(e, I, sets) };
-    });
+    const items = picked.map(e => calisItem(e, I, I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1))));
     lastCalItems = items;
 
     const names = CAL_CATS.filter(c => calCfg.cats.has(c[0])).map(c => c[1]);
@@ -2323,9 +2340,11 @@
     shuffle.onclick = buildCalis;
     const edit = el('button', 'secondary', 'Edit settings');
     edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-    const gi = { type:'calisthenics', title:'Calisthenics', mins:calCfg.dur, lifts:items.length, intensity:calCfg.intensity };
+    const gi = { type:'calisthenics', title:'Calisthenics', mins:calCfg.dur, lifts:items.length, intensity:calCfg.intensity, items, loc: planLoc };
+    const rest = restFor(I);
+    gi.rebuild = () => repSteps(items, rest, false);
     actions.append(shuffle, edit, makeCompleteBtn(gi));
-    addGuide(actions, title, repSteps(items, restFor(I), false), gi);
+    addGuide(actions, title, repSteps(items, rest, false), gi);
     card.appendChild(actions);
 
     $('calOut').replaceChildren(card);
@@ -2407,11 +2426,12 @@
     if (e[3] === 3 && !wtd) n = Math.max(6, Math.round(n / 2));
     return e[4] === 'each' ? (wtd ? Math.min(n, 12) : Math.max(6, Math.round(n / 2))) : n;
   }
-  function absRx(e, I, sets) {
+  function absRx(e, I, sets, o) {
+    o = o || absCfg;
     const wtd = e[5] > 0;
-    if (absCfg.mode === 'timed') {   // every move runs for the same timer; one-sided moves switch sides halfway
+    if (o.mode === 'timed') {   // every move runs for the same timer; one-sided moves switch sides halfway
       const side = e[4] === 'each' || e[4] === 'holdeach';
-      return { rx: sets + ' × ' + absCfg.work + 's' + (side ? ' (switch sides halfway)' : ''), reps: 0 };
+      return { rx: sets + ' × ' + o.work + 's' + (side ? ' (switch sides halfway)' : ''), reps: 0 };
     }
     if (e[4] === 'hold' || e[4] === 'holdeach') {
       const s = Math.min(90, Math.max(20, holdSecs() + I.hold - (wtd ? 10 : 0)));
@@ -2426,6 +2446,12 @@
     return wSnap(e[7] * m * pgK(), wStep(e[0]));
   }
 
+  function absItem(e, I, sets, o) {
+    const x = absRx(e, I, sets, o), it = { name: e[0], focus: e[1], rx: x.rx };
+    if (e[5] > 0) it.wtd = true;
+    if (e[5] > 0 && progOn()) { it.weighted = true; it.wt = progSuggest(e[0], x.reps) || absStart(e); it.last = progLast(e[0]); it.w0 = it.wt; it.r0 = x.reps; }
+    return it;
+  }
   function buildAbs() {
     const fail = (m) => { $('absOut').replaceChildren(); return say($('absMsg'), m, 'err'); };
     if (!absCfg.focus.size) return fail('Pick at least one focus area.');
@@ -2456,13 +2482,8 @@
     }
     picked.sort((a, b) => ABS_ORDER.indexOf(a[1]) - ABS_ORDER.indexOf(b[1]));
 
-    const items = picked.map(e => {
-      const sets = circ ? S : I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1)), x = absRx(e, I, sets);
-      const it = { name: e[0], focus: e[1], rx: x.rx };
-      if (e[5] > 0) it.wtd = true;
-      if (e[5] > 0 && progOn()) { it.weighted = true; it.wt = progSuggest(e[0], x.reps) || absStart(e); it.last = progLast(e[0]); it.w0 = it.wt; it.r0 = x.reps; }
-      return it;
-    });
+    const opt = { mode: absCfg.mode, work: absCfg.work };
+    const items = picked.map(e => absItem(e, I, circ ? S : I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1)), opt));
 
     const names = ABS_FOCUS.filter(c => absCfg.focus.has(c[0]) && c[0] !== 'full').map(c => c[1]);
     const title = absCfg.focus.has('full') ? 'Full Core' : names.length <= 2 ? names.join(' + ') : 'Custom Core';
@@ -2501,9 +2522,11 @@
     shuffle.onclick = buildAbs;
     const edit = el('button', 'secondary', 'Edit settings');
     edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-    const gi = { type:'abs', title:'Abs', mins:absCfg.dur, lifts:items.length, intensity:absCfg.intensity, items, rated: new Set() };
+    const gi = { type:'abs', title:'Abs', mins:absCfg.dur, lifts:items.length, intensity:absCfg.intensity, items, rated: new Set(), wtOn: absCfg.wt, absOpt: opt, loc: planLoc };
+    const stepsFor = () => circ ? circuitSteps(items, S, restEx, restSet, progOn()) : repSteps(items, restSet, false, progOn());
+    gi.rebuild = stepsFor;
     actions.append(shuffle, edit, makeCompleteBtn(gi));
-    addGuide(actions, title, circ ? circuitSteps(items, S, restEx, restSet, progOn()) : repSteps(items, restSet, false, progOn()), gi);
+    addGuide(actions, title, stepsFor(), gi);
     card.appendChild(actions);
 
     $('absOut').replaceChildren(card);
@@ -4839,6 +4862,7 @@
       ring.appendChild(tm); box.appendChild(ring);
     }
     box.appendChild(el('div', 'gname' + (timed ? '' : ' solo'), st.kind === 'rest' ? 'Rest' : st.name));
+    guidedSwapBtn(box, st);
     guidedTargets(box, st);
     const dt = st.det ? st.det() : st.detail;
     if (dt) box.appendChild(el('div', 'gdetail', dt));
@@ -4873,6 +4897,7 @@
       ring.appendChild(tm); box.appendChild(ring);
     }
     box.appendChild(el('div', 'gname' + (timed ? '' : ' solo'), G.name));
+    if (!rest) guidedSwapBtn(box, st);
     guidedSets(box, st);
     guidedTargets(box, st);
     const dt = rest ? '' : (st.det ? st.det() : st.detail);
@@ -4889,6 +4914,87 @@
     main.onclick = timed ? (Guided.paused ? guidedResume : guidedPause) : guidedNext;
     ctl.append(back, main, skip); box.appendChild(ctl);
     guidedTime();
+  }
+  // ----- swapping an exercise during a guided workout -----
+  const TIER_NAME = ['', 'Beginner', 'Intermediate', 'Advanced'];
+  const reqLabel = (req) => req === 'bodyweight' ? 'Bodyweight' : typeof req === 'string' ? (EQUIP[req] || req) : Array.isArray(req) ? reqLabel(req[0]) : reqLabel(req.all[0]);
+  // suggestions (same muscle group, your equipment, similar kind of move first) and the whole library for searching
+  function swapPools(gi, it) {
+    const used = new Set((gi.items || []).map(m => m.name)), lw = (s) => String(s).split(/\s+/).pop().replace(/s$/, ''), like = (n) => lw(n) === lw(it.name) ? -3 : 0;   // same kind of move (Row, Press, Curl...) first
+    if (gi.type === 'calisthenics') {
+      const I = CAL_INT[gi.intensity], old = CAL_EX.find(e => e[0] === it.name) || [0, 0, 0, 2, 'reps'];
+      const base = CAL_EX.filter(e => !used.has(e[0]) && (e[2] === 'both' || e[2] === gi.loc));
+      const mk = (e) => ({ name: e[0], tag: CAL_LABEL[e[1]] + ' · ' + TIER_NAME[e[3]], make: (sets) => calisItem(e, I, sets), rank: like(e[0]) + Math.abs(e[3] - old[3]) * 2 + (/each/.test(e[4]) !== /each/.test(old[4]) ? 1 : 0) + (/hold|timed/.test(e[4]) !== /hold|timed/.test(old[4]) ? 3 : 0) });
+      return { label: CAL_LABEL[it.cat], near: base.filter(e => e[1] === it.cat).map(mk).sort((a, b) => a.rank - b.rank), all: base.map(mk) };
+    }
+    if (gi.type === 'abs') {
+      const I = ABS_INT[gi.intensity], old = ABS_EX.find(e => e[0] === it.name) || [0, 0, 0, 2, 'reps', 0];
+      const base = ABS_EX.filter(e => !used.has(e[0]) && (e[2] === 'both' || e[2] === gi.loc) && (!(e[5] > 0) || gi.wtOn));
+      const mk = (e) => ({ name: e[0], tag: ABS_LABEL[e[1]] + (e[5] > 0 ? ' · weighted' : ''), make: (sets) => absItem(e, I, sets, gi.absOpt), rank: like(e[0]) + Math.abs(e[3] - old[3]) * 2 + ((e[5] > 0) !== (old[5] > 0) ? 1 : 0) + (/hold/.test(e[4]) !== /hold/.test(old[4]) ? 3 : 0) });
+      return { label: ABS_LABEL[it.focus], near: base.filter(e => e[1] === it.focus).map(mk).sort((a, b) => a.rank - b.rank), all: base.map(mk) };
+    }
+    const olyOn = !!(appData && appData.prefs && appData.prefs.olympic), eq = gi.equip || cfg.equip, old = EXERCISES.find(e => e[0] === it.name) || [];
+    const base = EXERCISES.filter(e => !used.has(e[0]) && (e[4] !== 'oly' || olyOn));
+    const rank = (e) => like(e[0]) + (!!e[3] !== !!old[3] ? 4 : 0) + (old.length && isCompound(e) !== isCompound(old) ? 2 : 0) + (old.length && isWeighted(e) !== isWeighted(old) ? 1 : 0);
+    const mk = (e) => ({ name: e[0], tag: cap(e[1]) + ' · ' + reqLabel(e[2]), have: reqOk(e[2], eq), make: (sets) => strengthItem(e, sets, gi.intensity), rank: rank(e), e });
+    return { label: cap(it.muscle || ''), near: base.filter(e => e[1] === it.muscle && reqOk(e[2], eq)).map(mk).sort((a, b) => a.rank - b.rank), all: base.map(mk) };
+  }
+  // the page's swap button: only for workouts whose exercises can be rebuilt (strength, calisthenics, abs)
+  function guidedSwapBtn(box, st) {
+    const it = st.item || (st.g && st.g.item), gi = Guided.info;
+    if (!it || st.kind !== 'work' || !gi || !gi.rebuild || !gi.items || gi.items.indexOf(it) < 0) return;
+    const b = el('button', 'gswap', '⇄ Swap exercise'); b.setAttribute('aria-label', 'Swap ' + it.name + ' for another exercise');
+    b.onclick = () => openSwap(it);
+    box.appendChild(b);
+  }
+  function openSwap(it) {
+    if (document.querySelector('.swp')) return;
+    const gi = Guided.info, pools = swapPools(gi, it), cur = Guided.steps[Guided.i];
+    const pausedHere = !Guided.paused && !!(cur && cur.secs);
+    if (pausedHere) guidedPause();
+    const back = el('div', 'swp'), card = el('div', 'swpc'), head = el('div', 'swph'), x = el('button', 'swpx', '✕'), list = el('div', 'swpl');
+    card.setAttribute('role', 'dialog'); card.setAttribute('aria-modal', 'true'); card.setAttribute('aria-label', 'Swap exercise');
+    const close = (resume) => { back.remove(); document.removeEventListener('keydown', onKey, true); if (resume && pausedHere) guidedResume(); };
+    const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(true); } };
+    x.setAttribute('aria-label', 'Close'); x.onclick = () => close(true);
+    back.onclick = (e) => { if (e.target === back) close(true); };
+    head.append(el('div', 'swpt', 'Swap exercise'), el('div', 'swps', 'Replacing ' + it.name + (pools.label ? ' · ' + pools.label : '')), x);
+    const q = mkInput('search', '', 'Search all exercises'); q.className += ' swpq'; q.setAttribute('aria-label', 'Search exercises'); q.setAttribute('autocomplete', 'off'); q.enterKeyHint = 'search';
+    const row = (c) => {
+      const b = el('button', 'swpr' + (c.have === false ? ' na' : '')), tx = el('div');
+      tx.append(el('span', null, c.name), el('small', null, c.tag + (c.have === false ? ' · not in your equipment' : '')));
+      b.appendChild(tx); b.onclick = () => { close(false); guidedSwap(it, c); }; return b;
+    };
+    const render = () => {
+      const s = q.value.trim().toLowerCase(); list.replaceChildren();
+      if (!s) {
+        list.appendChild(el('div', 'swpk', 'Suggested' + (pools.label ? ' for ' + pools.label : '')));
+        if (!pools.near.length) list.appendChild(el('div', 'swpn', 'No close matches with your equipment. Try the search above.'));
+        pools.near.slice(0, 12).forEach(c => list.appendChild(row(c)));
+        if (pools.near.length > 12) list.appendChild(el('div', 'swpn', 'Search to see more.'));
+        return;
+      }
+      const words = s.split(/\s+/), hits = pools.all.filter(c => words.every(w => (c.name + ' ' + c.tag).toLowerCase().includes(w)))
+        .sort((a, b) => (b.name.toLowerCase().startsWith(s) - a.name.toLowerCase().startsWith(s)) || ((b.have !== false) - (a.have !== false)));
+      list.appendChild(el('div', 'swpk', hits.length ? hits.length + (hits.length === 1 ? ' match' : ' matches') : 'No matches'));
+      if (!hits.length) list.appendChild(el('div', 'swpn', 'Nothing found for “' + q.value.trim() + '”. Try a muscle, an equipment name or part of the exercise name.'));
+      hits.slice(0, 40).forEach(c => list.appendChild(row(c)));
+    };
+    q.oninput = render; render();
+    card.append(head, q, list); back.appendChild(card); document.body.appendChild(back);
+    document.addEventListener('keydown', onKey, true);
+  }
+  // puts the new exercise in the workout, rebuilds the steps and lands on the same set of the new exercise
+  function guidedSwap(oldIt, c) {
+    const gi = Guided.info, items = gi.items, k = items.indexOf(oldIt); if (k < 0) return;
+    const itemOf = (s) => s.item || (s.g && s.g.item), works = (s, m) => itemOf(s) === m && s.kind === 'work';
+    let ord = 0; for (let j = 0; j < Guided.i; j++) if (works(Guided.steps[j], oldIt)) ord++;
+    const nu = c.make(parseRx(oldIt.rx).sets); items[k] = nu;
+    const steps = gi.rebuild(); let idx = -1, seen = 0;
+    steps.forEach((s, j) => { if (idx < 0 && works(s, nu)) { if (seen === ord) idx = j; seen++; } });
+    if (idx < 0) idx = Math.max(0, steps.findIndex(s => works(s, nu)));
+    Guided.steps = steps; Guided.gl = []; steps.forEach(s => { if (s.g && !Guided.gl.includes(s.g)) Guided.gl.push(s.g); });
+    guidedEnter(idx);
   }
   // weight and reps for the current exercise, shown as two tiles the user can change mid-workout
   function guidedTargets(box, st) {
