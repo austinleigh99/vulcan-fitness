@@ -800,6 +800,36 @@
   .nav button { flex:1; margin:0; padding: 10px 0 8px; background:none; border:0; border-radius:0; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing:.04em; text-transform: uppercase; display:flex; flex-direction:column; align-items:center; gap: 4px; }
   .nav button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .nav button.active { color: var(--accent2); }
+  /* sign-up questions */
+  .onb { position:fixed; inset:0; z-index:3500; background:var(--bg); display:flex; justify-content:center; animation:cfmFade .2s ease; }
+  .onbin { width:100%; max-width:520px; height:100%; display:flex; flex-direction:column; }
+  .onbtop { position:relative; flex:none; padding:calc(env(safe-area-inset-top, 0px) + 18px) 56px 8px 20px; }
+  .onbbar { height:6px; border-radius:99px; background:var(--chip); overflow:hidden; }
+  .onbbar i { display:block; height:100%; border-radius:99px; background:var(--accent); transition:width .25s ease; }
+  .onbstep { font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:10px; }
+  .onb .onbx { position:absolute; right:14px; top:calc(env(safe-area-inset-top, 0px) + 8px); width:38px; height:38px; margin:0; padding:0; border-radius:50%; background:var(--chip); color:var(--muted); font-size:15px; }
+  .onbbody { flex:1; overflow-y:auto; padding:14px 20px 20px; -webkit-overflow-scrolling:touch; }
+  .onbh { font-size:28px; font-weight:900; line-height:1.15; margin:8px 0 8px; }
+  .onbs { font-size:14px; color:var(--muted); line-height:1.5; margin:0 0 16px; }
+  .onbsub { font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--accent2); margin:22px 0 10px; }
+  .onb .onbopt { display:block; text-align:left; width:100%; margin:0 0 10px; padding:15px 16px; border-radius:16px; background:var(--card); border:1.5px solid var(--line); color:var(--text); font-weight:700; }
+  .onbopt .ot { display:block; font-size:16px; font-weight:800; }
+  .onbopt .os { display:block; font-size:13px; font-weight:600; color:var(--muted); margin-top:4px; line-height:1.35; }
+  .onb .onbopt.on { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 16%, var(--card)); }
+  .onbtwo { display:grid; grid-template-columns:1fr 1fr; gap:10px; } .onbtwo .onbopt { margin:0; }
+  .onb .onbgh { gap:8px; } .onb .onbgh .onbgt { flex:1; width:auto; margin:0; padding:6px 0; text-align:left; text-decoration:none; background:none; color:var(--accent2); font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+  .onb .onbgh button:last-child { margin-left:0; }
+  .onbfoot { flex:none; padding:10px 20px calc(env(safe-area-inset-bottom, 0px) + 16px); background:var(--bg); border-top:1px solid var(--line); }
+  .onb .onbgo { margin:0; padding:16px; font-size:17px; }
+  .onbrow { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+  .onb .onbback, .onb .onbskip { width:auto; margin:0; padding:10px 6px; background:none; color:var(--muted); font-size:14px; font-weight:700; }
+  .onb .onbskip { margin-left:auto; }
+  .onbmsg { color:var(--danger-t); font-size:13px; font-weight:700; margin:0 0 10px; text-align:center; }
+  .onb .pv { margin-top:18px; }
+  .setupcard { position:relative; margin:14px 0 4px; padding:16px 44px 16px 16px; border-radius:18px; background:color-mix(in srgb, var(--accent) 14%, var(--card)); border:1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .setupcard .sut { font-size:16px; font-weight:900; } .setupcard .sus { font-size:13px; color:var(--muted); margin-top:5px; line-height:1.45; }
+  .setupcard .sugo { width:auto; margin:12px 0 0; padding:10px 18px; font-size:14px; border-radius:999px; }
+  .setupcard .sux { position:absolute; right:8px; top:8px; width:32px; height:32px; margin:0; padding:0; border-radius:50%; background:none; color:var(--muted); font-size:14px; }
 </style>
 </head>
 <body>
@@ -832,6 +862,8 @@
         </div>
         <button id="homeSettings" class="gearbtn" aria-label="Settings" data-gear="1"></button>
       </div>
+
+      <div id="setupCard"></div>
 
       <div class="stats">
         <div class="stat s1 tap" id="tileCal" role="button" tabindex="0"><span class="sic ic" data-i="flame"></span><div class="num" id="stCal">0</div><div class="lbl">Cal</div></div>
@@ -1421,6 +1453,7 @@
       loadSets();
       loadAppData();
     } else {
+      onbClose();
       currentUser = null;
       appData = null;
       $('app').classList.add('hidden');
@@ -1715,6 +1748,23 @@
     { name:'Miscellaneous', items:[['medball','Medicine Ball'],['jumprope','Jump Rope'],['boxjump','Box Jump'],['stabilityball','Stability Ball'],['abwheel','Ab Wheel Carver'],['bands','Resistance Bands'],['rings','Rings / TRX'],['sled','Sled'],['battleropes','Battle Ropes']] }
   ];
   const EQUIP = Object.fromEntries(EQUIP_GROUPS.flatMap(g => g.items));
+  // injuries / limitations: moves whose names suggest they load that area are left out of generated workouts
+  const INJ = {
+    shoulder: { label: 'Shoulder', re: 'overhead|shoulder press|military|arnold|snatch|handstand|pike push|upright row|lateral raise|front raise|dip\\b|dips|bench press|push.?up|clean|jerk|pull.?over|thruster' },
+    elbow:    { label: 'Elbow',    re: 'skull|triceps extension|tricep extension|dip\\b|dips|curl|close.?grip|pull.?up|chin.?up|diamond' },
+    wrist:    { label: 'Wrist',    re: 'push.?up|plank|handstand|front squat|barbell curl|crawl|burpee|bear|dip\\b|dips|mountain climber' },
+    neck:     { label: 'Neck',     re: 'shrug|upright row|neck|crunch|bridge|headstand|overhead' },
+    lowerback:{ label: 'Lower back', re: 'deadlift|good morning|bent.?over|barbell row|hyperextension|back extension|superman|clean|snatch|swing|jackknife|v-up|sit.?up|russian twist|toe touch|windmill' },
+    hip:      { label: 'Hip',      re: 'sumo|hip thrust|lunge|bulgarian|deadlift|leg raise|kick|abduct|adduct|pistol|squat' },
+    knee:     { label: 'Knee',     re: 'lunge|jump|squat|pistol|step.?up|leg extension|sissy|burpee|box|skater|plyo|hack|mountain climber|high knee|bulgarian|wall sit|thruster' },
+    ankle:    { label: 'Ankle',    re: 'jump|jog|run|skater|box|calf|rope|lunge|plyo|burpee|high knee|hop' }
+  };
+  function injFilter(list) {
+    const a = (appData && appData.prefs && appData.prefs.inj) || [];
+    if (!a.length) return list;
+    const re = new RegExp(a.map(k => INJ[k].re).join('|'), 'i'), f = list.filter(e => !re.test(e[0]));
+    return f.length ? f : list;
+  }
   // [name, muscle, requirement, isTimedHold]
   // requirement: 'bodyweight' | an equipment key | [any of ...] | A(all of ...)
   const EXERCISES = [
@@ -1932,7 +1982,7 @@
 
     const r = rng(Math.floor(Math.random() * 4294967296));
     const olyOn = !!(appData && appData.prefs && appData.prefs.olympic);
-    const avail = EXERCISES.filter(e => groups.includes(e[1]) && reqOk(e[2]) && (e[4] !== 'oly' || olyOn));
+    const avail = injFilter(EXERCISES.filter(e => groups.includes(e[1]) && reqOk(e[2]) && (e[4] !== 'oly' || olyOn)));
     if (!avail.length) { $('cfgOut').replaceChildren(); return say($('cfgMsg'), 'No exercises match. Add more equipment or muscle groups.', 'err'); }
     say($('cfgMsg'), '');
 
@@ -2293,7 +2343,7 @@
 
     const buckets = {};
     want.forEach(c => {
-      let pool = CAL_EX.filter(e => e[1] === c && (e[2] === 'both' || e[2] === planLoc));
+      let pool = injFilter(CAL_EX.filter(e => e[1] === c && (e[2] === 'both' || e[2] === planLoc)));
       const capped = pool.filter(e => e[3] <= target + 1);
       if (capped.length) pool = capped;
       buckets[c] = pickN(r, pool, pool.length).sort((a, b) => Math.abs(a[3] - target) - Math.abs(b[3] - target));
@@ -2468,7 +2518,7 @@
 
     const bk = {};
     want.forEach(c => {
-      let pool = ABS_EX.filter(e => e[1] === c && (e[2] === 'both' || e[2] === planLoc) && (!(e[5] > 0) || absCfg.wt));
+      let pool = injFilter(ABS_EX.filter(e => e[1] === c && (e[2] === 'both' || e[2] === planLoc) && (!(e[5] > 0) || absCfg.wt)));
       const lo = pool.filter(e => e[3] <= cap); if (lo.length) pool = lo;
       const s = pickN(r, pool, pool.length).sort((a, b) => Math.abs(a[3] - I.tier) - Math.abs(b[3] - I.tier));
       bk[c] = { w: s.filter(e => e[5] > 0), b: s.filter(e => !(e[5] > 0)), k: 0 };
@@ -3541,6 +3591,10 @@
     const N = Object.assign({ reminders: false, time: '18:00', streak: false, weekly: false }, P.notif && typeof P.notif === 'object' ? P.notif : {});
     N.reminders = !!N.reminders; N.streak = !!N.streak; N.weekly = !!N.weekly; N.time = /^\d{2}:\d{2}$/.test(N.time) ? N.time : '18:00';
     P.notif = N;
+    P.inj = (Array.isArray(P.inj) ? P.inj : []).filter((k, n, a) => INJ[k] && a.indexOf(k) === n);
+    P.injNote = typeof P.injNote === 'string' ? P.injNote.slice(0, 120) : '';
+    const ob = P.onb && typeof P.onb === 'object' ? P.onb : null;
+    if (ob) { const sk = {}; ['name', 'goal', 'units', 'gear', 'sched', 'body'].forEach(k => { if (ob.skip && ob.skip[k]) sk[k] = 1; }); P.onb = { done: ob.done !== false, skip: sk, hide: !!ob.hide }; } else delete P.onb;
     return out;
   }
   let saveTimer = null;
@@ -3562,6 +3616,7 @@
     const uid = currentUser && currentUser.id;
     const local = lsGet('data', null);
     appData = cleanData(local);
+    let isNew = !local;
     logs = lsGet('logs', []);
     renderHomeUI();
     // Cloud backup switched off: keep everything on this device and don't talk to the cloud
@@ -3571,11 +3626,14 @@
       if (error) throw error;
       cloud.data = true;
       if (!currentUser || currentUser.id !== uid) return;
-      if (data) {
+      if (onbOpen) { isNew = false; }   // keep what is on screen while the questions are open
+      else if (data) {
+        isNew = false;
         appData = cleanData({ name: data.display_name || '', weight: data.weight_lb, schedule: data.schedule, challenges: data.challenges, prefs: data.prefs });
         lsSet('data', appData);
       } else if (local) { pushAppData(); }
-    } catch (e) { cloud.data = false; }
+    } catch (e) { cloud.data = false; isNew = false; }
+    maybeOnboard(isNew);
     try {
       const pending = logs.filter(l => String(l.id).startsWith('local-'));
       if (pending.length) {
@@ -3687,6 +3745,7 @@
     $('stStreak').textContent = logStreak() + 'd';
     renderSchedule();
     renderChallenges();
+    renderSetupCard();
   }
 
   let schedSel = null;   // day picked on the Home week row (0-6); null = today
@@ -4923,18 +4982,18 @@
     const used = new Set((gi.items || []).map(m => m.name)), lw = (s) => String(s).split(/\s+/).pop().replace(/s$/, ''), like = (n) => lw(n) === lw(it.name) ? -3 : 0;   // same kind of move (Row, Press, Curl...) first
     if (gi.type === 'calisthenics') {
       const I = CAL_INT[gi.intensity], old = CAL_EX.find(e => e[0] === it.name) || [0, 0, 0, 2, 'reps'];
-      const base = CAL_EX.filter(e => !used.has(e[0]) && (e[2] === 'both' || e[2] === gi.loc));
+      const base = injFilter(CAL_EX.filter(e => !used.has(e[0]) && (e[2] === 'both' || e[2] === gi.loc)));
       const mk = (e) => ({ name: e[0], tag: CAL_LABEL[e[1]] + ' · ' + TIER_NAME[e[3]], make: (sets) => calisItem(e, I, sets), rank: like(e[0]) + Math.abs(e[3] - old[3]) * 2 + (/each/.test(e[4]) !== /each/.test(old[4]) ? 1 : 0) + (/hold|timed/.test(e[4]) !== /hold|timed/.test(old[4]) ? 3 : 0) });
       return { label: CAL_LABEL[it.cat], near: base.filter(e => e[1] === it.cat).map(mk).sort((a, b) => a.rank - b.rank), all: base.map(mk) };
     }
     if (gi.type === 'abs') {
       const I = ABS_INT[gi.intensity], old = ABS_EX.find(e => e[0] === it.name) || [0, 0, 0, 2, 'reps', 0];
-      const base = ABS_EX.filter(e => !used.has(e[0]) && (e[2] === 'both' || e[2] === gi.loc) && (!(e[5] > 0) || gi.wtOn));
+      const base = injFilter(ABS_EX.filter(e => !used.has(e[0]) && (e[2] === 'both' || e[2] === gi.loc) && (!(e[5] > 0) || gi.wtOn)));
       const mk = (e) => ({ name: e[0], tag: ABS_LABEL[e[1]] + (e[5] > 0 ? ' · weighted' : ''), make: (sets) => absItem(e, I, sets, gi.absOpt), rank: like(e[0]) + Math.abs(e[3] - old[3]) * 2 + ((e[5] > 0) !== (old[5] > 0) ? 1 : 0) + (/hold/.test(e[4]) !== /hold/.test(old[4]) ? 3 : 0) });
       return { label: ABS_LABEL[it.focus], near: base.filter(e => e[1] === it.focus).map(mk).sort((a, b) => a.rank - b.rank), all: base.map(mk) };
     }
     const olyOn = !!(appData && appData.prefs && appData.prefs.olympic), eq = gi.equip || cfg.equip, old = EXERCISES.find(e => e[0] === it.name) || [];
-    const base = EXERCISES.filter(e => !used.has(e[0]) && (e[4] !== 'oly' || olyOn));
+    const base = injFilter(EXERCISES.filter(e => !used.has(e[0]) && (e[4] !== 'oly' || olyOn)));
     const rank = (e) => like(e[0]) + (!!e[3] !== !!old[3] ? 4 : 0) + (old.length && isCompound(e) !== isCompound(old) ? 2 : 0) + (old.length && isWeighted(e) !== isWeighted(old) ? 1 : 0);
     const mk = (e) => ({ name: e[0], tag: cap(e[1]) + ' · ' + reqLabel(e[2]), have: reqOk(e[2], eq), make: (sets) => strengthItem(e, sets, gi.intensity), rank: rank(e), e });
     return { label: cap(it.muscle || ''), near: base.filter(e => e[1] === it.muscle && reqOk(e[2], eq)).map(mk).sort((a, b) => a.rank - b.rank), all: base.map(mk) };
@@ -5103,6 +5162,7 @@
   const SET_GROUPS = [
     ['General settings', [
       ['Edit Profile', 'user', '#8c84ff', 'rgba(91,75,255,.25)', () => openEditProfile()],
+      ['Setup questions', 'sliders', '#34d399', 'rgba(52,211,153,.2)', () => openOnboarding(null)],
       ['Account', 'shield', 'var(--soft)', 'rgba(140,140,163,.2)', () => openAccount()],
       ['Notifications', 'bell', '#fb923c', 'rgba(251,146,60,.2)', () => openNotifications()],
       ['Display & Accessibility', 'eye', '#fbbf24', 'rgba(251,191,36,.18)', () => openDisplay()]
@@ -5199,12 +5259,14 @@
     const v = Number(text), lb = kg ? v / 0.4536 : v;
     if (lb >= 60 && lb <= 600) { appData.weight = Math.round(lb * 10) / 10; appData.prefs.weightSet = true; saveAppData(); }
   }
-  function buildAboutYou(body) {
+  function buildAboutYou(body, redraw, noHead) {
     const P = appData.prefs, kg = P.units === 'kg';
-    body.appendChild(el('h2', null, 'About you (optional)'));
-    body.appendChild(el('div', 'sheet-note', 'Share as much or as little as you like. You can leave any of these blank.'));
+    if (!noHead) {
+      body.appendChild(el('h2', null, 'About you (optional)'));
+      body.appendChild(el('div', 'sheet-note', 'Share as much or as little as you like. You can leave any of these blank.'));
+    }
     body.appendChild(el('label', null, 'Sex'));
-    body.appendChild(mkChips('mus-wrap', [['male', 'Male'], ['female', 'Female']], k => P.sex === k, (k) => { P.sex = P.sex === k ? '' : k; saveAppData(); refreshSheet(); }));
+    body.appendChild(mkChips('mus-wrap', [['male', 'Male'], ['female', 'Female']], k => P.sex === k, (k) => { P.sex = P.sex === k ? '' : k; saveAppData(); (redraw || refreshSheet)(); }));
     body.appendChild(el('label', null, 'Age'));
     const age = mkInput('number', P.age === '' ? '' : String(P.age), 'Years'); age.inputMode = 'numeric'; age.min = '10'; age.max = '100';
     age.oninput = () => { if (age.value.trim() === '') { P.age = ''; saveAppData(); } else { const v = Number(age.value); if (Number.isInteger(v) && v >= 10 && v <= 100) { P.age = v; saveAppData(); } } };
@@ -5869,6 +5931,171 @@
       body.appendChild(pv);
       body.appendChild(el('div', 'sheet-note', 'This builds a balanced week from a set of proven templates. You can fine-tune any day afterwards in the editor.'));
     }, [['Cancel', 'secondary', closeSheet], ['Use this split', '', () => { appData.schedule = makeSplit(autoDays, autoGoal); saveAppData(); closeSheet(); }]]);
+  }
+
+  // ----- sign-up questions (onboarding) -----
+  // Answers are saved straight into the normal profile settings as you go, so nothing is lost if the tab is closed.
+  // prefs.onb = { done, skip: { step: 1 }, hide } remembers which sections were skipped so they can be finished later.
+  const ONB_STEPS = ['name', 'goal', 'units', 'gear', 'sched', 'body'];
+  const ONB_LABEL = { name: 'Username', goal: 'Goal & experience', units: 'Units', gear: 'Gym, equipment & injuries', sched: 'Weekly schedule', body: 'Personal info' };
+  const LEVEL_DESC = { beginner: 'New to training or coming back after a break', intermediate: 'Train regularly and know the main lifts', advanced: 'Years of consistent training' };
+  const GOAL_DESC = { muscle: 'Strength-focused weeks with progressive weights', fat: 'A mix of HIIT, cardio and strength', fit: 'A balanced week of everything', flex: 'Yoga, pilates and recovery' };
+  let onbEl = null, onbOpen = false;
+  function onbState() { const P = appData.prefs; if (!P.onb) P.onb = { done: false, skip: {}, hide: false }; return P.onb; }
+  function onbClose() { if (onbEl) { onbEl.remove(); onbEl = null; } onbOpen = false; }
+  function maybeOnboard(isNew) {
+    if (!currentUser || onbOpen || !appData) return;
+    const S = appData.prefs.onb;
+    if ((isNew && !S) || (S && S.done === false)) openOnboarding(null);
+  }
+  function renderSetupCard() {
+    const box = $('setupCard'); if (!box) return;
+    box.replaceChildren();
+    const S = appData && appData.prefs.onb;
+    const left = S && S.done && !S.hide ? ONB_STEPS.filter(k => S.skip && S.skip[k]) : [];
+    if (!left.length) return;
+    const c = el('div', 'setupcard');
+    const x = el('button', 'sux', '✕'); x.setAttribute('aria-label', 'Hide'); x.onclick = () => { S.hide = true; saveAppData(); renderSetupCard(); };
+    c.appendChild(x);
+    c.appendChild(el('div', 'sut', 'Finish setting up'));
+    c.appendChild(el('div', 'sus', 'You skipped ' + left.map(k => ONB_LABEL[k]).join(', ') + '. Adding these helps FitPulse build workouts that fit you.'));
+    const go = el('button', 'sugo', 'Continue setup'); go.onclick = () => openOnboarding(left);
+    c.appendChild(go); box.appendChild(c);
+  }
+
+  function openOnboarding(only) {
+    if (onbOpen) return;
+    const P = appData.prefs, S = onbState(), steps = only && only.length ? only.slice() : ONB_STEPS.slice();
+    if (!only) S.done = false;
+    saveAppData();
+    onbOpen = true;
+    let i = 0, schedDays = typeof autoDays === 'number' ? autoDays : 4, gearLoc = P.loc === 'home' ? 'home' : 'gym', openGroups = new Set(), msg = '';
+    const root = el('div', 'onb'), inner = el('div', 'onbin');
+    root.appendChild(inner); document.body.appendChild(root); onbEl = root;
+    const mkOpt = (title, sub, on, fn) => { const b = el('button', 'onbopt' + (on ? ' on' : '')); b.append(el('span', 'ot', title)); if (sub) b.append(el('span', 'os', sub)); b.onclick = fn; return b; };
+    const isDone = {
+      name: () => !!appData.name,
+      goal: () => !!P.goal,
+      units: () => true,
+      gear: () => true,
+      sched: () => true,
+      body: () => P.age !== '' || P.heightCm !== '' || !!P.sex || !!P.weightSet
+    };
+    function finish() {
+      steps.forEach(k => { if (!S.skip[k] && !isDone[k]()) S.skip[k] = 1; });
+      ONB_STEPS.forEach(k => { if (!steps.includes(k) && !S.skip[k] && !isDone[k]()) { /* untouched sections stay as they were */ } });
+      S.done = true; if (!only) S.hide = false;
+      saveAppData(); onbClose(); renderHomeUI(); showTab('home');
+    }
+    function leaveEarly() {
+      steps.slice(i).forEach(k => { if (k !== 'name') S.skip[k] = 1; });
+      finish();
+    }
+    function next(skipped) {
+      const k = steps[i];
+      if (k === 'name') {
+        const v = (inner.querySelector('.onbname').value || '').trim();
+        if (!v) { msg = 'Please enter a username to continue.'; return draw(); }
+        appData.name = v.slice(0, 24);
+      }
+      if (skipped) S.skip[k] = 1; else if (k === 'sched') { delete S.skip[k]; appData.schedule = makeSplit(schedDays, P.goal || 'fit'); autoDays = schedDays; }
+      else if (isDone[k]()) delete S.skip[k]; else S.skip[k] = 1;
+      saveAppData(); msg = ''; i++; draw(); inner.querySelector('.onbbody').scrollTop = 0;
+    }
+    function draw() {
+      inner.replaceChildren();
+      const k = steps[i], last = i >= steps.length;
+      const top = el('div', 'onbtop');
+      if (!last) {
+        const bar = el('div', 'onbbar'), fill = el('i'); fill.style.width = Math.round((i + 1) / steps.length * 100) + '%'; bar.appendChild(fill);
+        top.appendChild(bar);
+        top.appendChild(el('div', 'onbstep', 'Step ' + (i + 1) + ' of ' + steps.length));
+        if (appData.name && !(k === 'name' && !appData.name)) { const x = el('button', 'onbx', '✕'); x.setAttribute('aria-label', 'Finish later'); x.onclick = leaveEarly; top.appendChild(x); }
+      }
+      inner.appendChild(top);
+      const body = el('div', 'onbbody'); inner.appendChild(body);
+      const h = (t, s) => { body.appendChild(el('h1', 'onbh', t)); if (s) body.appendChild(el('div', 'onbs', s)); };
+      const sub = (t) => body.appendChild(el('div', 'onbsub', t));
+      if (last) {
+        h('You\'re all set' + (appData.name ? ', ' + appData.name : '') + '!', 'Your workouts are ready.');
+        const left = ONB_STEPS.filter(x => S.skip[x]);
+        body.appendChild(el('div', 'onbs', left.length ? 'You skipped ' + left.map(x => ONB_LABEL[x]).join(', ') + '. You can finish those any time from the card on Home, or in Settings under Setup questions.' : 'Everything is filled in. You can change any of it later in Settings.'));
+      } else if (k === 'name') {
+        h('Welcome to FitPulse', 'What should we call you? This is the name shown on Home and your profile.');
+        const n = mkInput('text', appData.name || '', defaultName() || 'Your username'); n.className = 'onbname'; n.maxLength = 24; n.autocomplete = 'off';
+        n.onkeydown = (e) => { if (e.key === 'Enter') next(false); };
+        body.appendChild(n);
+        setTimeout(() => { try { n.focus(); } catch (e) { /* ignore */ } }, 50);
+      } else if (k === 'goal') {
+        h('What\'s your main goal?', 'This sets the style of your weekly plan.');
+        Object.entries(SPLIT_GOALS).forEach(([key, g]) => body.appendChild(mkOpt(g.label, GOAL_DESC[key], P.goal === key, () => { P.goal = P.goal === key ? '' : key; if (P.goal) { autoGoal = key; autoGoalSet = true; } saveAppData(); draw(); })));
+        sub('Experience level');
+        Object.entries(LEVEL_LABEL).forEach(([key, lab]) => body.appendChild(mkOpt(lab, LEVEL_DESC[key], P.level === key, () => { P.level = key; saveAppData(); draw(); })));
+      } else if (k === 'units') {
+        h('Which units do you use?', 'You can change this any time in Settings.');
+        const setU = (m) => { P.units = m ? 'kg' : 'lb'; P.distUnit = m ? 'km' : 'mi'; P.heightUnit = m ? 'cm' : 'ftin'; saveAppData(); draw(); };
+        body.appendChild(mkOpt('Imperial', 'Pounds, miles, feet & inches', P.units !== 'kg', () => setU(false)));
+        body.appendChild(mkOpt('Metric', 'Kilograms, kilometers, centimeters', P.units === 'kg', () => setU(true)));
+      } else if (k === 'gear') {
+        h('Where do you train?', 'FitPulse builds workouts using only the equipment you have.');
+        const row = el('div', 'onbtwo');
+        row.append(mkOpt('In the gym', '', P.loc === 'gym', () => { P.loc = 'gym'; gearLoc = 'gym'; saveAppData(); draw(); }), mkOpt('At home', '', P.loc === 'home', () => { P.loc = 'home'; gearLoc = 'home'; saveAppData(); draw(); }));
+        body.appendChild(row);
+        sub('Your equipment');
+        body.appendChild(mkSeg([['gym', 'Gym equipment'], ['home', 'Home equipment']], q => gearLoc === q, q => { gearLoc = q; draw(); }));
+        const field = gearLoc === 'gym' ? 'equipGym' : 'equipHome', have = new Set(P[field]);
+        const commit = () => { P[field] = EQUIP_KEYS.filter(q => have.has(q)); saveAppData(); };
+        body.appendChild(el('div', 'onbs', gearLoc === 'gym' ? 'A full gym is selected by default. Tap a group to open it and untick anything your gym doesn\'t have.' : 'Tick what you own at home. Bodyweight workouts always work with nothing.'));
+        EQUIP_GROUPS.forEach(g => {
+          const keys = g.items.map(it => it[0]), key = field + g.name, isOpen = openGroups.has(key);
+          const head = el('div', 'eqhead onbgh'), cnt = el('span', 'c'), all = el('button');
+          const sync = () => { const n = keys.filter(q => have.has(q)).length; cnt.textContent = n + '/' + keys.length; all.textContent = n === keys.length ? 'Clear' : 'Select all'; };
+          const tg = el('button', 'onbgt', (isOpen ? '▾ ' : '▸ ') + g.name); tg.onclick = () => { isOpen ? openGroups.delete(key) : openGroups.add(key); draw(); };
+          head.append(tg, cnt, all); body.appendChild(head);
+          const grid = el('div', 'eqgrid'), btns = {};
+          g.items.forEach(([q, label]) => {
+            const b = el('button', 'eqitem' + (have.has(q) ? ' on' : '')); b.setAttribute('aria-pressed', String(have.has(q)));
+            b.append(el('span', null, label), el('span', 'bx', '✓')); btns[q] = b;
+            b.onclick = () => { have.has(q) ? have.delete(q) : have.add(q); b.classList.toggle('on', have.has(q)); b.setAttribute('aria-pressed', String(have.has(q))); sync(); commit(); };
+            grid.appendChild(b);
+          });
+          all.onclick = () => { const allOn = keys.every(q => have.has(q)); keys.forEach(q => { allOn ? have.delete(q) : have.add(q); btns[q].classList.toggle('on', have.has(q)); btns[q].setAttribute('aria-pressed', String(have.has(q))); }); sync(); commit(); };
+          sync(); if (isOpen) body.appendChild(grid);
+        });
+        sub('Injuries or limitations (optional)');
+        body.appendChild(el('div', 'onbs', 'Pick any areas to go easy on. Strength, calisthenics and abs workouts will leave out moves that commonly stress them.'));
+        const inj = new Set(P.inj || []);
+        body.appendChild(mkChips('mus-wrap', Object.entries(INJ).map(([q, v]) => [q, v.label]), q => inj.has(q), (q) => { inj.has(q) ? inj.delete(q) : inj.add(q); P.inj = Object.keys(INJ).filter(z => inj.has(z)); saveAppData(); draw(); }));
+        const note = mkInput('text', P.injNote || '', 'Anything else? (optional)'); note.maxLength = 120; note.style.marginTop = '12px';
+        note.oninput = () => { P.injNote = note.value.trim().slice(0, 120); saveAppData(); };
+        body.appendChild(note);
+        body.appendChild(el('div', 'onbs', 'This is not medical advice. If you have an injury or health condition, check with a doctor before training.'));
+      } else if (k === 'sched') {
+        h('Set up your weekly schedule', 'How many days a week do you want to train?');
+        body.appendChild(mkChips('mus-wrap', [2, 3, 4, 5, 6].map(n => [n, n + ' days']), q => schedDays === q, q => { schedDays = q; draw(); }));
+        if (!P.goal) {
+          sub('Goal');
+          body.appendChild(mkChips('mus-wrap', Object.entries(SPLIT_GOALS).map(([q, g]) => [q, g.label]), q => false, q => { P.goal = q; autoGoal = q; autoGoalSet = true; delete S.skip.goal; saveAppData(); draw(); }));
+          body.appendChild(el('div', 'onbs', 'No goal picked yet, so this preview is a balanced "General fitness" week.'));
+        }
+        const pv = el('div', 'pv');
+        makeSplit(schedDays, P.goal || 'fit').forEach((d, q) => { const line = el('div'); line.innerHTML = '<b>' + DAY_NAMES[q].slice(0, 3) + '</b> · ' + WTYPES[d.type].label + (d.dur ? ' · ' + d.dur + ' min' : ''); pv.appendChild(line); });
+        body.appendChild(pv);
+        body.appendChild(el('div', 'onbs', 'Each day\'s workout is made ahead for the next 2 weeks. You can fine-tune any day later.'));
+      } else if (k === 'body') {
+        h('A little about you', 'Used for calorie estimates. Everything here is optional.');
+        buildAboutYou(body, draw, true);
+      }
+      const foot = el('div', 'onbfoot'); inner.appendChild(foot);
+      if (msg && !last) foot.appendChild(el('div', 'onbmsg', msg));
+      if (last) { const go = el('button', 'onbgo', 'Go to my workouts'); go.onclick = finish; foot.appendChild(go); return; }
+      const nx = el('button', 'onbgo', i === steps.length - 1 ? 'Finish' : 'Continue'); nx.onclick = () => next(false);
+      const row = el('div', 'onbrow');
+      if (i > 0) { const bk = el('button', 'onbback', 'Back'); bk.onclick = () => { i--; msg = ''; draw(); }; row.appendChild(bk); }
+      if (k !== 'name') { const sk = el('button', 'onbskip', 'Skip for now'); sk.onclick = () => next(true); row.appendChild(sk); }
+      foot.appendChild(nx); if (row.children.length) foot.appendChild(row);
+    }
+    draw();
   }
 
   // ----- weekly challenge goals -----
