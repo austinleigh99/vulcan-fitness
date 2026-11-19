@@ -32,7 +32,9 @@
   if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: light)'); var f = function () { window.applyUI(); }; if (mq.addEventListener) mq.addEventListener('change', f); }
 })();
 </script>
-<title>Workout Tracker</title>
+<title>Vulcan Health</title>
+<meta name="application-name" content="Vulcan Health">
+<meta name="apple-mobile-web-app-title" content="Vulcan Health">
 <style>
   :root { --bg:#0b0b12; --card:#171722; --line:#2a2a3d; --text:#f2f2f8; --muted:#8c8ca3; --accent:#5b4bff; --accent2:#9b92ff; --on-accent:#fff; --green:#4ade80; --danger:#f87171; --danger-t:#fb7185; --nav-h:76px;
     --inset:#0b0b12; --chip:#2a2a40; --chip2:#3a3a52; --panel:#12121c; --panel2:#1b1b2b; --sheet:#171726; --soft:#c9c9dc; --sched-a:#26263c; --nav-bg:rgba(15,15,26,.94); --accent-deep:#2a1f99; color-scheme:dark; }
@@ -830,6 +832,7 @@
   .setupcard .sut { font-size:16px; font-weight:900; } .setupcard .sus { font-size:13px; color:var(--muted); margin-top:5px; line-height:1.45; }
   .setupcard .sugo { width:auto; margin:12px 0 0; padding:10px 18px; font-size:14px; border-radius:999px; }
   .setupcard .sux { position:absolute; right:8px; top:8px; width:32px; height:32px; margin:0; padding:0; border-radius:50%; background:none; color:var(--muted); font-size:14px; }
+  .authlegal { font-size:12px; color:var(--muted); line-height:1.5; text-align:center; margin-top:12px; } .authlegal a { color:var(--accent2); text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -837,13 +840,14 @@
 
   <!-- AUTH SCREEN -->
   <div id="auth" class="hidden">
-    <h1>🏋️ Workout Tracker</h1>
+    <h1>🏋️ Vulcan Health</h1>
     <div class="card">
       <label for="email">Email</label>
       <input id="email" type="email" autocomplete="email" inputmode="email">
       <label for="password">Password (6+ characters)</label>
       <input id="password" type="password" autocomplete="current-password">
       <button id="authBtn">Log in</button>
+      <div id="authLegal" class="authlegal hidden">By creating an account you agree to our <a href="#" data-l="terms">Terms of Service</a> and <a href="#" data-l="privacy">Privacy Policy</a>.</div>
       <button id="toggleBtn" class="link">No account? Sign up</button>
       <div id="authMsg" class="msg"></div>
     </div>
@@ -1415,6 +1419,7 @@
     signupMode = !signupMode;
     $('authBtn').textContent = signupMode ? 'Create account' : 'Log in';
     $('toggleBtn').textContent = signupMode ? 'Have an account? Log in' : 'No account? Sign up';
+    $('authLegal').classList.toggle('hidden', !signupMode);
     say($('authMsg'), '');
   };
 
@@ -4414,7 +4419,7 @@
     const add = el('button', 'gadd', '+ New goal'); add.onclick = () => openGoalForm(); head.appendChild(add); root.appendChild(head);
 
     if (!active.length) {
-      const empty = el('div', 'wdcard gempty'); empty.append(el('div', 'gebig', '🎯'), el('div', 'get', 'Set your first goal'), el('div', 'ges', 'Pick a target and FitPulse tracks it for you. Try a quick start:'));
+      const empty = el('div', 'wdcard gempty'); empty.append(el('div', 'gebig', '🎯'), el('div', 'get', 'Set your first goal'), el('div', 'ges', 'Pick a target and Vulcan Health tracks it for you. Try a quick start:'));
       const row = el('div', 'gquick');
       G_STARTERS.forEach(s => { const g = { type: s.type, target: s.target }, b = el('button', 'secondary', gProgress(g).title); b.onclick = () => { P.goals.unshift({ id: pgId(), type: s.type, target: s.target, period: 'week', name: '', deadline: '', created: todayLocal(), doneOn: '' }); saveAppData(); renderGoals(); }; row.appendChild(b); });
       empty.appendChild(row); root.appendChild(empty);
@@ -4775,7 +4780,7 @@
   const LockTimer = (() => {
     let audio = null, on = false, lastTitle = '';
     const ok = () => 'mediaSession' in navigator && typeof MediaMetadata !== 'undefined';
-    function silence() {   // one second of silence, looped, so the phone treats FitPulse as "playing" and shows a lock screen player
+    function silence() {   // one second of silence, looped, so the phone treats Vulcan Health as "playing" and shows a lock screen player
       const n = 8000, buf = new ArrayBuffer(44 + n), v = new DataView(buf), w = (o, t) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
       w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
       v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
@@ -4801,7 +4806,7 @@
         const ms = navigator.mediaSession;
         if (title !== lastTitle) {
           lastTitle = title;
-          try { ms.metadata = new MediaMetadata({ title, artist: 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length, album: Guided.title + ' · FitPulse' }); } catch (e) { /* ignore */ }
+          try { ms.metadata = new MediaMetadata({ title, artist: 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length, album: Guided.title + ' · Vulcan Health' }); } catch (e) { /* ignore */ }
         }
         ms.playbackState = Guided.paused ? 'paused' : 'playing';
         try {
@@ -5293,11 +5298,11 @@
     const w = mkInput('number', P.weightSet ? String(weightShown()) : '', 'Optional'); w.inputMode = 'decimal'; w.step = 'any';
     w.oninput = () => saveWeightInput(w.value);
     body.appendChild(w);
-    body.appendChild(el('div', 'sheet-note', 'Weight is also used to estimate calories burned. If you leave it blank, FitPulse assumes ' + (kg ? Math.round(defaultAppData().weight * 0.4536) + ' kg' : defaultAppData().weight + ' lb') + '. Age, height and sex are only shown on your profile.'));
+    body.appendChild(el('div', 'sheet-note', 'Weight is also used to estimate calories burned. If you leave it blank, Vulcan Health assumes ' + (kg ? Math.round(defaultAppData().weight * 0.4536) + ' kg' : defaultAppData().weight + ' lb') + '. Age, height and sex are only shown on your profile.'));
   }
 
   function openEditProfile() {
-    openSheet('Edit Profile', 'How you appear in FitPulse', (body) => {
+    openSheet('Edit Profile', 'How you appear in Vulcan Health', (body) => {
       const wrap = el('div', 'setprof'); wrap.appendChild(avatarNode()); body.appendChild(wrap);
       if (appData.prefs.avatar) {
         const rm = el('button', 'secondary', 'Remove photo');
@@ -5406,12 +5411,12 @@
       body.appendChild(t);
       body.appendChild(mkToggle('Streak alerts', 'Warn me before my streak would break', N.streak, v => { N.streak = v; save(); }));
       body.appendChild(mkToggle('Weekly summary', 'A recap of your week every Monday', N.weekly, v => { N.weekly = v; save(); }));
-      body.appendChild(el('div', 'sheet-note', 'Heads up: your choices are saved, but FitPulse can’t send notifications to your phone yet. That needs a separate push-notification setup, which can be added later.'));
+      body.appendChild(el('div', 'sheet-note', 'Heads up: your choices are saved, but Vulcan Health can’t send notifications to your phone yet. That needs a separate push-notification setup, which can be added later.'));
     }, closeBtn);
   }
 
   function openDisplay() {
-    openSheet('Display & Accessibility', 'Make FitPulse look and work the way you like', (body) => {
+    openSheet('Display & Accessibility', 'Make Vulcan Health look and work the way you like', (body) => {
       const P = appData.prefs;
       body.appendChild(el('h2', null, 'Theme'));
       body.appendChild(mkChips('mus-wrap', [['dark', 'Dark'], ['light', 'Light'], ['system', 'Match device']], k => P.theme === k, (k) => { P.theme = k; saveAppData(); applyAppearance(); refreshSheet(); }));
@@ -5428,7 +5433,7 @@
       body.appendChild(el('div', 'sheet-note', cur[1] + '. Each workout type keeps its own signature color.'));
 
       body.appendChild(el('h2', null, 'During workouts'));
-      body.appendChild(mkToggle('Stay awake', wakeSupported() ? 'Keeps your screen on while FitPulse is open' : 'Not supported by this browser', P.stayAwake, v => { P.stayAwake = v; saveAppData(); syncWakeLock(); }));
+      body.appendChild(mkToggle('Stay awake', wakeSupported() ? 'Keeps your screen on while Vulcan Health is open' : 'Not supported by this browser', P.stayAwake, v => { P.stayAwake = v; saveAppData(); syncWakeLock(); }));
       body.appendChild(mkToggle('Lock screen timer', 'Shows your rest time or time left in an exercise on the lock screen during a guided workout', P.lockTimer, v => { P.lockTimer = v; saveAppData(); }));
       body.appendChild(mkToggle('Audio cues', 'Chimes or voice prompts for each step, and when breaks start and stop', P.audioCues, v => { P.audioCues = v; saveAppData(); refreshSheet(); }));
       if (P.audioCues) {
@@ -5565,17 +5570,17 @@
   function exportLogs() {
     const rows = [['date', 'type', 'title', 'minutes', 'calories', 'lifts']].concat(
       sortedLogs().map(l => [l.performed_on, l.wtype, l.title, l.minutes, l.calories, l.lifts]));
-    downloadFile('fitpulse-workouts-' + todayLocal() + '.csv', rows.map(r => r.map(csvCell).join(',')).join('\n'), 'text/csv');
+    downloadFile('vulcan-health-workouts-' + todayLocal() + '.csv', rows.map(r => r.map(csvCell).join(',')).join('\n'), 'text/csv');
   }
   function exportArchive() {
     const P = Object.assign({}, appData.prefs); delete P.avatar;
     const archive = {
-      app: 'FitPulse', exported_at: new Date().toISOString(), account_email: (currentUser && currentUser.email) || null,
+      app: 'Vulcan Health', exported_at: new Date().toISOString(), account_email: (currentUser && currentUser.email) || null,
       profile: { name: appData.name, weight_lb: appData.weight, age: P.age, height_cm: P.heightCm, sex: P.sex, has_profile_photo: !!appData.prefs.avatar },
       settings: P, weekly_schedule: appData.schedule, challenges: appData.challenges,
       workouts: sortedLogs().map(l => ({ date: l.performed_on, type: l.wtype, title: l.title, minutes: l.minutes, calories: l.calories, lifts: l.lifts }))
     };
-    downloadFile('fitpulse-archive-' + todayLocal() + '.json', JSON.stringify(archive, null, 2), 'application/json');
+    downloadFile('vulcan-health-archive-' + todayLocal() + '.json', JSON.stringify(archive, null, 2), 'application/json');
   }
   async function clearHistory() {
     logs = []; lsSet('logs', logs);
@@ -5587,58 +5592,85 @@
   }
 
   // ----- legal text (plain language, written from what the app actually does) -----
-  const LEGAL_CONTACT = '';   // put your support email here, e.g. 'help@yourdomain.com'
-  const LEGAL_DATE = 'November 17, 2026';
+  const LEGAL_CONTACT = 'vulcanhealth@gmail.com';   // put your support email here, e.g. 'help@yourdomain.com'
+  const LEGAL_DATE = 'November 19, 2026';
   const LEGAL = {
     privacy: ['Privacy Policy', [
-      ['The short version', 'FitPulse is a personal workout app. We use your information to run the app for you. We don’t sell it, we don’t show ads, and we don’t share it with advertisers.'],
-      ['What we collect', ['Your email address and password (the password is handled by our sign-in provider and is stored scrambled, so we can’t read it). If you sign in with Google, we receive your Google name and email.',
-        'Your profile: username, and optionally age, height, weight, sex and a profile photo.',
-        'Your activity: workouts you complete, your weekly schedule, goals and challenges, and your app settings.']],
-      ['Where it is stored', 'On your device (in the browser’s storage) and, if Cloud backup is on, in our cloud database provided by Supabase. Each account can only read and change its own rows. The app is delivered through GitHub Pages and a code library is loaded from the jsDelivr network, so those services may see standard technical details such as your IP address when the page loads.'],
-      ['How we use it', 'To sign you in, show your history and stats, build your workouts, and sync your data between your devices. We don’t use it for anything else.'],
-      ['Sharing', 'We don’t sell or rent your data. It is processed by the services that run the app (Supabase for the database and sign-in, GitHub for hosting, Google only if you choose Google sign-in). Your profile visibility and sharing choices in Data & Privacy are saved now and will apply if friends and sharing features are added.'],
-      ['Your choices', ['Download a copy of your data any time (Data & Privacy → Export your data).',
-        'Turn Cloud backup off to keep your data on this device only.',
-        'Delete your workout history, or permanently delete your account, in Data & Privacy.']],
-      ['Children', 'FitPulse is not meant for children under 13, and we don’t knowingly collect their information.'],
-      ['Changes', 'If this policy changes, the updated version will appear here with a new date.']]],
+      ['The short version', 'Vulcan Health is a personal workout app. We use your information to run the app for you: to sign you in, build workouts that fit you, and keep your history. We don’t sell your information, we don’t show ads, and we don’t share it with advertisers.'],
+      ['What we collect', ['Account: your email address and password (the password is handled by our sign-in provider and stored scrambled, so we can’t read it). If you sign in with Google, we receive your Google name and email.',
+        'Profile and sign-up answers: your username, main goal, experience level, units, whether you train at the gym or at home, and the equipment you have.',
+        'Health-related details you choose to give: injuries or limitations (and any note you type), and optionally age, height, weight and sex. All of these are optional.',
+        'Profile photo, if you add one.',
+        'Activity: workouts you complete and their length and calories, your weekly schedule, goals, challenges, personal records and app settings.',
+        'Technical details: when the app loads, the hosting and library services can see standard information such as your IP address and browser type.']],
+      ['Health-related information', 'Injuries, limitations, age, height, weight and sex are health-related, so we treat them with extra care. You decide whether to share them. We use them only to build your workouts (for example, leaving out moves that may stress an injured area) and to estimate calories. We don’t use them for advertising and we don’t share them. By entering them you agree that we can store and use them for these purposes. You can remove them at any time in Data & Privacy → Health & body info, and your workouts will keep working without them.'],
+      ['Where it is stored', 'On your device (in the browser’s storage) and, if Cloud backup is on, in our cloud database provided by Supabase. Each account can only read and change its own rows. The app is delivered through GitHub Pages and a code library is loaded from the jsDelivr network.'],
+      ['How we use it', 'To sign you in, show your history and stats, build and schedule your workouts, estimate calories, and sync your data between your devices. We don’t use it for anything else, and we don’t make automated decisions about you beyond choosing exercises for your workouts.'],
+      ['Who handles it', 'We don’t sell or rent your data. It is processed only by the services that run the app: Supabase (database and sign-in), GitHub (hosting), jsDelivr (a code library), and Google only if you choose Google sign-in. These providers may process data in other countries, including the United States. Your profile visibility and sharing choices in Data & Privacy are saved now and will apply if friends and sharing features are added; nothing is shared with other people today.'],
+      ['Reminders', 'Workout reminders and notifications are set up on your device and only if you allow them. We don’t use your location, camera or microphone.'],
+      ['Security', 'Data is sent over encrypted connections, and your account’s data in the cloud is protected so that only your account can read or change it. No system is perfectly secure, so keep your password private. If we learn of a breach that affects your information, we will tell you as the law requires.'],
+      ['Your rights and choices', ['See and download your data any time: Data & Privacy → Export your data.',
+        'Correct it: edit your profile, goals and settings in the app.',
+        'Remove health and body details: Data & Privacy → Health & body info.',
+        'Keep data on this device only: turn Cloud backup off.',
+        'Delete your workout history, or permanently delete your account and everything stored with it, in Data & Privacy.',
+        'If you live somewhere with extra privacy rights (for example the EU, the UK or California), you may also have the right to ask what we hold, to correct or delete it, to object to or restrict how it is used, and to complain to your local privacy authority. Contact us below and we will respond. We don’t “sell” or “share” personal information for advertising.']],
+      ['Children', 'Vulcan Health is for people 13 and older. We don’t knowingly collect information from children under 13, and if we learn we have, we will delete it. If you are under 18, please use the app with a parent or guardian’s okay, especially before following workout plans.'],
+      ['Changes', 'If this policy changes in a meaningful way, the updated version will appear here with a new date.']]],
     terms: ['Terms of Service', [
-      ['Using FitPulse', 'FitPulse is provided for your personal, non-commercial use. By creating an account or using the app you agree to these terms. If you don’t agree, please don’t use it.'],
-      ['Not medical advice', 'Workout plans, calorie numbers and other suggestions are general information, not medical advice. Calories are estimates. Talk to a doctor before starting a new exercise program, especially if you have a health condition, and stop if something hurts or feels wrong. You exercise at your own risk.'],
-      ['Your account', 'Keep your sign-in details safe. You are responsible for what happens under your account. Give accurate information and don’t use the app to break the law or to disrupt the service or other people.'],
-      ['Your content', 'The workouts, profile details and photo you add stay yours. You let us store and display them to you so the app can work.'],
-      ['Availability', 'FitPulse is provided “as is”, without promises that it will always be available or error-free. Features may change or be removed, and data could be lost, so use the export option to keep your own copy.'],
-      ['Limits of responsibility', 'To the fullest extent the law allows, we aren’t liable for injuries, losses or damages that result from using the app.'],
-      ['Ending things', 'You can stop using the app and delete your account at any time. We may suspend accounts that misuse the service.'],
-      ['Changes', 'We may update these terms. Continuing to use the app after an update means you accept it.']]],
+      ['Using Vulcan Health', 'Vulcan Health is provided for your personal, non-commercial use. By creating an account or using the app you agree to these terms and to our Privacy Policy. If you don’t agree, please don’t use it.'],
+      ['Who can use it', 'You must be at least 13. If you are under 18, you need a parent or guardian’s permission. Please give accurate information when you sign up.'],
+      ['Not medical advice', 'Workout plans, exercise suggestions, calorie numbers and everything else in the app are general fitness information, not medical advice, and are not a substitute for a doctor, physical therapist or qualified trainer. Calories are estimates. Talk to a doctor before starting a new exercise program, especially if you are pregnant, have an injury, a heart or health condition, or haven’t exercised in a while. Stop right away if you feel pain, dizziness, chest discomfort or shortness of breath, and get medical help if needed.'],
+      ['Injuries and limitations', 'If you tell the app about an injury or limitation, it tries to leave out moves that commonly stress that area. It works from exercise names and can’t judge your situation, so it can’t guarantee that a workout is safe for you. You are responsible for choosing exercises, weights and intensity that are right for your body, and for swapping or skipping anything that doesn’t feel right.'],
+      ['Exercise at your own risk', 'Exercise carries a risk of injury. Use proper form, a safe space and equipment in good condition, and get a spotter when lifting heavy. You use the app and follow its workouts at your own risk.'],
+      ['Your account', 'Keep your sign-in details safe. You are responsible for what happens under your account. Don’t use the app to break the law, to try to access other people’s data, or to disrupt the service.'],
+      ['Your content', 'The workouts, profile details and photo you add stay yours. You let us store and process them so the app can work for you.'],
+      ['Our content', 'The app, its design, workout builder, exercise library and text belong to Vulcan Health and its owner. You may use them through the app, but you may not copy, resell or build a competing service from them.'],
+      ['Third-party services', 'Vulcan Health relies on services such as Supabase, GitHub Pages, jsDelivr and, if you choose it, Google sign-in. Their availability and rules are outside our control.'],
+      ['Availability', 'Vulcan Health is provided “as is” and “as available”, without promises that it will always work, be accurate or be error-free. Features may change or be removed, and data could be lost, so use the export option to keep your own copy.'],
+      ['Limits of responsibility', 'To the fullest extent the law allows, we aren’t liable for injuries, health problems, lost data or other losses or damages that result from using the app. Nothing here limits rights you have under law that can’t be limited.'],
+      ['Ending things', 'You can stop using the app and delete your account at any time. We may suspend or remove accounts that misuse the service or break these terms.'],
+      ['Changes', 'We may update these terms. If a change is important we will show the new date here. Continuing to use the app after an update means you accept it.']]],
     cookies: ['Cookie Policy', [
-      ['The short version', 'FitPulse doesn’t use advertising or tracking cookies.'],
+      ['The short version', 'Vulcan Health doesn’t use advertising or tracking cookies.'],
       ['What is stored in your browser', ['Your sign-in session, so you stay logged in.',
-        'Your data and settings (profile, workout history, schedule, theme and color), so the app works quickly and offline-friendly on your device.']],
+        'Your data and settings (profile, sign-up answers, workout history, schedule, theme and color), so the app works quickly on your device and keeps working when your connection is poor.',
+        'Which sign-up steps you skipped, so the app can remind you to finish them.']],
       ['Why', 'These are needed for the app to work. We don’t use them to follow you around the web, and we have no third-party analytics or ad tools.'],
       ['Controlling it', 'You can clear this storage in your browser or phone settings. Doing so signs you out and removes anything that wasn’t backed up to your account. Removing the app from your Home Screen does not by itself delete your account.']]],
     retention: ['Data Retention Policy', [
-      ['How long we keep things', ['Account, profile and settings: until you delete your account.',
+      ['How long we keep things', ['Account, profile, sign-up answers and settings: until you delete your account.',
+        'Health and body details (injuries, age, height, weight, sex): until you clear them in Data & Privacy or delete your account.',
         'Workout history: until you delete it or delete your account.',
-        'Data on your device: until you clear your browser data or reset the app.']],
+        'Data on your device: until you clear your browser data or reset the app.',
+        'Files you export: they are saved on your device and are yours to keep or delete.']],
+      ['When you clear health info', 'Choosing “Clear health & body info” removes those details from this device and from your account the next time the app saves.'],
       ['When you delete your history', 'Choosing “Delete my workout history” removes your logged workouts from this device and from your account.'],
-      ['When you delete your account', 'Choosing “Permanently delete account” removes your login and your profile, schedule, goals and workout history from our database. It can’t be undone. Copies on your own device are cleared at the same time. The hosting providers may keep routine backups or server logs for a short period before they are overwritten.'],
+      ['When you delete your account', 'Choosing “Permanently delete account” removes your login and your profile, sign-up answers, schedule, goals and workout history from our database. It can’t be undone. Copies on your own device are cleared at the same time. The hosting providers may keep routine backups or server logs for a short period before they are overwritten.'],
       ['Inactive accounts', 'We don’t currently delete inactive accounts automatically.']]]
   };
-  function openLegal(key) {
-    const [title, secs] = LEGAL[key];
-    openSheet(title, 'Updated ' + LEGAL_DATE, (body) => {
-      const wrap = el('div', 'lgl');
-      secs.forEach(([h, content]) => {
-        wrap.appendChild(el('h2', null, h));
-        if (Array.isArray(content)) { const ul = el('ul'); content.forEach(t => ul.appendChild(el('li', null, t))); wrap.appendChild(ul); }
-        else wrap.appendChild(el('p', null, content));
-      });
-      if (LEGAL_CONTACT) wrap.appendChild(el('p', null, 'Questions? Contact ' + LEGAL_CONTACT + '.'));
-      body.appendChild(wrap);
-    }, closeBtn);
+  function legalNodes(key) {
+    const secs = LEGAL[key][1], wrap = el('div', 'lgl');
+    secs.forEach(([h, content]) => {
+      wrap.appendChild(el('h2', null, h));
+      if (Array.isArray(content)) { const ul = el('ul'); content.forEach(t => ul.appendChild(el('li', null, t))); wrap.appendChild(ul); }
+      else wrap.appendChild(el('p', null, content));
+    });
+    wrap.appendChild(el('h2', null, 'Contact'));
+    wrap.appendChild(el('p', null, LEGAL_CONTACT ? 'Questions, requests about your data, or concerns? Contact ' + LEGAL_CONTACT + '.' : 'For questions or requests about your data, contact the person or team that runs this Vulcan Health app.'));
+    return wrap;
   }
+  function openLegal(key) {
+    openSheet(LEGAL[key][0], 'Updated ' + LEGAL_DATE, (body) => { body.appendChild(legalNodes(key)); }, closeBtn);
+  }
+  // the same text, shown full-screen before sign-in (the normal sheet only exists inside the app)
+  function openLegalOverlay(key) {
+    const root = el('div', 'onb'), inner = el('div', 'onbin'), body = el('div', 'onbbody'), foot = el('div', 'onbfoot');
+    body.appendChild(el('h1', 'onbh', LEGAL[key][0])); body.appendChild(el('div', 'onbs', 'Updated ' + LEGAL_DATE)); body.appendChild(legalNodes(key));
+    const x = el('button', 'onbgo', 'Close'); x.onclick = () => root.remove(); foot.appendChild(x);
+    inner.append(body, foot); root.appendChild(inner); document.body.appendChild(root);
+  }
+  document.querySelectorAll('#authLegal a').forEach(a => { a.onclick = (e) => { e.preventDefault(); openLegalOverlay(a.dataset.l); }; });
 
   // ----- data & privacy page -----
   const VIS_TEXT = {
@@ -5651,6 +5683,10 @@
     if (!on) { await pushAppData(); lsSet('data', appData); cloud.data = false; cloud.logs = false; }   // last sync records the choice, then stop
     else { lsSet('data', appData); cloud.data = true; await pushAppData(); await loadAppData(); }
     renderDataPrivacy();
+  }
+  function clearHealthInfo() {
+    const P = appData.prefs; P.age = ''; P.heightCm = ''; P.sex = ''; P.inj = []; P.injNote = ''; P.weightSet = false; appData.weight = defaultAppData().weight;
+    saveAppData(); renderHomeUI();
   }
   function renderDataPrivacy() {
     if (!appData) appData = cleanData(null);
@@ -5667,7 +5703,7 @@
     sec('Social sharing');
     c = card();
     c.appendChild(mkToggle('Share workout activity', 'Broadcast completed sessions to your friends feed', P.shareActivity, v => { P.shareActivity = v; saveAppData(); }));
-    root.appendChild(el('div', 'dpnote', 'Friends and a feed aren’t part of FitPulse yet. These choices are saved now and will apply when they arrive. Nothing is shared today.'));
+    root.appendChild(el('div', 'dpnote', 'Friends and a feed aren’t part of Vulcan Health yet. These choices are saved now and will apply when they arrive. Nothing is shared today.'));
 
     sec('Export your data');
     c = card();
@@ -5682,12 +5718,23 @@
     c.appendChild(tiles);
     c.appendChild(el('div', 'dpnote', 'JSON has everything. CSV is your workout list only, for spreadsheets. Your profile photo isn’t included.'));
 
+    sec('Health & body info');
+    c = card();
+    const have = [P.sex && 'sex', P.age !== '' && 'age', P.heightCm !== '' && 'height', P.weightSet && 'weight', (P.inj && P.inj.length || P.injNote) && 'injuries or limitations'].filter(Boolean);
+    c.appendChild(el('div', 'dpdesc', have.length ? 'Saved: ' + have.join(', ') + '.' : 'Nothing saved. You haven’t shared any health or body details.'));
+    c.appendChild(el('div', 'dpnote', 'These optional details are used only to estimate calories and to leave out moves that may stress an injured area. They are never shared or used for ads.'));
+    if (have.length) {
+      const ch = el('button', 'danger dpdanger', 'Clear health & body info');
+      ch.onclick = () => appConfirm({ icon: '🩺', title: 'Clear health & body info?', msg: 'This removes your age, height, weight, sex and injury details from this device and your account. Your workouts and history stay.', ok: 'Clear', cancel: 'Keep', danger: true }, () => { clearHealthInfo(); renderDataPrivacy(); });
+      c.appendChild(ch);
+    }
+
     sec('Privacy controls');
     c = card();
-    c.appendChild(mkToggle('Anonymous analytics', 'Help improve FitPulse by sharing anonymous usage data', P.analytics, v => { P.analytics = v; saveAppData(); }));
+    c.appendChild(mkToggle('Anonymous analytics', 'Help improve Vulcan Health by sharing anonymous usage data', P.analytics, v => { P.analytics = v; saveAppData(); }));
     const cb = mkToggle('Cloud backup', 'Securely sync your data across devices', P.cloudBackup, v => { setCloudBackup(v); });
     c.appendChild(cb);
-    root.appendChild(el('div', 'dpnote', (P.cloudBackup ? (isSynced() ? 'Your data is saved to your account and on this device.' : 'Backup is on, but the cloud isn’t reachable right now, so data is saved on this device for now.') : 'Backup is off. Your data stays on this device only, so clearing your browser data would erase it.') + ' FitPulse doesn’t collect any analytics today; that choice is remembered for the future.'));
+    root.appendChild(el('div', 'dpnote', (P.cloudBackup ? (isSynced() ? 'Your data is saved to your account and on this device.' : 'Backup is on, but the cloud isn’t reachable right now, so data is saved on this device for now.') : 'Backup is off. Your data stays on this device only, so clearing your browser data would erase it.') + ' Vulcan Health doesn’t collect any analytics today; that choice is remembered for the future.'));
 
     sec('Legal & policies');
     [['Privacy Policy', 'Read our privacy policy', 'shieldcheck', 'privacy'], ['Terms of Service', 'Read our terms of service', 'doc', 'terms'],
@@ -5700,9 +5747,9 @@
 
     sec('Danger zone');
     const h = el('button', 'danger dpdanger', 'Delete my workout history');
-    h.onclick = async () => { if (confirm('Delete all ' + logs.length + ' logged workouts? This can’t be undone.')) { await clearHistory(); renderDataPrivacy(); } };
+    h.onclick = () => appConfirm({ icon: '🗑️', title: 'Delete workout history?', msg: 'All ' + logs.length + ' logged workouts will be deleted from this device and your account. This can’t be undone.', ok: 'Delete history', cancel: 'Keep', danger: true }, async () => { await clearHistory(); renderDataPrivacy(); });
     const r = el('button', 'danger dpdanger', 'Reset profile, schedule & goals');
-    r.onclick = () => { if (confirm('Reset your profile, weekly schedule, goals and settings? Your workout history stays.')) { resetEverything(); renderDataPrivacy(); } };
+    r.onclick = () => appConfirm({ icon: '↺', title: 'Reset profile, schedule & goals?', msg: 'Your profile, weekly schedule, goals and settings go back to the defaults. Your workout history stays.', ok: 'Reset', cancel: 'Keep', danger: true }, () => { resetEverything(); renderDataPrivacy(); });
     const d = el('button', 'dangerfill', 'Permanently delete account'); d.onclick = () => openDeleteAccount();
     root.append(h, r, d);
     const back = el('button', 'wdlink', 'Back to settings'); back.onclick = openSettingsPage; root.appendChild(back);
@@ -5716,7 +5763,7 @@
   $('dpBack').onclick = () => openSettingsPage();
 
   function openPermissions() {
-    openSheet('Permissions', 'What FitPulse can access on this device', (body) => {
+    openSheet('Permissions', 'What Vulcan Health can access on this device', (body) => {
       const perm = 'Notification' in window ? Notification.permission : 'unsupported';
       body.appendChild(kv('Notifications', { granted: 'Allowed', denied: 'Blocked', default: 'Not asked yet', unsupported: 'Not supported here' }[perm]));
       if (perm === 'default') {
@@ -5731,7 +5778,7 @@
   }
 
   function openAppInfo() {
-    openSheet('App info', 'FitPulse', (body) => {
+    openSheet('App info', 'Vulcan Health', (body) => {
       body.appendChild(kv('Version', APP_VERSION));
       body.appendChild(kv('Signed in as', (currentUser && currentUser.email) || '—'));
       body.appendChild(kv('Sync', isSynced() ? 'On — saved to your account' : 'Off — saved on this device'));
@@ -5958,7 +6005,7 @@
     const x = el('button', 'sux', '✕'); x.setAttribute('aria-label', 'Hide'); x.onclick = () => { S.hide = true; saveAppData(); renderSetupCard(); };
     c.appendChild(x);
     c.appendChild(el('div', 'sut', 'Finish setting up'));
-    c.appendChild(el('div', 'sus', 'You skipped ' + left.map(k => ONB_LABEL[k]).join(', ') + '. Adding these helps FitPulse build workouts that fit you.'));
+    c.appendChild(el('div', 'sus', 'You skipped ' + left.map(k => ONB_LABEL[k]).join(', ') + '. Adding these helps Vulcan Health build workouts that fit you.'));
     const go = el('button', 'sugo', 'Continue setup'); go.onclick = () => openOnboarding(left);
     c.appendChild(go); box.appendChild(c);
   }
@@ -6021,7 +6068,7 @@
         const left = ONB_STEPS.filter(x => S.skip[x]);
         body.appendChild(el('div', 'onbs', left.length ? 'You skipped ' + left.map(x => ONB_LABEL[x]).join(', ') + '. You can finish those any time from the card on Home, or in Settings under Setup questions.' : 'Everything is filled in. You can change any of it later in Settings.'));
       } else if (k === 'name') {
-        h('Welcome to FitPulse', 'What should we call you? This is the name shown on Home and your profile.');
+        h('Welcome to Vulcan Health', 'What should we call you? This is the name shown on Home and your profile.');
         const n = mkInput('text', appData.name || '', defaultName() || 'Your username'); n.className = 'onbname'; n.maxLength = 24; n.autocomplete = 'off';
         n.onkeydown = (e) => { if (e.key === 'Enter') next(false); };
         body.appendChild(n);
@@ -6037,7 +6084,7 @@
         body.appendChild(mkOpt('Imperial', 'Pounds, miles, feet & inches', P.units !== 'kg', () => setU(false)));
         body.appendChild(mkOpt('Metric', 'Kilograms, kilometers, centimeters', P.units === 'kg', () => setU(true)));
       } else if (k === 'gear') {
-        h('Where do you train?', 'FitPulse builds workouts using only the equipment you have.');
+        h('Where do you train?', 'Vulcan Health builds workouts using only the equipment you have.');
         const row = el('div', 'onbtwo');
         row.append(mkOpt('In the gym', '', P.loc === 'gym', () => { P.loc = 'gym'; gearLoc = 'gym'; saveAppData(); draw(); }), mkOpt('At home', '', P.loc === 'home', () => { P.loc = 'home'; gearLoc = 'home'; saveAppData(); draw(); }));
         body.appendChild(row);
@@ -6069,7 +6116,7 @@
         const note = mkInput('text', P.injNote || '', 'Anything else? (optional)'); note.maxLength = 120; note.style.marginTop = '12px';
         note.oninput = () => { P.injNote = note.value.trim().slice(0, 120); saveAppData(); };
         body.appendChild(note);
-        body.appendChild(el('div', 'onbs', 'This is not medical advice. If you have an injury or health condition, check with a doctor before training.'));
+        body.appendChild(el('div', 'onbs', 'Optional, and used only to build your workouts. You can remove it any time in Data & Privacy. This is not medical advice. If you have an injury or health condition, check with a doctor before training.'));
       } else if (k === 'sched') {
         h('Set up your weekly schedule', 'How many days a week do you want to train?');
         body.appendChild(mkChips('mus-wrap', [2, 3, 4, 5, 6].map(n => [n, n + ' days']), q => schedDays === q, q => { schedDays = q; draw(); }));
@@ -6085,6 +6132,7 @@
       } else if (k === 'body') {
         h('A little about you', 'Used for calorie estimates. Everything here is optional.');
         buildAboutYou(body, draw, true);
+        body.appendChild(el('div', 'onbs', 'These details are optional health information. They are stored in your account, used only for calorie estimates, never shared or used for ads, and you can clear them any time in Data & Privacy.'));
       }
       const foot = el('div', 'onbfoot'); inner.appendChild(foot);
       if (msg && !last) foot.appendChild(el('div', 'onbmsg', msg));
