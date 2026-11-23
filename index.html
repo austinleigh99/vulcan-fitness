@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0b12">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vulcan">
 <script>
 (function () {
   var ACC = [['indigo','Indigo','#5b4bff'],['violet','Violet','#8b5cf6'],['purple','Purple','#a855f7'],['pink','Pink','#ec4899'],['rose','Rose','#f43f5e'],
@@ -7468,5 +7472,6 @@
     URL.revokeObjectURL(a.href);
   };
 </script>
+<script>if ('serviceWorker' in navigator && location.protocol === 'https:') { window.addEventListener('load', function () { try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} }); }</script>
 </body>
 </html>
