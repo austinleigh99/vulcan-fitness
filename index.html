@@ -923,8 +923,8 @@
   .socbar { display:block; height:6px; border-radius:99px; background:var(--chip); overflow:hidden; margin:6px 0 0 40px; } .socbar i { display:block; height:100%; background:var(--accent); border-radius:99px; }
   .snack { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(86px + env(safe-area-inset-bottom, 0px)); z-index:3900; display:flex; align-items:center; gap:14px; max-width:92vw; padding:12px 16px; border-radius:99px; background:var(--text); color:var(--bg); font-size:14px; font-weight:700; box-shadow:0 8px 30px rgba(0,0,0,.4); animation:cfmFade .2s ease; }
   .snack button { width:auto; margin:0; padding:6px 12px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-size:13px; font-weight:800; }
-  .socbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; } .socbar h1 { margin:0; }
-  .socbar .socmebtn { width:auto; margin:0; padding:0; background:none; border-radius:50%; line-height:0; border:2px solid var(--line); } .socbar .socmebtn .socav { width:38px; height:38px; }
+  .sochdr { display:flex; align-items:center; justify-content:space-between; margin:8px 0 16px; } .sochdr h1 { margin:0; }
+  .sochdr .socmebtn { width:auto; margin:0; padding:0; background:none; border-radius:50%; line-height:0; border:2px solid var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); } .sochdr .socmebtn .socav { width:42px; height:42px; font-size:18px; }
   .socav { position:relative; overflow:hidden; } .socav img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; } .socav img:not([src]) { display:none; }
   .soclink { cursor:pointer; }
   .socpg { z-index:950; } .socpg .socedit { width:auto; margin:0; padding:9px 16px; border-radius:99px; font-size:14px; }
@@ -1394,7 +1394,7 @@
 
     <!-- SOCIAL -->
     <section id="view-social" data-view="social" class="hidden">
-      <div class="socbar"><h1>Social</h1><span id="socMe"></span></div>
+      <div class="sochdr"><h1>Social</h1><span id="socMe"></span></div>
       <div id="socBody"></div>
     </section>
 
@@ -4999,7 +4999,7 @@
     if (!SOC.me) { socSetup(root); return; }
     const me = SOC.me, inReq = SOC.friends.filter(f => f.status === 'pending' && f.direction === 'in').length;
     const inv = SOC.challenges.filter(c => (SOC.members[c.id] || []).some(m => m.user_id === currentUser.id && m.status === 'invited')).length;
-    const slot = $('socMe'); const pb = el('button', 'socmebtn'); pb.setAttribute('aria-label', 'Your profile'); pb.appendChild(socMeAvatar(38)); pb.onclick = () => openProfilePage(socMeUser(), true); slot.appendChild(pb);
+    const slot = $('socMe'); const pb = el('button', 'socmebtn'); pb.setAttribute('aria-label', 'Your profile'); pb.appendChild(socMeAvatar(42)); pb.onclick = () => openProfilePage(socMeUser(), true); slot.appendChild(pb);
     const tabs = el('div', 'soctabs');
     [['feed', 'Feed', 0], ['friends', 'Friends', inReq], ['challenges', 'Challenges', inv]].forEach(([k, l, n]) => {
       const b = el('button', 'soctab' + (SOC.tab === k ? ' on' : ''), l); if (n) b.appendChild(el('span', 'socdot', String(n))); b.onclick = () => { SOC.tab = k; renderSocial(); if (k === 'challenges') { socSyncSoon(); } }; tabs.appendChild(b);
