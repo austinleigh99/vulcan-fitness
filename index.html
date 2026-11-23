@@ -363,8 +363,8 @@
   .stkcell .sq.on { background:#34d399; border-color:#34d399; color:#06281c; } .stkcell .sq svg { width:46%; height:46%; fill:currentColor; stroke:none; }
   .stkcell .dn { font-size:11px; font-weight:900; color:var(--muted); }
   .gsum { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
-  .gs { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px 12px; text-align:center; }
-  .gs .v { font-size:24px; font-weight:900; color:var(--accent2); } .gs .k { font-size:10px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+  .gsumt { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px 12px; text-align:center; }
+  .gsumt .v { font-size:24px; font-weight:900; color:var(--accent2); } .gsumt .k { font-size:10px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
   .ghead { display:flex; align-items:center; justify-content:space-between; }
   .ghead .wdsec { margin:26px 0 10px; }
   .gadd { width:auto; margin:16px 0 0; padding:9px 14px; border-radius:999px; font-size:13px; }
@@ -846,6 +846,42 @@
   .homebrand .vlogo { flex:none; } .hbi .vlogo, .homebrand > .vlogo:first-child { width:34px; }
   .hbw { display:flex; flex-direction:column; align-items:flex-start; } .hbw .vlogo { width:92px; }
   .hbs { font-size:10px; font-weight:900; letter-spacing:.52em; color:var(--muted); margin-top:5px; line-height:1; }
+  /* badges */
+  .bdgi { --tc:#cd7f32; position:relative; width:58px; height:58px; border-radius:50%; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; border:3px solid var(--line); background:var(--inset); color:var(--muted); }
+  .bdgi.t2 { --tc:#9aa6b8; } .bdgi.t3 { --tc:#e5a50a; } .bdgi.t4 { --tc:#ff6a1a; }
+  .bdgi svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .bdgi.lock { opacity:.5; }
+  .bdgi.got { border-color:var(--tc); background:color-mix(in srgb, var(--tc) 20%, var(--card)); color:var(--tc); }
+  .bdgi.got.t4 { background:linear-gradient(145deg, #ff9a2a, #e8431a); border-color:#ffb066; color:#fff; box-shadow:0 0 18px rgba(255,106,26,.45); }
+  .bdgi.big { width:112px; height:112px; border-width:4px; margin:14px auto 14px; } .bdgi.big svg { width:50px; height:50px; }
+  .gbadges .bdgt { margin:0; }
+  .bdgt { display:block; width:100%; margin:0; padding:14px 6px 12px; text-align:center; background:var(--card); border:1px solid var(--line); border-radius:18px; color:var(--text); }
+  .bdgt.got { border-color:color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .bdgt .bn { font-size:12px; font-weight:800; line-height:1.2; } .bdgt .bs { font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:5px; } .bdgt .bs.got { color:#34d399; }
+  .bdgbar { height:8px; border-radius:99px; background:var(--chip); overflow:hidden; margin:12px 0 6px; } .bdgbar i { display:block; height:100%; border-radius:99px; background:var(--accent); }
+  .bdgbar.sm { height:4px; margin:8px 10px 0; }
+  .bdgsub { font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--accent2); margin:20px 0 10px; }
+  .bdgpg { position:fixed; inset:0; z-index:3000; background:var(--bg); display:flex; justify-content:center; animation:cfmFade .2s ease; }
+  .bdgin { width:100%; max-width:520px; height:100%; display:flex; flex-direction:column; }
+  .bdgtop { flex:none; display:flex; align-items:center; gap:6px; padding:calc(env(safe-area-inset-top, 0px) + 12px) 14px 8px; }
+  .bdgtop .bdgback { width:40px; height:40px; margin:0; padding:0; border-radius:50%; background:var(--chip); color:var(--text); font-size:26px; line-height:1; }
+  .bdgtitle { font-size:22px; font-weight:900; margin-left:6px; }
+  .bdgbody { flex:1; overflow-y:auto; padding:6px 16px calc(env(safe-area-inset-bottom, 0px) + 28px); -webkit-overflow-scrolling:touch; }
+  .bdgsum { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:18px; margin-bottom:14px; text-align:center; }
+  .bdgbig { font-size:34px; font-weight:900; } .bdgsmall { font-size:13px; color:var(--muted); font-weight:700; margin-top:2px; }
+  .bdgpop { position:fixed; inset:0; z-index:4200; background:rgba(5,5,12,.72); display:flex; align-items:center; justify-content:center; padding:20px; animation:cfmFade .2s ease; }
+  html.light .bdgpop { background:rgba(20,20,40,.5); }
+  .bdgcard { width:100%; max-width:340px; max-height:86vh; overflow-y:auto; background:var(--card); border:1px solid var(--line); border-radius:26px; padding:22px 20px 18px; text-align:center; animation:bdgPop .35s cubic-bezier(.2,1.3,.4,1); }
+  @keyframes bdgPop { from { transform:scale(.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+  .bdgk { font-size:11px; font-weight:900; letter-spacing:.18em; text-transform:uppercase; color:var(--accent2); }
+  .bdgn { font-size:24px; font-weight:900; line-height:1.15; margin-top:2px; }
+  .bdgtier { display:inline-block; margin:8px 0 4px; padding:3px 12px; border-radius:99px; font-size:11px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; background:var(--chip); color:#cd7f32; }
+  .bdgtier.t2 { color:#9aa6b8; } .bdgtier.t3 { color:#e5a50a; } .bdgtier.t4 { color:#ff6a1a; }
+  .bdgd { font-size:14px; color:var(--muted); line-height:1.45; margin:6px 0 4px; }
+  .bdgp { font-size:12px; font-weight:800; color:var(--muted); margin-bottom:6px; }
+  .bdgcard .bdgbar { margin:14px 6px 6px; }
+  .bdgcard .bdgok { margin:14px 0 0; } .bdgcard .bdgmore { width:100%; margin:8px 0 0; background:none; color:var(--accent2); font-size:14px; font-weight:800; }
+  .bdgmany { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin:16px 0 8px; } .bdgmi .bn { font-size:11px; font-weight:800; line-height:1.2; } .bdgmi .bdgi { width:50px; height:50px; margin-bottom:6px; }
 </style>
 </head>
 <body>
@@ -3622,6 +3658,10 @@
     const N = Object.assign({ reminders: false, time: '18:00', streak: false, weekly: false }, P.notif && typeof P.notif === 'object' ? P.notif : {});
     N.reminders = !!N.reminders; N.streak = !!N.streak; N.weekly = !!N.weekly; N.time = /^\d{2}:\d{2}$/.test(N.time) ? N.time : '18:00';
     P.notif = N;
+    const bgIn = P.badges && typeof P.badges === 'object' && !Array.isArray(P.badges) ? P.badges : {}, bgOut = {};
+    Object.keys(bgIn).filter(k => /^[a-z0-9_]{2,16}$/.test(k) && /^\d{4}-\d{2}-\d{2}$/.test(bgIn[k])).slice(0, 200).forEach(k => { bgOut[k] = bgIn[k]; });
+    P.badges = bgOut; P.badgeInit = !!P.badgeInit;
+    P.healthSync = !!P.healthSync; P.healthSyncAt = typeof P.healthSyncAt === 'string' ? P.healthSyncAt.slice(0, 40) : '';
     P.inj = (Array.isArray(P.inj) ? P.inj : []).filter((k, n, a) => INJ[k] && a.indexOf(k) === n);
     P.injNote = typeof P.injNote === 'string' ? P.injNote.slice(0, 120) : '';
     const ob = P.onb && typeof P.onb === 'object' ? P.onb : null;
@@ -3629,7 +3669,7 @@
     return out;
   }
   let saveTimer = null;
-  function saveAppData() { lsSet('data', appData); clearTimeout(saveTimer); saveTimer = setTimeout(pushAppData, 700); }
+  function saveAppData() { lsSet('data', appData); clearTimeout(saveTimer); saveTimer = setTimeout(pushAppData, 700); setTimeout(() => { if (typeof checkBadges === 'function') checkBadges(); }, 0); }
   async function pushAppData() {
     if (!currentUser || !appData || !cloud.data) return;
     try {
@@ -3679,7 +3719,7 @@
       logs = data.map(normLog);
       lsSet('logs', logs);
     } catch (e) { cloud.logs = false; }
-    if (currentUser && currentUser.id === uid) renderHomeUI();
+    if (currentUser && currentUser.id === uid) { renderHomeUI(); syncHealthSteps(); }
   }
 
   // ----- calories, week math, totals -----
@@ -3777,6 +3817,7 @@
     renderSchedule();
     renderChallenges();
     renderSetupCard();
+    checkBadges();
   }
 
   let schedSel = null;   // day picked on the Home week row (0-6); null = today
@@ -4137,7 +4178,7 @@
     stats.append(t1, t2); card.appendChild(stats);
     if (pgMetric === 'steps') {
       const b = el('button', 'pgadd', '+ Log steps'); b.onclick = () => openLogSteps(); card.appendChild(b);
-      card.appendChild(el('div', 'dpnote', 'Steps are typed in by hand. A web app can’t read your phone’s step counter.'));
+      healthSyncCard(card, renderProgress);
     } else if (pgMetric === 'volume') {
       const b = el('button', 'pgadd', '+ Log a lift'); b.onclick = () => openLogLift(); card.appendChild(b);
       card.appendChild(el('div', 'dpnote', 'Volume = weight × reps × sets for the lifts you log, in ' + wu + '.'));
@@ -4417,17 +4458,280 @@
     return '<svg viewBox="0 0 56 56" class="gring' + (done ? ' done' : '') + '" aria-label="' + pct + ' percent"><circle cx="28" cy="28" r="22" class="t"/><circle cx="28" cy="28" r="22" class="p" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - frac)).toFixed(1) + '" transform="rotate(-90 28 28)"/><text x="28" y="32" text-anchor="middle">' + (done ? '✓' : pct + '%') + '</text></svg>';
   };
 
-  function gBadges() {
-    const info = pgStreakInfo(), P = appData.prefs, totalMin = logs.reduce((s, l) => s + (l.minutes || 0), 0), maxSteps = Math.max(0, ...Object.values(P.steps));
-    const prs = P.records.length + P.lifts.length, goalsDone = P.goals.filter(g => g.doneOn).length;
-    return [
-      ['First workout', 'Complete 1 workout', 'bolt', logs.length, 1], ['10 workouts', 'Complete 10 workouts', 'bolt', logs.length, 10],
-      ['50 workouts', 'Complete 50 workouts', 'trophy', logs.length, 50], ['100 workouts', 'Complete 100 workouts', 'trophy', logs.length, 100],
-      ['7-day streak', 'Train 7 days in a row', 'calories', info.best, 7], ['30-day streak', 'Train 30 days in a row', 'calories', info.best, 30],
-      ['10k steps', 'Log a 10,000-step day', 'steps', maxSteps, 10000], ['1,000 minutes', 'Be active 1,000 minutes', 'time', totalMin, 1000],
-      ['First record', 'Log a lift or record', 'volume', prs, 1], ['Goal getter', 'Complete a goal', 'cal', goalsDone, 1]
-    ].map(([name, req, icon, cur, need]) => ({ name, req, icon, cur, need, got: cur >= need }));
+  // ----- automatic steps from Apple Health / Health Connect -----
+  // Only works inside the Vulcan Health mobile app (a Capacitor wrapper with the health plugin installed). In a normal browser there is no plugin,
+  // so nothing here runs and steps stay manual. Google Fit is being shut down, so on Android this uses Health Connect.
+  function healthPlugin() {
+    try { const C = window.Capacitor; if (C && C.isNativePlatform && C.isNativePlatform() && C.Plugins && C.Plugins.Health) return C.Plugins.Health; } catch (e) { /* not native */ }
+    return null;
   }
+  const healthName = () => { try { return window.Capacitor.getPlatform() === 'ios' ? 'Apple Health' : 'Health Connect'; } catch (e) { return 'Health Connect'; } };
+  let healthBusy = false;
+  async function syncHealthSteps() {
+    const H = healthPlugin(), P = appData && appData.prefs;
+    if (!H || !P || !P.healthSync || healthBusy || !currentUser) return { ok: false, n: 0 };
+    healthBusy = true;
+    try {
+      const end = new Date(); end.setDate(end.getDate() + 1); end.setHours(0, 0, 0, 0);       // end of today (exclusive)
+      const start = new Date(); start.setDate(start.getDate() - 29); start.setHours(0, 0, 0, 0);   // last 30 days
+      const res = await H.queryAggregated({ dataType: 'steps', startDate: start.toISOString(), endDate: end.toISOString(), bucket: 'day', aggregation: 'sum' });
+      let n = 0; const today = todayLocal();
+      ((res && res.samples) || []).forEach(s => {
+        const d = ymd(new Date(s.startDate)), v = Math.round(Number(s.value));
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d) && d <= today && v > 0 && v <= 200000 && P.steps[d] !== v) { P.steps[d] = v; n++; }
+      });
+      P.healthSyncAt = new Date().toISOString();
+      saveAppData();
+      if (n && typeof renderProgress === 'function' && !document.querySelector('[data-view="progress"]').classList.contains('hidden')) renderProgress();
+      return { ok: true, n };
+    } catch (e) { return { ok: false, n: 0, err: String((e && e.message) || e) }; }
+    finally { healthBusy = false; }
+  }
+  async function setHealthSync(on) {
+    const H = healthPlugin(), P = appData.prefs;
+    if (!on) { P.healthSync = false; saveAppData(); return { ok: true }; }
+    if (!H) return { ok: false, err: 'Not available here' };
+    try {
+      const av = H.isAvailable ? await H.isAvailable() : { available: true };
+      if (av && av.available === false) return { ok: false, err: av.reason || (healthName() + ' isn’t available on this device.') };
+      await H.requestAuthorization({ read: ['steps'], write: [] });
+    } catch (e) { return { ok: false, err: String((e && e.message) || e) }; }
+    P.healthSync = true; saveAppData();
+    return syncHealthSteps();
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || !appData || !appData.prefs.healthSync) return;
+    const last = Date.parse(appData.prefs.healthSyncAt || '') || 0;
+    if (Date.now() - last > 5 * 60 * 1000) syncHealthSteps();
+  });
+  function healthSyncCard(parent, redraw) {
+    const P = appData.prefs, H = healthPlugin();
+    if (!H) {
+      parent.appendChild(el('div', 'dpnote', 'In the browser, steps are typed in by hand. In the Vulcan Health mobile app they can sync automatically from Apple Health (iPhone) or Health Connect (Android, including Google Fit data).'));
+      return;
+    }
+    const nm = healthName(), msg = el('div', 'dpnote');
+    parent.appendChild(mkToggle('Sync steps from ' + nm, 'Reads your daily step totals. Read-only, and only after you allow it.', P.healthSync, async (v) => {
+      msg.textContent = v ? 'Connecting…' : ''; const r = await setHealthSync(v);
+      if (v && !r.ok) { msg.textContent = r.err || ('Couldn’t connect to ' + nm + '.'); P.healthSync = false; saveAppData(); }
+      else if (v) msg.textContent = 'Connected. Synced the last 30 days' + (r.n ? ' (' + r.n + ' days updated).' : '.');
+      redraw();
+    }));
+    if (P.healthSync) {
+      const last = P.healthSyncAt ? 'Last synced ' + new Date(P.healthSyncAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + '.' : 'Not synced yet.';
+      parent.appendChild(el('div', 'dpnote', last + ' Days from ' + nm + ' replace typed-in numbers for the same day.'));
+      const b = el('button', 'pgadd', 'Sync now'); b.onclick = async () => { b.disabled = true; b.textContent = 'Syncing…'; const r = await syncHealthSteps(); b.disabled = false; b.textContent = 'Sync now'; msg.textContent = r.ok ? 'Up to date.' : 'Couldn’t sync. Check ' + nm + ' permissions.'; if (r.ok) redraw(); };
+      parent.appendChild(b);
+    }
+    parent.appendChild(msg);
+  }
+
+  // ----- badges -----
+  // Earned badges are kept in prefs.badges as { id: 'YYYY-MM-DD' }. Once earned, a badge stays earned (even if a workout is later undone).
+  Object.assign(PG_ICONS, {
+    star: '<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.2 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/>',
+    medal: '<circle cx="12" cy="15" r="5"/><path d="M8.5 3l3.5 6 3.5-6M10 15l1.5 1.5L14.5 13"/>',
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
+    crown: '<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/>',
+    flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+    rocket: '<path d="M12 3c4 2 6 6 5 11l-3 3h-4l-3-3c-1-5 1-9 5-11zM9 17l-3 3M15 17l3 3"/><circle cx="12" cy="10" r="1.5"/>',
+    mix: '<path d="M12 3v18M4 7.5l16 9M20 7.5l-16 9"/>',
+    heart: '<path d="M12 21s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 11c0 5.5-7 10-7 10z"/>',
+    body: '<circle cx="12" cy="5" r="2"/><path d="M12 8v6M7 10l5-2 5 2M9 21l3-7 3 7"/>',
+    pulse: '<path d="M3 12h4l2-6 4 12 2-6h6"/>',
+    core: '<rect x="8" y="3" width="8" height="18" rx="4"/><path d="M8 9h8M8 15h8M12 3v18"/>',
+    lotus: '<path d="M12 20c-4 0-7-3-8-7 3 0 5 1 6 3-1-4 0-8 2-10 2 2 3 6 2 10 1-2 3-3 6-3-1 4-4 7-8 7z"/>',
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'
+  });
+  const BADGE_TIER = ['', 'Bronze', 'Silver', 'Gold', 'Legendary'];
+  const BADGE_CATS = [['workouts', 'Workouts'], ['streaks', 'Streaks'], ['calories', 'Calories'], ['time', 'Time'], ['steps', 'Steps'], ['variety', 'Variety'], ['consistency', 'Consistency'], ['strength', 'Strength & records'], ['goals', 'Goals & setup']];
+  const BADGES = [];
+  (function () {
+    const add = (cat, stat, rows) => rows.forEach(([id, name, desc, icon, tier, need]) => BADGES.push({ cat, id, name, desc, icon, tier, stat, need }));
+    add('workouts', 'workouts', [
+      ['w1', 'First Strike', 'Complete your first workout', 'bolt', 1, 1], ['w5', 'Heating Up', 'Complete 5 workouts', 'bolt', 1, 5],
+      ['w10', 'Hammer Time', 'Complete 10 workouts', 'volume', 2, 10], ['w25', 'Forged in Sweat', 'Complete 25 workouts', 'volume', 2, 25],
+      ['w50', 'Anvil Regular', 'Complete 50 workouts', 'trophy', 3, 50], ['w100', 'Centurion', 'Complete 100 workouts', 'trophy', 3, 100],
+      ['w250', 'Master Smith', 'Complete 250 workouts', 'crown', 4, 250], ['w500', 'Vulcan’s Chosen', 'Complete 500 workouts', 'crown', 4, 500]]);
+    add('streaks', 'streak', [
+      ['s3', 'Three-Day Spark', 'Train 3 days in a row', 'calories', 1, 3], ['s7', 'Week of Fire', 'Train 7 days in a row', 'calories', 2, 7],
+      ['s14', 'Fortnight Forge', 'Train 14 days in a row', 'calories', 2, 14], ['s30', 'Unbroken Month', 'Train 30 days in a row', 'calories', 3, 30],
+      ['s60', 'Iron Will', 'Train 60 days in a row', 'calories', 3, 60], ['s100', 'Eternal Flame', 'Train 100 days in a row', 'calories', 4, 100]]);
+    add('calories', 'calories', [
+      ['c1k', 'Ember', 'Burn 1,000 calories in total', 'calories', 1, 1000], ['c5k', 'Blaze', 'Burn 5,000 calories in total', 'calories', 2, 5000],
+      ['c10k', 'Bonfire', 'Burn 10,000 calories in total', 'calories', 2, 10000], ['c25k', 'Inferno', 'Burn 25,000 calories in total', 'calories', 3, 25000],
+      ['c50k', 'Furnace', 'Burn 50,000 calories in total', 'calories', 3, 50000], ['c100k', 'Volcano', 'Burn 100,000 calories in total', 'calories', 4, 100000]]);
+    add('calories', 'bestCal', [
+      ['cb300', 'Hot Session', 'Burn 300 calories in one workout', 'star', 1, 300], ['cb500', 'Scorcher', 'Burn 500 calories in one workout', 'star', 2, 500],
+      ['cb800', 'Meltdown', 'Burn 800 calories in one workout', 'star', 3, 800]]);
+    add('time', 'minutes', [
+      ['m60', 'First Hour', 'Be active for 1 hour in total', 'time', 1, 60], ['m300', 'Five Hours Strong', 'Be active for 5 hours in total', 'time', 1, 300],
+      ['m1000', 'Thousand Minutes', 'Be active for 1,000 minutes in total', 'time', 2, 1000], ['m3000', 'Fifty Hours', 'Be active for 50 hours in total', 'time', 3, 3000],
+      ['m6000', 'Hundred Hours', 'Be active for 100 hours in total', 'time', 4, 6000]]);
+    add('time', 'bestMin', [
+      ['mb45', 'Long Haul', 'Complete a 45-minute workout', 'medal', 1, 45], ['mb60', 'Hour Hero', 'Complete a 60-minute workout', 'medal', 2, 60],
+      ['mb90', 'Marathon Session', 'Complete a 90-minute workout', 'medal', 3, 90]]);
+    add('steps', 'maxSteps', [
+      ['sp5', 'First Stride', 'Log a 5,000-step day', 'steps', 1, 5000], ['sp10', '10K Club', 'Log a 10,000-step day', 'steps', 2, 10000],
+      ['sp15', 'Road Warrior', 'Log a 15,000-step day', 'steps', 3, 15000], ['sp20', 'Trailblazer', 'Log a 20,000-step day', 'steps', 4, 20000]]);
+    add('steps', 'totalSteps', [
+      ['st50k', 'Footloose', 'Log 50,000 steps in total', 'steps', 1, 50000], ['st250k', 'Distance Walker', 'Log 250,000 steps in total', 'steps', 2, 250000],
+      ['st500k', 'Long Way Home', 'Log 500,000 steps in total', 'steps', 3, 500000], ['st1m', 'Million Step Legend', 'Log 1,000,000 steps in total', 'steps', 4, 1000000]]);
+    add('steps', 'stepDays', [
+      ['sd7', 'Step Tracker', 'Log your steps on 7 days', 'flag', 1, 7], ['sd30', 'Step Habit', 'Log your steps on 30 days', 'flag', 2, 30], ['sd100', 'Step Master', 'Log your steps on 100 days', 'flag', 3, 100]]);
+    add('variety', 'types', [
+      ['v3', 'Mix It Up', 'Try 3 different workout types', 'mix', 1, 3], ['v5', 'Well Rounded', 'Try 5 different workout types', 'mix', 2, 5], ['v8', 'Jack of All Trades', 'Try all 8 workout types', 'mix', 3, 8]]);
+    add('variety', 't_strength', [['ty_st', 'Iron Devotee', 'Complete 10 strength workouts', 'volume', 2, 10]]);
+    add('variety', 't_cardio', [['ty_ca', 'Engine Builder', 'Complete 10 cardio workouts', 'pulse', 2, 10]]);
+    add('variety', 't_calisthenics', [['ty_cl', 'Bodyweight Boss', 'Complete 10 calisthenics workouts', 'body', 2, 10]]);
+    add('variety', 't_abs', [['ty_ab', 'Core Forged', 'Complete 10 abs workouts', 'core', 2, 10]]);
+    add('variety', 't_hiit', [['ty_hi', 'Interval Fiend', 'Complete 10 HIIT workouts', 'bolt', 2, 10]]);
+    add('variety', 't_yoga', [['ty_yo', 'Flow State', 'Complete 10 yoga workouts', 'lotus', 2, 10]]);
+    add('variety', 't_recovery', [['ty_re', 'Rest & Rebuild', 'Complete 10 recovery workouts', 'heart', 2, 10]]);
+    add('consistency', 'weekBest', [['wk4', 'Solid Week', 'Work out on 4 different days in one week', 'cal', 1, 4], ['wk5', 'Perfect Week', 'Work out on 5 different days in one week', 'cal', 2, 5], ['wk6', 'Relentless Week', 'Work out on 6 different days in one week', 'cal', 3, 6]]);
+    add('consistency', 'weekend', [['we', 'Weekend Warrior', 'Work out on both Saturday and Sunday in the same weekend', 'flag', 1, 1]]);
+    add('consistency', 'comeback', [['cb', 'Comeback Kid', 'Work out again after 7 or more days away', 'rocket', 1, 1]]);
+    add('consistency', 'monthBest', [['mo20', 'Month of Motion', 'Work out on 20 different days in one month', 'cal', 3, 20]]);
+    add('strength', 'lifts', [['l100', 'Hundred Lifts', 'Complete 100 lifts', 'volume', 2, 100], ['l500', 'Heavy Metal', 'Complete 500 lifts', 'volume', 3, 500]]);
+    add('strength', 'liftLogs', [['ll1', 'Log It', 'Log your first lift', 'volume', 1, 1], ['ll25', 'Lifter’s Logbook', 'Log 25 lifts', 'volume', 2, 25]]);
+    add('strength', 'prs', [['pr1', 'New Record', 'Save a personal record', 'medal', 1, 1], ['pr5', 'Record Breaker', 'Save 5 personal records', 'medal', 2, 5], ['pr15', 'Hall of Fame', 'Save 15 personal records', 'medal', 3, 15]]);
+    add('goals', 'goalsSet', [['g1', 'Aim High', 'Set your first goal', 'target', 1, 1]]);
+    add('goals', 'goalsDone', [['gd1', 'Goal Getter', 'Reach a goal', 'target', 1, 1], ['gd5', 'Goal Crusher', 'Reach 5 goals', 'target', 2, 5], ['gd15', 'Unstoppable', 'Reach 15 goals', 'target', 3, 15]]);
+    add('goals', 'setup', [['su', 'Ready to Roll', 'Finish all the sign-up questions', 'rocket', 1, 1]]);
+  })();
+  const BADGE_BY_ID = Object.fromEntries(BADGES.map(b => [b.id, b]));
+
+  function badgeStats() {
+    const P = appData.prefs, L = logs, S = {};
+    const sum = (f) => L.reduce((n, l) => n + (Number(f(l)) || 0), 0), max = (f) => L.reduce((n, l) => Math.max(n, Number(f(l)) || 0), 0);
+    S.workouts = L.length; S.minutes = sum(l => l.minutes); S.calories = sum(l => l.calories); S.bestCal = max(l => l.calories); S.bestMin = max(l => l.minutes);
+    S.lifts = sum(l => l.lifts); S.streak = pgStreakInfo().best;
+    const sv = Object.values(P.steps);
+    S.maxSteps = Math.max(0, ...sv); S.totalSteps = sv.reduce((a, b) => a + b, 0); S.stepDays = sv.length;
+    const tc = {}; L.forEach(l => { if (l.wtype && l.wtype !== 'rest') tc[l.wtype] = (tc[l.wtype] || 0) + 1; });
+    S.types = Object.keys(tc).length; Object.keys(WTYPES).forEach(k => { S['t_' + k] = tc[k] || 0; });
+    const days = [...new Set(L.map(l => l.performed_on))].sort(), weeks = {}, months = {};
+    days.forEach(d => {
+      const dt = new Date(d + 'T12:00:00'), wk = ymd(new Date(dt.getTime() - ((dt.getDay() + 6) % 7) * 86400000));
+      (weeks[wk] = weeks[wk] || new Set()).add(dt.getDay()); (months[d.slice(0, 7)] = months[d.slice(0, 7)] || new Set()).add(d);
+    });
+    S.weekBest = Math.max(0, ...Object.values(weeks).map(s => s.size)); S.monthBest = Math.max(0, ...Object.values(months).map(s => s.size));
+    S.weekend = Object.values(weeks).some(s => s.has(6) && s.has(0)) ? 1 : 0;
+    S.comeback = days.some((d, i) => i && (new Date(d + 'T12:00:00') - new Date(days[i - 1] + 'T12:00:00')) / 86400000 >= 8) ? 1 : 0;
+    S.liftLogs = P.lifts.length; S.prs = P.records.length; S.goalsSet = P.goals.length; S.goalsDone = P.goals.filter(g => g.doneOn).length;
+    S.setup = P.onb && P.onb.done && !Object.keys(P.onb.skip || {}).length ? 1 : 0;
+    return S;
+  }
+  function gBadges() {
+    const P = appData.prefs, S = badgeStats();
+    return BADGES.map(b => ({ ...b, cur: S[b.stat] || 0, got: !!P.badges[b.id], date: P.badges[b.id] || '' }));
+  }
+
+  let badgeQueue = [], badgePopEl = null, badgeBusy = false;
+  function checkBadges() {
+    if (!appData || !currentUser || badgeBusy) return;
+    badgeBusy = true;
+    try {
+      const P = appData.prefs, S = badgeStats(), won = [];
+      BADGES.forEach(b => { if (!P.badges[b.id] && (S[b.stat] || 0) >= b.need) { P.badges[b.id] = todayLocal(); won.push(b); } });
+      if (won.length) {
+        const first = !P.badgeInit; P.badgeInit = true; saveAppDataQuiet();
+        if (first && won.length >= 3) badgeQueue.push({ many: won, intro: 'You’ve already earned ' + won.length + ' badges!' });
+        else if (won.length === 1) badgeQueue.push({ one: won[0] });
+        else badgeQueue.push({ many: won, intro: won.length + ' new badges!' });
+      } else if (!P.badgeInit) { P.badgeInit = true; saveAppDataQuiet(); }
+    } finally { badgeBusy = false; }
+    flushBadges();
+  }
+  function saveAppDataQuiet() { lsSet('data', appData); clearTimeout(saveTimer); saveTimer = setTimeout(pushAppData, 700); }
+  function flushBadges() {
+    if (badgePopEl || onbOpen || !badgeQueue.length) return;
+    const q = badgeQueue.shift();
+    if (q.one) showBadge(q.one, 'new'); else showBadgeMany(q.many, q.intro);
+  }
+  function badgeIcon(b, got, big) {
+    const i = el('span', 'bdgi t' + b.tier + (got ? ' got' : ' lock') + (big ? ' big' : '')); i.innerHTML = pgSvg(b.icon); return i;
+  }
+  function badgeShell(onClose) {
+    const root = el('div', 'bdgpop'), card = el('div', 'bdgcard'); root.appendChild(card);
+    const close = () => { root.remove(); badgePopEl = null; if (onClose) onClose(); flushBadges(); };
+    root.onclick = (e) => { if (e.target === root) close(); };
+    document.body.appendChild(root); badgePopEl = root;
+    return { card, close };
+  }
+  function showBadge(b, mode) {
+    const got = mode === 'new' || !!(appData.prefs.badges[b.id]);
+    const { card, close } = badgeShell();
+    card.appendChild(el('div', 'bdgk', mode === 'new' ? 'Badge unlocked' : got ? 'Earned' : 'Locked'));
+    card.appendChild(badgeIcon(b, got, true));
+    card.appendChild(el('div', 'bdgn', b.name)); card.appendChild(el('div', 'bdgtier t' + b.tier, BADGE_TIER[b.tier]));
+    card.appendChild(el('div', 'bdgd', b.desc));
+    if (!got) {
+      const cur = Math.min(badgeStats()[b.stat] || 0, b.need), bar = el('div', 'bdgbar'), fill = el('i'); fill.style.width = Math.round(cur / b.need * 100) + '%'; bar.appendChild(fill);
+      card.appendChild(bar); card.appendChild(el('div', 'bdgp', gNum(cur) + ' / ' + gNum(b.need)));
+    } else if (mode !== 'new') card.appendChild(el('div', 'bdgp', 'Earned ' + pgDate(appData.prefs.badges[b.id], { month: 'short', day: 'numeric', year: 'numeric' })));
+    const ok = el('button', 'bdgok', mode === 'new' ? 'Nice!' : 'Close'); ok.onclick = close; card.appendChild(ok);
+    if (mode === 'new') { const all = el('button', 'bdgmore', 'View all badges'); all.onclick = () => { close(); openBadges(); }; card.appendChild(all); }
+  }
+  function showBadgeMany(list, intro) {
+    const { card, close } = badgeShell();
+    card.appendChild(el('div', 'bdgk', 'Badges unlocked')); card.appendChild(el('div', 'bdgn', intro));
+    const g = el('div', 'bdgmany');
+    list.slice(0, 9).forEach(b => { const t = el('div', 'bdgmi'); t.append(badgeIcon(b, true), el('div', 'bn', b.name)); g.appendChild(t); });
+    card.appendChild(g);
+    if (list.length > 9) card.appendChild(el('div', 'bdgp', '+ ' + (list.length - 9) + ' more'));
+    const ok = el('button', 'bdgok', 'Nice!'); ok.onclick = close; card.appendChild(ok);
+    const all = el('button', 'bdgmore', 'View all badges'); all.onclick = () => { close(); openBadges(); }; card.appendChild(all);
+  }
+  const badgeNext = (list, n) => list.filter(b => !b.got && b.cur > 0).sort((a, b) => b.cur / b.need - a.cur / a.need).slice(0, n);
+  function badgeTile(b) {
+    const t = el('button', 'bdgt' + (b.got ? ' got' : '')); t.appendChild(badgeIcon(b, b.got));
+    t.appendChild(el('div', 'bn', b.name));
+    if (b.got) t.appendChild(el('div', 'bs got', 'Earned'));
+    else { const bar = el('div', 'bdgbar sm'), f = el('i'); f.style.width = Math.round(Math.min(b.cur, b.need) / b.need * 100) + '%'; bar.appendChild(f); t.appendChild(bar); t.appendChild(el('div', 'bs', gNum(Math.min(b.cur, b.need)) + ' / ' + gNum(b.need))); }
+    t.onclick = () => showBadge(b, 'view'); return t;
+  }
+  // a short preview used on the Goals tab
+  function badgeTeaser(root) {
+    const list = gBadges(), earned = list.filter(b => b.got), head = el('div', 'ghead');
+    head.appendChild(el('div', 'wdsec', 'Badges · ' + earned.length + ' of ' + list.length + ' earned'));
+    const all = el('button', 'gadd', 'View all'); all.onclick = () => openBadges(); head.appendChild(all); root.appendChild(head);
+    const recent = earned.slice().sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 3), next = badgeNext(list, 3);
+    const grid = el('div', 'gbadges');
+    if (!recent.length && !next.length) {
+      const e = el('div', 'wdcard gempty'); e.append(el('div', 'gebig', '🏅'), el('div', 'get', 'Collect badges'), el('div', 'ges', 'Finish workouts, log steps and build streaks to unlock them.'));
+      const b = el('button', 'secondary', 'See all badges'); b.onclick = () => openBadges(); e.appendChild(b); root.appendChild(e); return;
+    }
+    if (recent.length) { root.appendChild(el('div', 'bdgsub', 'Recently earned')); recent.forEach(b => grid.appendChild(badgeTile(b))); root.appendChild(grid); }
+    if (next.length) { root.appendChild(el('div', 'bdgsub', 'Next up')); const g2 = el('div', 'gbadges'); next.forEach(b => g2.appendChild(badgeTile(b))); root.appendChild(g2); }
+  }
+  // the full collection
+  function openBadges() {
+    if (document.querySelector('.bdgpg')) return;
+    let filter = 'all';
+    const root = el('div', 'bdgpg'), inner = el('div', 'bdgin'); root.appendChild(inner); document.body.appendChild(root);
+    const draw = () => {
+      inner.replaceChildren();
+      const list = gBadges(), earned = list.filter(b => b.got).length;
+      const top = el('div', 'bdgtop'), back = el('button', 'bdgback', '‹'); back.setAttribute('aria-label', 'Back'); back.onclick = () => root.remove();
+      top.append(back, el('div', 'bdgtitle', 'Badges')); inner.appendChild(top);
+      const body = el('div', 'bdgbody'); inner.appendChild(body);
+      const sum = el('div', 'bdgsum'), pct = Math.round(earned / list.length * 100), bar = el('div', 'bdgbar'), f = el('i'); f.style.width = pct + '%'; bar.appendChild(f);
+      sum.append(el('div', 'bdgbig', earned + ' / ' + list.length), el('div', 'bdgsmall', 'badges earned · ' + pct + '%'), bar); body.appendChild(sum);
+      body.appendChild(mkChips('mus-wrap', [['all', 'All'], ['got', 'Earned'], ['lock', 'Locked']], k => filter === k, (k) => { filter = k; draw(); }));
+      if (filter === 'all') { const nx = badgeNext(list, 3); if (nx.length) { body.appendChild(el('div', 'bdgsub', 'Next up')); const g = el('div', 'gbadges'); nx.forEach(b => g.appendChild(badgeTile(b))); body.appendChild(g); } }
+      let shown = 0;
+      BADGE_CATS.forEach(([cat, label]) => {
+        const all = list.filter(b => b.cat === cat), vis = all.filter(b => filter === 'all' || (filter === 'got' ? b.got : !b.got));
+        if (!vis.length) return; shown++;
+        body.appendChild(el('div', 'bdgsub', label + ' · ' + all.filter(b => b.got).length + '/' + all.length));
+        const g = el('div', 'gbadges'); vis.forEach(b => g.appendChild(badgeTile(b))); body.appendChild(g);
+      });
+      if (!shown) body.appendChild(el('div', 'dpnote', filter === 'got' ? 'No badges yet. Finish a workout to earn your first.' : 'You’ve earned every badge. Legendary!'));
+    };
+    draw();
+  }
+
 
   function renderGoals() {
     if (!appData) appData = cleanData(null);
@@ -4438,8 +4742,9 @@
     const active = P.goals.filter(g => !g.doneOn), finished = P.goals.filter(g => g.doneOn), badges = gBadges(), earned = badges.filter(b => b.got).length;
 
     const sum = el('div', 'gsum');
-    [[active.length, 'Active'], [finished.length, 'Completed'], [earned + '/' + badges.length, 'Badges']].forEach(([v, k]) => { const t = el('div', 'gs'); t.append(el('div', 'v', String(v)), el('div', 'k', k)); sum.appendChild(t); });
+    [[active.length, 'Active'], [finished.length, 'Completed'], [earned + '/' + badges.length, 'Badges']].forEach(([v, k]) => { const t = el('div', 'gsumt'); t.append(el('div', 'v', String(v)), el('div', 'k', k)); sum.appendChild(t); });
     root.appendChild(sum);
+    sum.children[2].style.cursor = 'pointer'; sum.children[2].onclick = () => openBadges();
 
     const head = el('div', 'ghead'); head.appendChild(el('div', 'wdsec', 'Your goals'));
     const add = el('button', 'gadd', '+ New goal'); add.onclick = () => openGoalForm(); head.appendChild(add); root.appendChild(head);
@@ -4474,14 +4779,7 @@
       });
     }
 
-    root.appendChild(el('div', 'wdsec', 'Milestones · ' + earned + ' of ' + badges.length + ' earned'));
-    const grid = el('div', 'gbadges');
-    badges.forEach(b => {
-      const c = el('div', 'gbadge' + (b.got ? ' got' : '')), ic = el('span', 'gbic'); ic.innerHTML = pgSvg(b.icon);
-      c.append(ic, el('div', 'bn', b.name), el('div', 'bs', b.got ? 'Earned' : gNum(Math.min(b.cur, b.need)) + ' / ' + gNum(b.need)));
-      c.title = b.req; grid.appendChild(c);
-    });
-    root.appendChild(grid);
+    badgeTeaser(root);
   }
 
   // ---- add / edit a goal ----
@@ -5628,13 +5926,14 @@
         'Profile and sign-up answers: your username, main goal, experience level, units, whether you train at the gym or at home, and the equipment you have.',
         'Health-related details you choose to give: injuries or limitations (and any note you type), and optionally age, height, weight and sex. All of these are optional.',
         'Profile photo, if you add one.',
+        'Steps: day totals you type in or, only if you turn on step sync in the mobile app, read from Apple Health or Health Connect after you give permission. We read steps only. We never write to those apps.',
         'Activity: workouts you complete and their length and calories, your weekly schedule, goals, challenges, personal records and app settings.',
         'Technical details: when the app loads, the hosting and library services can see standard information such as your IP address and browser type.']],
       ['Health-related information', 'Injuries, limitations, age, height, weight and sex are health-related, so we treat them with extra care. You decide whether to share them. We use them only to build your workouts (for example, leaving out moves that may stress an injured area) and to estimate calories. We don’t use them for advertising and we don’t share them. By entering them you agree that we can store and use them for these purposes. You can remove them at any time in Data & Privacy → Health & body info, and your workouts will keep working without them.'],
       ['Where it is stored', 'On your device (in the browser’s storage) and, if Cloud backup is on, in our cloud database provided by Supabase. Each account can only read and change its own rows. The app is delivered through GitHub Pages and a code library is loaded from the jsDelivr network.'],
       ['How we use it', 'To sign you in, show your history and stats, build and schedule your workouts, estimate calories, and sync your data between your devices. We don’t use it for anything else, and we don’t make automated decisions about you beyond choosing exercises for your workouts.'],
-      ['Who handles it', 'We don’t sell or rent your data. It is processed only by the services that run the app: Supabase (database and sign-in), GitHub (hosting), jsDelivr (a code library), and Google only if you choose Google sign-in. These providers may process data in other countries, including the United States. Your profile visibility and sharing choices in Data & Privacy are saved now and will apply if friends and sharing features are added; nothing is shared with other people today.'],
-      ['Reminders', 'Workout reminders and notifications are set up on your device and only if you allow them. We don’t use your location, camera or microphone.'],
+      ['Who handles it', 'We don’t sell or rent your data. It is processed only by the services that run the app: Supabase (database and sign-in), GitHub (hosting), jsDelivr (a code library), and Google only if you choose Google sign-in. In the mobile app, Apple Health or Health Connect are used only to read steps, only if you turn that on, and that data is never shared or used for ads. These providers may process data in other countries, including the United States. Your profile visibility and sharing choices in Data & Privacy are saved now and will apply if friends and sharing features are added; nothing is shared with other people today.'],
+      ['Reminders and permissions', 'Workout reminders, notifications and step sync use permissions on your device, and only if you allow them. You can turn step sync off in Progress → Steps or in your phone’s Health settings. We don’t use your location, camera or microphone.'],
       ['Security', 'Data is sent over encrypted connections, and your account’s data in the cloud is protected so that only your account can read or change it. No system is perfectly secure, so keep your password private. If we learn of a breach that affects your information, we will tell you as the law requires.'],
       ['Your rights and choices', ['See and download your data any time: Data & Privacy → Export your data.',
         'Correct it: edit your profile, goals and settings in the app.',
@@ -5653,7 +5952,7 @@
       ['Your account', 'Keep your sign-in details safe. You are responsible for what happens under your account. Don’t use the app to break the law, to try to access other people’s data, or to disrupt the service.'],
       ['Your content', 'The workouts, profile details and photo you add stay yours. You let us store and process them so the app can work for you.'],
       ['Our content', 'The app, its design, workout builder, exercise library and text belong to Vulcan Health and its owner. You may use them through the app, but you may not copy, resell or build a competing service from them.'],
-      ['Third-party services', 'Vulcan Health relies on services such as Supabase, GitHub Pages, jsDelivr and, if you choose it, Google sign-in. Their availability and rules are outside our control.'],
+      ['Third-party services', 'Vulcan Health relies on services such as Supabase, GitHub Pages, jsDelivr and, if you choose it, Google sign-in. If you use the mobile app, step sync relies on Apple Health or Health Connect. Their availability and rules are outside our control.'],
       ['Availability', 'Vulcan Health is provided “as is” and “as available”, without promises that it will always work, be accurate or be error-free. Features may change or be removed, and data could be lost, so use the export option to keep your own copy.'],
       ['Limits of responsibility', 'To the fullest extent the law allows, we aren’t liable for injuries, health problems, lost data or other losses or damages that result from using the app. Nothing here limits rights you have under law that can’t be limited.'],
       ['Ending things', 'You can stop using the app and delete your account at any time. We may suspend or remove accounts that misuse the service or break these terms.'],
