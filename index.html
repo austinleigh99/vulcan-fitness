@@ -1750,7 +1750,7 @@
         });
         card.appendChild(body);
         const acts = el('div', 'plan-actions');
-        acts.appendChild(makeCompleteBtn({ type:activeCat, title:o.title, mins:o.mins, lifts:activeCat === 'strength' ? o.moves.length : 0 }));
+        acts.appendChild(startBtn(activeCat, o.title, o.mins, o.moves));
         card.appendChild(acts);
       }
       list.appendChild(card);
@@ -1859,7 +1859,7 @@
     const actions = el('div', 'plan-actions');
     const shuffle = el('button', 'secondary', 'Shuffle');
     shuffle.onclick = buildPlan;
-    actions.append(shuffle, makeCompleteBtn({ type:planType, title:p.label, mins:mins, lifts:0 }));
+    actions.append(shuffle, startBtn(planType, p.label, mins, moves));
     card.appendChild(actions);
 
     out.appendChild(card);
@@ -5768,6 +5768,44 @@
     const b = el('button', 'startg', '▶ Start guided workout');
     b.onclick = () => guidedStart(title, steps, info);
     return b;
+  }
+  // "Start workout" for the quick library and basic plan cards: builds guided steps from the rx text
+  // ("3 × 8-10", "10 min easy", "40s on / 20s off", "45 sec each side") so it runs like a scheduled workout
+  function libSteps(key, moves) {
+    const secOf = (rx) => {
+      let m;
+      if ((m = /(\d+)\s*min/.exec(rx))) return Number(m[1]) * 60;
+      if ((m = /(\d+)\s*(?:sec|s)\b/.exec(rx))) return Number(m[1]) * (/each side/.test(rx) ? 2 : 1);
+      if ((m = /(\d+)\s*(?:slow )?breaths?/.exec(rx))) return Number(m[1]) * 6;
+      if ((m = /(\d+)\s*slow reps/.exec(rx))) return Number(m[1]) * 5;
+      return 45;
+    };
+    const items = moves.map(m => ({ name: m.name, rx: m.rx })), out = [];
+    if (key === 'strength' || key === 'calisthenics') return repSteps(items, 75, false, false);
+    if (key === 'pilates') return repSteps(items.map(m => ({ name: m.name, rx: '1 × ' + (/(\d+)\s*sec hold/.test(m.rx) ? m.rx.replace(/(\d+)\s*sec hold/, '$1s hold') : m.rx) })), 20, false, false);
+    if (key === 'cardio') {
+      moves.forEach(m => {
+        const iv = /^(\d+)\s*×\s*(\d+)\s*min\s*(\w+)/.exec(m.rx);
+        if (iv) { const n = Number(iv[1]); for (let k = 1; k <= n; k++) { out.push(gWork(m.name + ' · interval ' + k + ' of ' + n, Number(iv[2]) * 60, cap(iv[3]) + ' effort', m.name + '. Interval ' + k + ' of ' + n + '. Push hard.')); if (k < n) out.push(gRest(60, 'Recover at an easy pace')); } }
+        else out.push(gWork(m.name, secOf(m.rx), m.rx.replace(/^\d+\s*min\s*/, '').replace(/^./, c => c.toUpperCase()) + ' pace', m.name));
+      });
+      return out;
+    }
+    if (key === 'hiit') {
+      moves.forEach((m, i) => {
+        const h = /(\d+)s on \/ (\d+)s off(?:\s*×\s*(\d+))?/.exec(m.rx); if (!h) return;
+        const on = Number(h[1]), off = Number(h[2]), R = h[3] ? Number(h[3]) : Math.max(2, Math.round(300 / (on + off)));
+        for (let r = 1; r <= R; r++) { out.push(gWork(m.name, on, 'Round ' + r + ' of ' + R + ' · ' + on + 's on', m.name + '. Round ' + r + ' of ' + R)); if (r < R) out.push(gRest(off)); }
+        if (i < moves.length - 1) out.push(gRest(30, 'Next: ' + moves[i + 1].name));
+      });
+      return out;
+    }
+    moves.forEach(m => out.push(gWork(m.name, secOf(m.rx), m.rx, m.name + '. ' + m.rx)));   // yoga, recovery: timed holds
+    return out;
+  }
+  function startBtn(key, title, mins, moves) {
+    const b = guideBtn(title, libSteps(key, moves), { type: key, title, mins, lifts: key === 'strength' ? moves.length : 0, items: moves.map(m => ({ name: m.name, rx: m.rx })) });
+    b.textContent = '▶ Start workout'; return b;
   }
   function addGuide(actions, title, steps, info) { if (steps && steps.length) actions.prepend(guideBtn(title, steps, info)); }
 
