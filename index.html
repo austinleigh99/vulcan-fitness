@@ -5119,9 +5119,18 @@
     if (!list) box.appendChild(el('div', 'dpnote', 'Loading…'));
     else list.forEach(c => {
       const r = el('div', 'spc'), t = el('span', 'spct'); t.append(el('b', null, c.display_name || c.username), el('span', null, ' ' + c.body)); r.append(socAvatar(c.display_name || c.username, 26), t);
-      const mineC = c.user_id === currentUser.id, canDel = mineC || p.user_id === currentUser.id;
-      const x = el('button', 'spcx', canDel ? '✕' : '⚑'); x.setAttribute('aria-label', canDel ? 'Delete comment' : 'Report comment');
-      x.onclick = async () => { if (canDel) { await sb.from('comments').delete().eq('id', c.id); SOC.comments[p.id] = list.filter(z => z.id !== c.id); p.comment_count = Math.max(0, p.comment_count - 1); socRedraw(p); } else openReport('comment', c.id, 'this comment', () => { SOC.comments[p.id] = list.filter(z => z.id !== c.id); socRedraw(p); }); };
+      const mineC = c.user_id === currentUser.id, ownerP = p.user_id === currentUser.id;
+      const gone = () => { SOC.comments[p.id] = list.filter(z => z.id !== c.id); p.comment_count = Math.max(0, p.comment_count - 1); socRedraw(p); };
+      const delC = async () => { await sb.from('comments').delete().eq('id', c.id); gone(); };
+      const x = el('button', 'spcx', mineC ? '✕' : '⋯'); x.setAttribute('aria-label', mineC ? 'Delete comment' : 'Report or block');
+      x.onclick = () => {
+        if (mineC) { delC(); return; }
+        const acts = [['Report comment', 'danger', () => { closeSheet(); openReport('comment', c.id, 'this comment', gone); }],
+          ['Report profile', 'danger', () => { closeSheet(); openReport('user', c.user_id, '@' + c.username); }],
+          ['Block @' + c.username, 'danger', () => { closeSheet(); socBlockConfirm(c.user_id, c.username); }]];
+        if (ownerP) acts.unshift(['Delete comment', 'danger', () => { closeSheet(); delC(); }]);
+        acts.push(['Close', 'secondary', closeSheet]); openSheet('Comment by @' + c.username, '', () => {}, acts);
+      };
       r.appendChild(x); box.appendChild(r);
     });
     const row = el('div', 'spcin'), inp = mkInput('text', '', 'Add a comment…'); inp.maxLength = 200;
@@ -5143,6 +5152,7 @@
       ['Cancel', 'secondary', closeSheet]
     ] : [
       ['Report post', 'danger', () => { closeSheet(); openReport('post', p.id, 'this post', () => socPostGone(p.id)); }],
+      ['Report profile', 'danger', () => { closeSheet(); openReport('user', p.user_id, '@' + p.username); }],
       ['Block @' + p.username, 'danger', () => { closeSheet(); socBlockConfirm(p.user_id, p.username); }],
       ['Cancel', 'secondary', closeSheet]
     ]);
@@ -5220,7 +5230,8 @@
       const btn = el('button', 'socadd', rel ? (rel.status === 'accepted' ? 'Friends' : rel.direction === 'in' ? 'Accept' : 'Requested') : 'Add friend');
       btn.disabled = !!rel && (rel.status === 'accepted' || rel.direction === 'out');
       btn.onclick = async () => { btn.disabled = true; const { error } = await sb.rpc('send_friend_request', { target: f.user_id }); if (error) { snack(socMsg(error)); btn.disabled = false; return; } try { await socLoadFriends(); } catch (e) { /* ignore */ } SOC.search = null; renderSocial(); snack('Request sent'); };
-      out.appendChild(socFriendRow(f, btn));
+      const w = el('span', 'socbtns'), more = el('button', 'socno', '⋯'); more.setAttribute('aria-label', 'Report or block'); more.onclick = () => openUserMenu(f); w.append(btn, more);
+      out.appendChild(socFriendRow(f, w));
     };
     const search = async () => {
       const v = q.value.trim().toLowerCase().replace(/^@/, ''); if (!/^[a-z0-9_]{3,20}$/.test(v)) { show(null, 'Enter their full username (3 to 20 letters, numbers or _).'); return; }
@@ -5236,7 +5247,8 @@
         const w = el('span', 'socbtns'), ok = el('button', 'socadd', 'Accept'), no = el('button', 'socno', 'Decline');
         ok.onclick = async () => { ok.disabled = true; const { error } = await sb.from('friendships').update({ status: 'accepted' }).eq('id', f.friendship_id); if (error) { snack(socMsg(error)); return; } try { await socLoadFriends(); await socLoadFeed(true); } catch (e) { /* ignore */ } renderSocial(); };
         no.onclick = async () => { await sb.from('friendships').delete().eq('id', f.friendship_id); try { await socLoadFriends(); } catch (e) { /* ignore */ } renderSocial(); };
-        w.append(ok, no); root.appendChild(socFriendRow(f, w));
+        const more = el('button', 'socno', '⋯'); more.setAttribute('aria-label', 'Report or block'); more.onclick = () => openUserMenu(f);
+        w.append(ok, no, more); root.appendChild(socFriendRow(f, w));
       });
     }
     const fr = SOC.friends.filter(f => f.status === 'accepted');
@@ -5314,11 +5326,17 @@
     }
     body.scrollTop = st; socPhotoUrls(socAvatarPaths().concat(pp.posts.map(p => p.photo_path)));
   }
+  function openUserMenu(u) {
+    openSheet('@' + u.username, '', () => {}, [
+      ['Report profile', 'danger', () => { closeSheet(); openReport('user', u.user_id, '@' + u.username); }],
+      ['Block @' + u.username, 'danger', () => { closeSheet(); socBlockConfirm(u.user_id, u.username); }],
+      ['Close', 'secondary', closeSheet]]);
+  }
   function openFriendMenu(f) {
     openSheet('@' + f.username, '', () => {}, [
       ['Remove friend', 'danger', () => { closeSheet(); appConfirm({ icon: '👋', title: 'Remove @' + f.username + '?', msg: 'You’ll stop seeing each other’s posts. You can add each other again later.', ok: 'Remove', cancel: 'Keep', danger: true }, async () => { await sb.from('friendships').delete().eq('id', f.friendship_id); closeProfilePage(); try { await socLoadFriends(); await socLoadFeed(true); } catch (e) { /* ignore */ } renderSocial(); }); }],
       ['Block', 'danger', () => { closeSheet(); socBlockConfirm(f.user_id, f.username); }],
-      ['Report', 'danger', () => { closeSheet(); openReport('user', f.user_id, '@' + f.username); }],
+      ['Report profile', 'danger', () => { closeSheet(); openReport('user', f.user_id, '@' + f.username); }],
       ['Close', 'secondary', closeSheet]]);
   }
   function socAvatarFile(file) {
@@ -5442,10 +5460,10 @@
         const me = b.user_id === currentUser.id, r = el('div', 'socrank' + (me ? ' me' : '')), pos = el('span', 'socpos', i === 0 && b.total > 0 ? '🥇' : i === 1 && b.total > 0 ? '🥈' : i === 2 && b.total > 0 ? '🥉' : String(i + 1));
         const m = el('span', 'socmid'); m.append(el('span', 'socn', (b.display_name || b.username) + (me ? ' (you)' : '')), el('span', 'soch', '@' + b.username));
         const bar = el('span', 'socbar'), f = el('i'); f.style.width = Math.round(b.total / top * 100) + '%'; bar.appendChild(f);
-        const v = el('span', 'socval', gNum(b.total) + ' ' + M[1]); r.append(pos, m, v); body.append(r, bar);
+        const v = el('span', 'socval', gNum(b.total) + ' ' + M[1]); r.append(pos, m, v); if (!me) { r.classList.add('soclink'); r.onclick = () => openUserMenu(b); } body.append(r, bar);
       });
       const inv = board.filter(b => b.status === 'invited'); if (inv.length) body.appendChild(el('div', 'dpnote', 'Invited: ' + inv.map(b => '@' + b.username).join(', ')));
-      body.appendChild(el('div', 'dpnote', 'Everyone in the challenge can see usernames and scores. Scores come from each person’s own logged ' + M[0].toLowerCase() + '.'));
+      body.appendChild(el('div', 'dpnote', 'Everyone in the challenge can see usernames and scores. Scores come from each person’s own logged ' + M[0].toLowerCase() + '. Tap a name to report or block.'));
     }, actions);
   }
   function openInviteMore(c, board) {
@@ -6212,7 +6230,7 @@
   document.addEventListener('visibilitychange', syncWakeLock);
 
   // ----- settings page -----
-  const APP_VERSION = '1.0';
+  const APP_VERSION = '1.0-beta';
   const SET_ICONS = {
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
     shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
@@ -6247,6 +6265,9 @@
     ['Workout settings', [
       ['Workout defaults', 'sliders', '#a78bfa', 'rgba(167,139,250,.22)', () => openWorkoutDefaults()],
       ['Health & Integration', 'heart', 'var(--danger-t)', 'rgba(251,113,133,.2)', () => openHealth()]
+    ]],
+    ['Support', [
+      ['Send feedback or report a bug', 'info', '#fbbf24', 'rgba(251,191,36,.18)', () => openFeedback('bug')]
     ]],
     ['Privacy & info', [
       ['Data & Privacy', 'lock', '#60a5fa', 'rgba(96,165,250,.2)', () => openDataPrivacy()],
@@ -6678,6 +6699,7 @@
         'Steps: day totals you type in or, only if you turn on step sync in the mobile app, read from Apple Health or Health Connect after you give permission. We read steps only. We never write to those apps.',
         'Activity: workouts you complete and their length and calories, your weekly schedule, goals, challenges, personal records and app settings.',
         'Technical details: when the app loads, the hosting and library services can see standard information such as your IP address and browser type.']],
+      ['Feedback and bug reports', 'If you send feedback from the app, we store your message and your account ID. If you leave “Include technical details” on, we also store your app version, device type, screen size and the last few error messages. Nothing is sent unless you tap Send. We keep feedback until you delete your account or ask us to remove it.'],
       ['Social features', 'Social is optional and off until you create a Social profile. If you join, we store your username, display name, bio, profile picture, up to 3 showcase badges, simple stats (workouts, streak, badges), posts (captions, workout summaries with the exercises you did, and photos), reactions, comments, your friend list, challenges you join (every participant can see usernames and scores), and your reports and blocks. Only your accepted friends can see your profile, posts and photos; there is no public feed. Photos are shrunk and stripped of location data before upload and kept in a private storage area. You can delete any post, leave or delete challenges, and remove all Social data at once in Data & Privacy. Reports are kept so we can review and act on them.'],
       ['Health-related information', 'Injuries, limitations, age, height, weight and sex are health-related, so we treat them with extra care. You decide whether to share them. We use them only to build your workouts (for example, leaving out moves that may stress an injured area) and to estimate calories. We don’t use them for advertising and we don’t share them. By entering them you agree that we can store and use them for these purposes. You can remove them at any time in Data & Privacy → Health & body info, and your workouts will keep working without them.'],
       ['Where it is stored', 'On your device (in the browser’s storage) and, if Cloud backup is on, in our cloud database provided by Supabase. Each account can only read and change its own rows. The app is delivered through GitHub Pages and a code library is loaded from the jsDelivr network.'],
@@ -6721,7 +6743,8 @@
         'Workout history: until you delete it or delete your account.',
         'Social posts, photos, comments, reactions, friendships and challenges: until you delete them, leave or delete the challenge, remove your Social data, or delete your account. Deleting a post also deletes its photo, reactions and comments. Blocking removes the friendship.',
         'Reports about content: kept for as long as needed to review them and keep the community safe.',
-        'Data on your device: until you clear your browser data or reset the app.',
+        'Data on your device (including a short list of the last few app error messages): until you clear your browser data or reset the app.',
+        'Feedback you send: until you delete your account or ask us to remove it.',
         'Files you export: they are saved on your device and are yours to keep or delete.']],
       ['When you clear health info', 'Choosing “Clear health & body info” removes those details from this device and from your account the next time the app saves.'],
       ['When you delete your history', 'Choosing “Delete my workout history” removes your logged workouts from this device and from your account.'],
@@ -6867,6 +6890,47 @@
       body.appendChild(kv('Sync', isSynced() ? 'On — saved to your account' : 'Off — saved on this device'));
       if (!isSynced()) body.appendChild(el('div', 'sheet-note', 'To turn sync on, run the home_setup.sql file in Supabase → SQL Editor.'));
     }, closeBtn);
+  }
+
+  // ----- feedback & bug reports -----
+  // Errors are only noted on this device (last 5). Nothing is sent unless the person taps Send.
+  const ERR_KEY = 'fitpulse_errs';
+  const errList = () => { try { const a = JSON.parse(localStorage.getItem(ERR_KEY) || '[]'); return Array.isArray(a) ? a.slice(-5) : []; } catch (e) { return []; } };
+  let errToasted = false;
+  function errNote(msg, src) {
+    msg = String(msg || '').slice(0, 160);
+    if (!msg || /ResizeObserver|^Script error|Failed to fetch|NetworkError|Load failed|AbortError|network/i.test(msg)) return;
+    try { const a = errList(); a.push({ t: new Date().toISOString(), m: msg, s: String(src || '').replace(/^.*[\\/]/, '').slice(0, 40) }); localStorage.setItem(ERR_KEY, JSON.stringify(a.slice(-5))); } catch (e) { /* ignore */ }
+    if (!errToasted && typeof snack === 'function') { errToasted = true; snack('Something went wrong', 'Report it', () => openFeedback('bug')); }
+  }
+  window.addEventListener('error', (e) => errNote(e.message, (e.filename || '') + ':' + (e.lineno || '')));
+  window.addEventListener('unhandledrejection', (e) => errNote(e.reason && e.reason.message ? e.reason.message : e.reason, 'promise'));
+  function feedbackInfo() {
+    const v = document.querySelector('section[data-view]:not(.hidden)');
+    return { v: APP_VERSION, tab: v ? v.dataset.view : '', ua: navigator.userAgent.slice(0, 160), scr: innerWidth + 'x' + innerHeight, pwa: !!(window.matchMedia && matchMedia('(display-mode: standalone)').matches), online: navigator.onLine, theme: document.documentElement.classList.contains('light') ? 'light' : 'dark', errs: errList() };
+  }
+  function openFeedback(kind0) {
+    let kind = ['bug', 'idea', 'other'].includes(kind0) ? kind0 : 'bug', text = '', diag = true;
+    const PH = { bug: 'What happened? What did you expect to happen? What were you doing?', idea: 'What would make Vulcan Health better for you?', other: 'What’s on your mind?' };
+    const mail = () => {
+      const body = text + (diag ? '\n\n---\n' + JSON.stringify(feedbackInfo()).slice(0, 900) : '');
+      location.href = 'mailto:' + LEGAL_CONTACT + '?subject=' + encodeURIComponent('Vulcan Health ' + (kind === 'bug' ? 'bug' : kind === 'idea' ? 'idea' : 'feedback')) + '&body=' + encodeURIComponent(body);
+    };
+    openSheet('Send feedback', 'Found a bug or have an idea? We read every message.', (body) => {
+      body.appendChild(mkChips('mus-wrap', [['bug', '🐞 Bug'], ['idea', '💡 Idea'], ['other', '💬 Other']], k => kind === k, k => { kind = k; refreshSheet(); }));
+      const ta = document.createElement('textarea'); ta.className = 'soccap'; ta.maxLength = 1000; ta.rows = 6; ta.value = text; ta.placeholder = PH[kind]; ta.style.marginTop = '12px';
+      const cnt = el('div', 'dpnote', text.length + '/1000'); ta.oninput = () => { text = ta.value; cnt.textContent = text.length + '/1000'; };
+      body.append(ta, cnt);
+      body.appendChild(mkToggle('Include technical details', 'App version, device type, screen size and recent error messages. No workouts or personal info.', diag, v => { diag = v; }));
+      body.appendChild(el('div', 'dpnote', 'We can’t always reply here. If you want an answer, use “Email instead”.'));
+    }, [['Send', '', async () => {
+      if (!text.trim()) { snack('Write a short message first.'); return; }
+      if (!(typeof sb !== 'undefined' && sb && currentUser)) { mail(); return; }
+      const btn = document.querySelector('#sheetActions button'); if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+      const { error } = await sb.from('feedback').insert({ kind, message: text.trim().slice(0, 1000), app_info: diag ? feedbackInfo() : null });
+      if (error) { if (btn) { btn.disabled = false; btn.textContent = 'Send'; } snack(/42P01|PGRST205|does not exist|schema cache/i.test((error.code || '') + ' ' + (error.message || '')) ? 'Feedback isn’t switched on yet. Tap “Email instead”.' : (error.message || 'Couldn’t send. Try again.')); return; }
+      closeSheet(); snack('Thanks! We read every message.');
+    }], ['Email instead', 'secondary', mail], ['Cancel', 'secondary', closeSheet]]);
   }
 
   // ----- calendar page -----
