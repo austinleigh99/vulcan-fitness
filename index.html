@@ -882,6 +882,47 @@
   .bdgcard .bdgbar { margin:14px 6px 6px; }
   .bdgcard .bdgok { margin:14px 0 0; } .bdgcard .bdgmore { width:100%; margin:8px 0 0; background:none; color:var(--accent2); font-size:14px; font-weight:800; }
   .bdgmany { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin:16px 0 8px; } .bdgmi .bn { font-size:11px; font-weight:800; line-height:1.2; } .bdgmi .bdgi { width:50px; height:50px; margin-bottom:6px; }
+  /* social */
+  .socav { flex:none; width:40px; height:40px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:17px; }
+  .sochead { display:flex; align-items:center; gap:12px; width:100%; margin:0 0 12px; padding:12px 14px; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:20px; color:var(--text); }
+  .socmid { flex:1; min-width:0; display:flex; flex-direction:column; text-align:left; } .socn { font-size:15px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .socn.big { font-size:22px; margin-top:8px; }
+  .soch { font-size:12px; color:var(--muted); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .socsc { display:inline-flex; gap:4px; flex:none; } .bdgi.mini { width:30px; height:30px; margin:0; border-width:2px; } .bdgi.mini { flex:none; } .bdgi.mini svg { width:15px; height:15px; flex:none; }
+  .soctabs { display:flex; gap:6px; background:var(--chip); padding:4px; border-radius:16px; margin-bottom:14px; }
+  .soctabs .soctab { flex:1; margin:0; padding:10px 6px; border-radius:12px; background:none; color:var(--muted); font-size:14px; font-weight:800; position:relative; } .soctabs .soctab.on { background:var(--card); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.25); }
+  .socdot { display:inline-block; margin-left:6px; min-width:18px; padding:1px 5px; border-radius:9px; background:var(--accent); color:var(--on-accent); font-size:11px; font-weight:900; }
+  .soccomp { display:flex; align-items:center; gap:12px; width:100%; margin:0 0 12px; padding:12px 14px; text-align:left; background:var(--card); border:1px dashed var(--line); border-radius:18px; color:var(--muted); font-weight:700; }
+  .socplus { width:34px; height:34px; border-radius:50%; background:var(--accent); color:var(--on-accent); display:inline-flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; }
+  .spost { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:14px; margin-bottom:12px; }
+  .sph { display:flex; align-items:center; gap:10px; } .sphw { flex:1; min-width:0; display:flex; flex-direction:column; }
+  .spost .spmenu { width:36px; height:36px; margin:0; padding:0; background:none; color:var(--muted); font-size:22px; }
+  .socwo { display:flex; align-items:center; gap:12px; margin-top:12px; padding:12px; border-radius:16px; background:var(--inset); }
+  .socwi { flex:none; width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--accent); color:#fff; } .socwi svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .socwm { display:flex; flex-direction:column; min-width:0; } .socwt { font-weight:800; font-size:15px; } .socws { font-size:12px; color:var(--muted); font-weight:700; margin-top:2px; }
+  .spcap { margin-top:10px; font-size:15px; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+  .spimg { display:block; width:100%; max-height:420px; object-fit:cover; border-radius:16px; margin-top:10px; background:var(--inset); min-height:120px; }
+  .spacts { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+  .spost .spre { width:auto; margin:0; padding:7px 12px; border-radius:99px; background:var(--chip); color:var(--text); font-size:14px; font-weight:800; border:1.5px solid transparent; }
+  .spost .spre.on { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 18%, var(--chip)); } .spost .spre.cm { margin-left:auto; color:var(--muted); }
+  .spcm { margin-top:12px; padding-top:10px; border-top:1px solid var(--line); } .spc { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; } .spct { flex:1; font-size:14px; line-height:1.4; word-break:break-word; } .spct b { font-weight:800; }
+  .spc .socav { width:26px; height:26px; font-size:11px; } .spost .spcx { width:30px; height:30px; margin:0; padding:0; background:none; color:var(--muted); font-size:14px; }
+  .spcin { display:flex; gap:8px; align-items:center; } .spcin input { flex:1; margin:0; } .spcin button { width:auto; margin:0; padding:12px 16px; flex:none; }
+  .soccap { width:100%; box-sizing:border-box; border-radius:14px; padding:12px; background:var(--inset); border:1px solid var(--line); color:var(--text); font:inherit; resize:vertical; }
+  .socpick { display:flex; flex-direction:column; gap:6px; } .socpick .socpk { width:100%; margin:0; padding:10px 12px; text-align:left; border-radius:12px; background:var(--chip); color:var(--text); font-size:14px; font-weight:700; border:1.5px solid transparent; } .socpick .socpk.on { border-color:var(--accent); }
+  .socfr { display:flex; align-items:center; gap:8px; margin-bottom:8px; } .socfb { flex:1; min-width:0; display:flex; align-items:center; gap:12px; margin:0; padding:10px 12px; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:16px; color:var(--text); }
+  .socbtns { display:flex; gap:6px; } .socfr .socadd, .socadd { width:auto; margin:0; padding:9px 14px; border-radius:99px; font-size:13px; flex:none; } .socfr .socno, .socno { width:auto; margin:0; padding:9px 14px; border-radius:99px; font-size:13px; background:var(--chip); color:var(--muted); flex:none; }
+  .socres { margin-top:12px; } .socsetup-t { font-size:18px; font-weight:900; margin-bottom:6px; }
+  .sociink { width:100%; margin:14px 0 0; background:none; color:var(--muted); font-size:13px; text-decoration:underline; }
+  .socprof { text-align:center; display:flex; flex-direction:column; align-items:center; margin-bottom:6px; } .socprof .socav { width:72px; height:72px; font-size:30px; }
+  .socsel { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; } .socsel .bdgmi { margin:0; padding:10px 4px; background:var(--card); border:2px solid var(--line); border-radius:16px; color:var(--text); } .socsel .bdgmi.sel { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 14%, var(--card)); }
+  .bdgmi { width:auto; margin:0; padding:0; background:none; color:var(--text); } .bdgmany .bdgmi.bdgmi { background:none; border:none; }
+  .socch { display:flex; align-items:center; gap:12px; width:100%; margin:0 0 8px; padding:12px 14px; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:18px; color:var(--text); } .socch .pgic { flex:none; }
+  .socpill { flex:none; padding:3px 10px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-size:11px; font-weight:900; }
+  .socinv { width:100%; margin:0 0 6px; padding:10px 12px; background:var(--card); border:1.5px solid var(--line); border-radius:14px; color:var(--text); } .socinv.on { border-color:var(--accent); } .socinv .socn { flex:1; text-align:left; } .socck { color:var(--accent2); font-weight:900; }
+  .socrank { display:flex; align-items:center; gap:10px; margin-top:12px; } .socrank.me .socn { color:var(--accent2); } .socpos { flex:none; width:30px; text-align:center; font-weight:900; font-size:18px; } .socval { font-weight:900; font-size:14px; flex:none; }
+  .socbar { display:block; height:6px; border-radius:99px; background:var(--chip); overflow:hidden; margin:6px 0 0 40px; } .socbar i { display:block; height:100%; background:var(--accent); border-radius:99px; }
+  .snack { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(86px + env(safe-area-inset-bottom, 0px)); z-index:3900; display:flex; align-items:center; gap:14px; max-width:92vw; padding:12px 16px; border-radius:99px; background:var(--text); color:var(--bg); font-size:14px; font-weight:700; box-shadow:0 8px 30px rgba(0,0,0,.4); animation:cfmFade .2s ease; }
+  .snack button { width:auto; margin:0; padding:6px 12px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-size:13px; font-weight:800; }
 </style>
 </head>
 <body>
@@ -1342,7 +1383,7 @@
     <!-- SOCIAL -->
     <section id="view-social" data-view="social" class="hidden">
       <h1>Social</h1>
-      <div class="soon"><div class="big">👥</div><h2 style="margin-top:12px">Coming soon</h2><p>Friends and sharing will live here.</p></div>
+      <div id="socBody"></div>
     </section>
 
     <!-- CALENDAR (opened from the Home badge) -->
@@ -1472,6 +1513,7 @@
     if (name === 'workout' && typeof renderLibrary === 'function') renderLibrary();
     if (name === 'progress' && typeof renderProgress === 'function') renderProgress();
     if (name === 'goals' && typeof renderGoals === 'function') renderGoals();
+    if (name === 'social' && typeof socOpen === 'function') socOpen();
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('.nav button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
@@ -1520,7 +1562,7 @@
       loadSets();
       loadAppData();
     } else {
-      onbClose();
+      onbClose(); socReset();
       currentUser = null;
       appData = null;
       $('app').classList.add('hidden');
@@ -3608,7 +3650,13 @@
     P.defSets = Math.min(10, Math.max(1, Math.round(Number(P.defSets)) || 3));
     P.defReps = Math.min(50, Math.max(1, Math.round(Number(P.defReps)) || 10));
     P.demos = P.demos === undefined ? true : !!P.demos;
-    if (!['public', 'friends', 'private'].includes(P.visibility)) P.visibility = 'private';
+    if (P.visibility === 'public') P.visibility = 'friends';
+    if (!['friends', 'private'].includes(P.visibility)) P.visibility = 'private';
+    P.socOn = !!P.socOn;
+    const ss = P.socStats && typeof P.socStats === 'object' ? P.socStats : {}; P.socStats = {};
+    ['friends', 'posts', 'joined'].forEach(k => { const n = Math.round(Number(ss[k])); if (n > 0) P.socStats[k] = Math.min(n, 100000); });
+    const idOk = (x) => typeof x === 'string' && /^[0-9a-f-]{36}$/.test(x);
+    P.socWon = (Array.isArray(P.socWon) ? P.socWon : []).filter(idOk).slice(-200); P.socDone = (Array.isArray(P.socDone) ? P.socDone : []).filter(idOk).slice(-200);
     P.shareActivity = !!P.shareActivity; P.analytics = !!P.analytics;
     P.cloudBackup = P.cloudBackup === undefined ? true : !!P.cloudBackup;
     // progress data: steps typed in by hand, logged lifts, personal records
@@ -3762,7 +3810,7 @@
       title: info.title || (WTYPES[info.type] || {}).label || 'Workout', minutes: Math.max(1, Math.round(info.mins || 0)),
       calories: calcCal(info), lifts: info.lifts || 0
     };
-    logs.unshift(entry); lsSet('logs', logs); renderHomeUI();
+    logs.unshift(entry); lsSet('logs', logs); renderHomeUI(); socAfterLog(entry);
     if (cloud.logs) {
       try {
         const { data, error } = await sb.from('workout_logs').insert(logRow(entry)).select().single();
@@ -3775,7 +3823,7 @@
   }
   async function removeLog(entry) {
     entry.removed = true;
-    logs = logs.filter(l => l !== entry); lsSet('logs', logs); renderHomeUI();
+    logs = logs.filter(l => l !== entry); lsSet('logs', logs); renderHomeUI(); socAfterUnlog(entry);
     if (cloud.logs && !String(entry.id).startsWith('local-')) {
       try { await sb.from('workout_logs').delete().eq('id', entry.id); } catch (e) { /* ignore */ }
     }
@@ -4544,7 +4592,7 @@
     moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'
   });
   const BADGE_TIER = ['', 'Bronze', 'Silver', 'Gold', 'Legendary'];
-  const BADGE_CATS = [['workouts', 'Workouts'], ['streaks', 'Streaks'], ['calories', 'Calories'], ['time', 'Time'], ['steps', 'Steps'], ['variety', 'Variety'], ['consistency', 'Consistency'], ['strength', 'Strength & records'], ['goals', 'Goals & setup']];
+  const BADGE_CATS = [['workouts', 'Workouts'], ['streaks', 'Streaks'], ['calories', 'Calories'], ['time', 'Time'], ['steps', 'Steps'], ['variety', 'Variety'], ['consistency', 'Consistency'], ['strength', 'Strength & records'], ['social', 'Social'], ['goals', 'Goals & setup']];
   const BADGES = [];
   (function () {
     const add = (cat, stat, rows) => rows.forEach(([id, name, desc, icon, tier, need]) => BADGES.push({ cat, id, name, desc, icon, tier, stat, need }));
@@ -4597,6 +4645,10 @@
     add('strength', 'prs', [['pr1', 'New Record', 'Save a personal record', 'medal', 1, 1], ['pr5', 'Record Breaker', 'Save 5 personal records', 'medal', 2, 5], ['pr15', 'Hall of Fame', 'Save 15 personal records', 'medal', 3, 15]]);
     add('goals', 'goalsSet', [['g1', 'Aim High', 'Set your first goal', 'target', 1, 1]]);
     add('goals', 'goalsDone', [['gd1', 'Goal Getter', 'Reach a goal', 'target', 1, 1], ['gd5', 'Goal Crusher', 'Reach 5 goals', 'target', 2, 5], ['gd15', 'Unstoppable', 'Reach 15 goals', 'target', 3, 15]]);
+    add('social', 'friends', [['fr1', 'Squad Up', 'Make your first friend', 'heart', 1, 1], ['fr5', 'Crew', 'Have 5 friends', 'heart', 2, 5]]);
+    add('social', 'posts', [['po1', 'Show Off', 'Share your first post', 'star', 1, 1], ['po10', 'Feed Regular', 'Share 10 posts', 'star', 2, 10]]);
+    add('social', 'joined', [['ch1', 'Challenger', 'Join a challenge', 'flag', 1, 1]]);
+    add('social', 'won', [['chw1', 'Champion', 'Win a challenge', 'trophy', 3, 1], ['chw5', 'Dynasty', 'Win 5 challenges', 'crown', 4, 5]]);
     add('goals', 'setup', [['su', 'Ready to Roll', 'Finish all the sign-up questions', 'rocket', 1, 1]]);
   })();
   const BADGE_BY_ID = Object.fromEntries(BADGES.map(b => [b.id, b]));
@@ -4619,6 +4671,7 @@
     S.weekend = Object.values(weeks).some(s => s.has(6) && s.has(0)) ? 1 : 0;
     S.comeback = days.some((d, i) => i && (new Date(d + 'T12:00:00') - new Date(days[i - 1] + 'T12:00:00')) / 86400000 >= 8) ? 1 : 0;
     S.liftLogs = P.lifts.length; S.prs = P.records.length; S.goalsSet = P.goals.length; S.goalsDone = P.goals.filter(g => g.doneOn).length;
+    S.friends = (P.socStats && P.socStats.friends) || 0; S.posts = (P.socStats && P.socStats.posts) || 0; S.joined = (P.socStats && P.socStats.joined) || 0; S.won = (P.socWon || []).length;
     S.setup = P.onb && P.onb.done && !Object.keys(P.onb.skip || {}).length ? 1 : 0;
     return S;
   }
@@ -4660,16 +4713,16 @@
     return { card, close };
   }
   function showBadge(b, mode) {
-    const got = mode === 'new' || !!(appData.prefs.badges[b.id]);
+    const got = mode === 'new' || mode === 'friend' || !!(appData.prefs.badges[b.id]);
     const { card, close } = badgeShell();
-    card.appendChild(el('div', 'bdgk', mode === 'new' ? 'Badge unlocked' : got ? 'Earned' : 'Locked'));
+    card.appendChild(el('div', 'bdgk', mode === 'new' ? 'Badge unlocked' : mode === 'friend' ? 'Showcase badge' : got ? 'Earned' : 'Locked'));
     card.appendChild(badgeIcon(b, got, true));
     card.appendChild(el('div', 'bdgn', b.name)); card.appendChild(el('div', 'bdgtier t' + b.tier, BADGE_TIER[b.tier]));
     card.appendChild(el('div', 'bdgd', b.desc));
     if (!got) {
       const cur = Math.min(badgeStats()[b.stat] || 0, b.need), bar = el('div', 'bdgbar'), fill = el('i'); fill.style.width = Math.round(cur / b.need * 100) + '%'; bar.appendChild(fill);
       card.appendChild(bar); card.appendChild(el('div', 'bdgp', gNum(cur) + ' / ' + gNum(b.need)));
-    } else if (mode !== 'new') card.appendChild(el('div', 'bdgp', 'Earned ' + pgDate(appData.prefs.badges[b.id], { month: 'short', day: 'numeric', year: 'numeric' })));
+    } else if (mode === 'view') card.appendChild(el('div', 'bdgp', 'Earned ' + pgDate(appData.prefs.badges[b.id], { month: 'short', day: 'numeric', year: 'numeric' })));
     const ok = el('button', 'bdgok', mode === 'new' ? 'Nice!' : 'Close'); ok.onclick = close; card.appendChild(ok);
     if (mode === 'new') { const all = el('button', 'bdgmore', 'View all badges'); all.onclick = () => { close(); openBadges(); }; card.appendChild(all); }
   }
@@ -4780,6 +4833,532 @@
     }
 
     badgeTeaser(root);
+  }
+
+  // ----- Social: profile, friends, feed, challenges -----
+  // Everything lives in Supabase (see social_setup.sql). Posts are visible only to accepted friends.
+  const SOC = { me: null, loaded: false, loading: false, err: '', tab: 'feed', friends: [], blocks: [], feed: [], feedEnd: false, feedBusy: false, challenges: [], members: {}, urls: {}, comments: {}, openC: new Set(), search: null };
+  const SOC_EMOJI = ['🔥', '💪', '👏', '❤️'];
+  const SOC_METRIC = { steps: ['Steps', 'steps', 'steps'], workouts: ['Workouts', 'workouts', 'bolt'], minutes: ['Active minutes', 'min', 'time'], calories: ['Calories', 'kcal', 'calories'] };
+  const socOK = () => !!(typeof sb !== 'undefined' && sb && currentUser && appData);
+  const socMissing = (e) => !!e && (['42P01', 'PGRST205', 'PGRST202'].includes(e.code) || /does not exist|schema cache|Could not find the (table|function)/i.test(e.message || ''));
+  const socMsg = (e) => e && e.code === '23505' ? 'That username is taken. Try another.' : (e && e.message) ? String(e.message).replace(/^.*?: /, m => m.length > 40 ? '' : m) : 'Something went wrong. Try again.';
+  const socAgo = (iso) => {
+    const s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+    if (s < 60) return 'now'; if (s < 3600) return Math.floor(s / 60) + 'm'; if (s < 86400) return Math.floor(s / 3600) + 'h';
+    if (s < 7 * 86400) return Math.floor(s / 86400) + 'd'; return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
+  function socAvatar(name, size) {
+    const n = String(name || '?'); let h = 0; for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % 360;
+    const a = el('span', 'socav', n.charAt(0).toUpperCase()); a.style.background = 'hsl(' + h + ' 55% 42%)'; if (size) { a.style.width = a.style.height = size + 'px'; a.style.fontSize = Math.round(size * .42) + 'px'; }
+    return a;
+  }
+  function socShowcase(ids, size) {
+    const w = el('span', 'socsc');
+    (Array.isArray(ids) ? ids : []).slice(0, 3).forEach(id => { const b = BADGE_BY_ID[id]; if (b) { const i = badgeIcon(b, true); i.classList.add('mini'); if (size) i.style.width = i.style.height = size + 'px'; i.title = b.name; w.appendChild(i); } });
+    return w;
+  }
+  const socEarned = () => gBadges().filter(b => b.got).sort((a, b) => b.tier - a.tier || (a.date < b.date ? 1 : -1));
+  const socStatsPayload = () => ({ w: logs.length, s: logStreak(), b: Object.keys(appData.prefs.badges).length });
+  function socCounts() {
+    const S = appData.prefs.socStats = appData.prefs.socStats || {};
+    return S;
+  }
+  function socBump(key, val) { const S = socCounts(); if ((S[key] || 0) < val) { S[key] = Math.min(val, 100000); saveAppData(); } }
+
+  // ---- loading ----
+  async function socLoadFriends() {
+    const { data, error } = await sb.rpc('my_friend_list'); if (error) throw error;
+    SOC.friends = data || [];
+    socBump('friends', SOC.friends.filter(f => f.status === 'accepted').length);
+  }
+  async function socLoadBlocks() { const { data } = await sb.rpc('my_blocks'); SOC.blocks = data || []; }
+  async function socLoadFeed(reset) {
+    if (SOC.feedBusy) return; SOC.feedBusy = true;
+    try {
+      const before = reset || !SOC.feed.length ? null : SOC.feed[SOC.feed.length - 1].created_at;
+      const { data, error } = await sb.rpc('feed_page', { p_limit: 15, p_before: before }); if (error) throw error;
+      const rows = (data || []).map(r => ({ ...r, comment_count: Number(r.comment_count) || 0, react: r.react || {} }));
+      SOC.feed = reset ? rows : SOC.feed.concat(rows); SOC.feedEnd = rows.length < 15;
+      socBump('posts', SOC.feed.filter(p => p.user_id === currentUser.id).length);
+    } finally { SOC.feedBusy = false; }
+  }
+  async function socLoadChallenges() {
+    const { data, error } = await sb.from('challenges').select('*').order('start_date', { ascending: false }).limit(60); if (error) throw error;
+    SOC.challenges = data || []; SOC.members = {};
+    if (SOC.challenges.length) {
+      const { data: m, error: e2 } = await sb.from('challenge_members').select('challenge_id,user_id,status').in('challenge_id', SOC.challenges.map(c => c.id)); if (e2) throw e2;
+      (m || []).forEach(x => (SOC.members[x.challenge_id] = SOC.members[x.challenge_id] || []).push(x));
+    }
+    socBump('joined', SOC.challenges.filter(c => (SOC.members[c.id] || []).some(m => m.user_id === currentUser.id && m.status === 'joined')).length);
+  }
+  async function socInit() {
+    if (!socOK() || SOC.loading) return;
+    SOC.loading = true; SOC.err = ''; renderSocial();
+    try {
+      const { data, error } = await sb.from('profiles').select('*').eq('user_id', currentUser.id).maybeSingle(); if (error) throw error;
+      SOC.me = data || null; SOC.loaded = true;
+      const on = !!SOC.me; if (appData.prefs.socOn !== on) { appData.prefs.socOn = on; saveAppData(); }
+      if (SOC.me) { await Promise.all([socLoadFriends(), socLoadFeed(true), socLoadChallenges()]); socPushStatsSoon(); socSyncSoon(); socCheckWins(); }
+    } catch (e) { SOC.err = socMissing(e) ? 'missing' : socMsg(e); }
+    SOC.loading = false; renderSocial();
+  }
+  function socOpen() { if (!SOC.loaded && !SOC.loading) socInit(); else { renderSocial(); if (SOC.me) { socLoadFriends().then(renderSocial).catch(() => {}); socLoadFeed(true).then(renderSocial).catch(() => {}); socLoadChallenges().then(() => { renderSocial(); socSyncSoon(); socCheckWins(); }).catch(() => {}); } } }
+  const socReset = () => { Object.assign(SOC, { me: null, loaded: false, loading: false, err: '', friends: [], blocks: [], feed: [], feedEnd: false, challenges: [], members: {}, urls: {}, comments: {}, search: null }); SOC.openC = new Set(); };
+
+  // ---- profile maintenance ----
+  let socStatsTimer = null;
+  function socPushStatsSoon() {
+    clearTimeout(socStatsTimer);
+    socStatsTimer = setTimeout(async () => {
+      if (!socOK() || !SOC.me) return;
+      const upd = { stats: socStatsPayload(), display_name: displayName().slice(0, 40), updated_at: new Date().toISOString() };
+      const { error } = await sb.from('profiles').update(upd).eq('user_id', currentUser.id); if (!error) Object.assign(SOC.me, upd);
+    }, 1500);
+  }
+  let socSyncTimer = null;
+  function socSyncSoon() { clearTimeout(socSyncTimer); socSyncTimer = setTimeout(() => { socSyncScores().catch(() => {}); }, 1500); }
+  function snack(msg, label, fn) {
+    document.querySelectorAll('.snack').forEach(s => s.remove());
+    const s = el('div', 'snack'); s.appendChild(el('span', null, msg));
+    if (label) { const b = el('button', null, label); b.onclick = () => { s.remove(); if (fn) fn(); }; s.appendChild(b); }
+    document.body.appendChild(s); setTimeout(() => s.remove(), 6500);
+  }
+
+  // ---- hooks from the rest of the app ----
+  const socWorkoutJson = (e) => ({ t: String(e.wtype || e.type || 'strength'), n: String(e.title || 'Workout').slice(0, 60), m: Math.round(e.minutes || e.mins || 0), c: Math.round(e.calories || 0), l: Math.round(e.lifts || 0), d: e.performed_on || todayLocal() });
+  async function socAutoPost(entry) {
+    try {
+      if (!SOC.me) { const { data } = await sb.from('profiles').select('user_id').eq('user_id', currentUser.id).maybeSingle(); if (!data) return; }
+      const { data, error } = await sb.from('posts').insert({ caption: '', workout: socWorkoutJson(entry) }).select('id').single();
+      if (!error && data) { entry._postId = data.id; socBump('posts', (socCounts().posts || 0) + 1); if (SOC.loaded) socLoadFeed(true).then(() => { if (!$('view-social').classList.contains('hidden')) renderSocial(); }).catch(() => {}); }
+    } catch (e) { /* offline: skip */ }
+  }
+  function socAfterLog(entry) {
+    const P = appData.prefs; if (!P.socOn || !socOK()) return;
+    if (P.shareActivity) socAutoPost(entry); else snack('Workout logged', 'Share it', () => { showTab('social'); setTimeout(() => openCompose(entry), 50); });
+    socSyncSoon(); socPushStatsSoon();
+  }
+  function socAfterUnlog(entry) {
+    if (!appData.prefs.socOn || !socOK()) return;
+    if (entry._postId) { sb.from('posts').delete().eq('id', entry._postId).then(() => { SOC.feed = SOC.feed.filter(p => p.id !== entry._postId); }); }
+    socSyncSoon(); socPushStatsSoon();
+  }
+
+  // ---- photos ----
+  async function socPhotoUrls(paths) {
+    const need = [...new Set(paths.filter(p => p && !SOC.urls[p]))]; if (!need.length) return;
+    try { const { data } = await sb.storage.from('post-photos').createSignedUrls(need, 3600); (data || []).forEach(x => { if (x && x.signedUrl) SOC.urls[x.path] = x.signedUrl; }); } catch (e) { /* ignore */ }
+    document.querySelectorAll('img[data-sp]').forEach(i => { const u = SOC.urls[i.dataset.sp]; if (u && !i.src) i.src = u; });
+  }
+  function socCompress(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file), im = new Image();
+      im.onload = () => {
+        const M = 1080, k = Math.min(1, M / Math.max(im.width, im.height)), c = document.createElement('canvas');
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+        c.toBlob(b => b ? resolve(b) : reject(new Error('Couldn’t read that photo.')), 'image/jpeg', 0.8);   // re-encoding also removes location data from the photo
+      };
+      im.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Couldn’t read that photo.')); };
+      im.src = url;
+    });
+  }
+  async function socRemovePhotos(paths) { try { if (paths.length) await sb.storage.from('post-photos').remove(paths); } catch (e) { /* ignore */ } }
+  async function socRemoveAllMyPhotos() {
+    try { const st = sb.storage.from('post-photos'), { data } = await st.list(currentUser.id, { limit: 1000 }); await socRemovePhotos((data || []).map(f => currentUser.id + '/' + f.name)); } catch (e) { /* ignore */ }
+  }
+
+  // ---- main screen ----
+  function socCard(parent, icon, title, text, btn, fn) {
+    const c = el('div', 'wdcard gempty'); c.append(el('div', 'gebig', icon), el('div', 'get', title), el('div', 'ges', text));
+    if (btn) { const b = el('button', 'secondary', btn); b.onclick = fn; c.appendChild(b); }
+    parent.appendChild(c); return c;
+  }
+  function renderSocial() {
+    const root = $('socBody'); if (!root) return; const top = window.scrollY; root.replaceChildren();
+    if (!socOK()) { socCard(root, '🔒', 'Sign in to use Social', 'Friends, the feed and challenges need your account.'); return; }
+    if (appData.prefs.cloudBackup === false) { socCard(root, '☁️', 'Cloud backup is off', 'Social needs your account online. Turn Cloud backup on in Data & Privacy to use it.'); return; }
+    if (SOC.loading && !SOC.loaded) { root.appendChild(el('div', 'dpnote', 'Loading…')); return; }
+    if (SOC.err === 'missing') { socCard(root, '🛠️', 'Social isn’t switched on yet', 'The Social tables haven’t been created in Supabase. (App owner: run social_setup.sql in the Supabase SQL Editor, then reopen this tab.)', 'Try again', () => { SOC.loaded = false; socInit(); }); return; }
+    if (SOC.err) { socCard(root, '📡', 'Couldn’t load Social', SOC.err, 'Try again', () => { SOC.loaded = false; socInit(); }); return; }
+    if (!SOC.me) { socSetup(root); return; }
+    const me = SOC.me, inReq = SOC.friends.filter(f => f.status === 'pending' && f.direction === 'in').length;
+    const inv = SOC.challenges.filter(c => (SOC.members[c.id] || []).some(m => m.user_id === currentUser.id && m.status === 'invited')).length;
+    const head = el('button', 'sochead'); head.append(socAvatar(displayName(), 46));
+    const mid = el('span', 'socmid'); mid.append(el('span', 'socn', displayName()), el('span', 'soch', '@' + me.username)); head.append(mid, socShowcase(me.showcase, 30));
+    head.onclick = openSocProfile; root.appendChild(head);
+    const tabs = el('div', 'soctabs');
+    [['feed', 'Feed', 0], ['friends', 'Friends', inReq], ['challenges', 'Challenges', inv]].forEach(([k, l, n]) => {
+      const b = el('button', 'soctab' + (SOC.tab === k ? ' on' : ''), l); if (n) b.appendChild(el('span', 'socdot', String(n))); b.onclick = () => { SOC.tab = k; renderSocial(); if (k === 'challenges') { socSyncSoon(); } }; tabs.appendChild(b);
+    });
+    root.appendChild(tabs);
+    if (SOC.tab === 'feed') socFeedView(root); else if (SOC.tab === 'friends') socFriendsView(root); else socChallengesView(root);
+    window.scrollTo(0, top);
+  }
+  function socSetup(root) {
+    const c = el('div', 'wdcard'); c.append(el('div', 'socsetup-t', 'Join the community'), el('div', 'dpnote', 'Pick a username so friends can find you. Only your friends can see your profile, posts and photos.'));
+    const name = (appData.name || defaultName() || '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+    const u = mkInput('text', name.length >= 3 ? name : '', 'username (3-20 letters, numbers, _)'); u.maxLength = 20; u.autocapitalize = 'none'; u.autocomplete = 'off'; u.spellcheck = false;
+    c.append(el('label', null, 'Username'), u);
+    let vis = appData.prefs.visibility === 'private' ? 'friends' : appData.prefs.visibility;
+    const seg = () => { const w = el('div'); w.appendChild(mkSeg([['friends', 'Friends can find me'], ['private', 'Hidden']], k => vis === k, k => { vis = k; draw(); })); w.appendChild(el('div', 'dpdesc', VIS_TEXT[vis])); return w; };
+    const holder = el('div'); const draw = () => { holder.replaceChildren(seg()); }; draw();
+    c.append(el('label', null, 'Who can find you'), holder);
+    const msg = el('div', 'okmsg'); msg.style.color = 'var(--danger-t)';
+    const go = el('button', null, 'Create my profile');
+    go.onclick = async () => {
+      const v = u.value.trim().toLowerCase(); msg.textContent = '';
+      if (!/^[a-z0-9_]{3,20}$/.test(v)) { msg.textContent = 'Use 3 to 20 letters, numbers or underscores.'; return; }
+      go.disabled = true; go.textContent = 'Creating…';
+      const row = { user_id: currentUser.id, username: v, display_name: displayName().slice(0, 40), visibility: vis, showcase: socEarned().slice(0, 3).map(b => b.id), stats: socStatsPayload() };
+      const { data, error } = await sb.from('profiles').insert(row).select().single();
+      go.disabled = false; go.textContent = 'Create my profile';
+      if (error) { msg.textContent = socMsg(error); return; }
+      SOC.me = data; appData.prefs.visibility = vis; appData.prefs.socOn = true; saveAppData();
+      try { await Promise.all([socLoadFriends(), socLoadFeed(true), socLoadChallenges()]); } catch (e) { /* ignore */ }
+      renderSocial();
+    };
+    c.append(msg, go, el('div', 'dpnote', 'By joining you agree to the Community rules in the Terms of Service.'));
+    root.appendChild(c);
+  }
+
+  // ---- feed ----
+  function socWorkoutNode(w) {
+    if (!w || typeof w !== 'object') return null;
+    const T = WTYPES[w.t] || WTYPES.strength, b = el('div', 'socwo'), ic = el('span', 'socwi'); ic.innerHTML = iconSvg(T.icon || 'dumb'); if (T.color) ic.style.background = T.color;
+    const m = el('span', 'socwm'), parts = [];
+    if (Number(w.m) > 0) parts.push(Math.round(w.m) + ' min'); if (Number(w.c) > 0) parts.push(Math.round(w.c) + ' kcal'); if (Number(w.l) > 0) parts.push(Math.round(w.l) + ' lifts');
+    m.append(el('span', 'socwt', String(w.n || T.label).slice(0, 60)), el('span', 'socws', parts.join(' · ') || T.label)); b.append(ic, m); return b;
+  }
+  function socFeedView(root) {
+    const comp = el('button', 'soccomp'); comp.append(socAvatar(displayName(), 34), el('span', null, 'Share a workout or photo…')); comp.onclick = () => openCompose(); root.appendChild(comp);
+    if (!SOC.feed.length) { socCard(root, '🏋️', SOC.friends.some(f => f.status === 'accepted') ? 'Nothing here yet' : 'Your feed is empty', SOC.friends.some(f => f.status === 'accepted') ? 'Share a workout, or check back when friends post.' : 'Add friends to see their workouts. Posts are only visible to friends.', SOC.friends.some(f => f.status === 'accepted') ? '' : 'Find friends', () => { SOC.tab = 'friends'; renderSocial(); }); return; }
+    SOC.feed.forEach(p => root.appendChild(socPostNode(p)));
+    if (!SOC.feedEnd) { const more = el('button', 'secondary', 'Load more'); more.onclick = async () => { more.disabled = true; try { await socLoadFeed(false); } catch (e) { /* ignore */ } renderSocial(); }; root.appendChild(more); }
+    socPhotoUrls(SOC.feed.map(p => p.photo_path));
+  }
+  function socPostNode(p) {
+    const card = el('div', 'spost'); card.dataset.id = p.id;
+    const h = el('div', 'sph'); const who = el('span', 'sphw'); who.append(el('span', 'socn', p.display_name || p.username), el('span', 'soch', '@' + p.username + ' · ' + socAgo(p.created_at)));
+    const menu = el('button', 'spmenu', '⋯'); menu.setAttribute('aria-label', 'More'); menu.onclick = () => openPostMenu(p);
+    h.append(socAvatar(p.display_name || p.username, 38), who, menu); card.appendChild(h);
+    const wo = socWorkoutNode(p.workout); if (wo) card.appendChild(wo);
+    if (p.caption) card.appendChild(el('div', 'spcap', p.caption));
+    if (p.photo_path) { const im = document.createElement('img'); im.className = 'spimg'; im.alt = 'Photo shared by ' + p.username; im.dataset.sp = p.photo_path; if (SOC.urls[p.photo_path]) im.src = SOC.urls[p.photo_path]; card.appendChild(im); }
+    const acts = el('div', 'spacts');
+    SOC_EMOJI.forEach(e => {
+      const n = Number(p.react[e]) || 0, b = el('button', 'spre' + (p.mine === e ? ' on' : ''), e + (n ? ' ' + n : '')); b.setAttribute('aria-pressed', String(p.mine === e));
+      b.onclick = () => socReact(p, e); acts.appendChild(b);
+    });
+    const cb = el('button', 'spre cm', '💬' + (p.comment_count ? ' ' + p.comment_count : '')); cb.onclick = () => socToggleComments(p); acts.appendChild(cb);
+    card.appendChild(acts);
+    if (SOC.openC.has(p.id)) card.appendChild(socCommentsNode(p));
+    return card;
+  }
+  const socRedraw = (p) => { const old = document.querySelector('.spost[data-id="' + p.id + '"]'); if (!old) return; old.replaceWith(socPostNode(p)); socPhotoUrls([p.photo_path]); };
+  async function socReact(p, e) {
+    const prev = { mine: p.mine, react: { ...p.react } };
+    const dec = (k) => { if (k && p.react[k]) { p.react[k]--; if (p.react[k] <= 0) delete p.react[k]; } };
+    if (p.mine === e) { dec(e); p.mine = null; } else { dec(p.mine); p.react[e] = (p.react[e] || 0) + 1; p.mine = e; }
+    socRedraw(p);
+    const q = p.mine ? sb.from('reactions').upsert({ post_id: p.id, user_id: currentUser.id, emoji: e }, { onConflict: 'post_id,user_id' }) : sb.from('reactions').delete().eq('post_id', p.id).eq('user_id', currentUser.id);
+    const { error } = await q; if (error) { p.mine = prev.mine; p.react = prev.react; renderSocial(); snack('Couldn’t save your reaction'); }
+  }
+  async function socToggleComments(p) {
+    if (SOC.openC.has(p.id)) { SOC.openC.delete(p.id); socRedraw(p); return; }
+    SOC.openC.add(p.id); delete SOC.comments[p.id]; socRedraw(p);
+    const { data } = await sb.rpc('post_comments', { pid: p.id }); SOC.comments[p.id] = data || []; p.comment_count = SOC.comments[p.id].length; socRedraw(p);
+  }
+  function socCommentsNode(p) {
+    const box = el('div', 'spcm'); const list = SOC.comments[p.id];
+    if (!list) box.appendChild(el('div', 'dpnote', 'Loading…'));
+    else list.forEach(c => {
+      const r = el('div', 'spc'), t = el('span', 'spct'); t.append(el('b', null, c.display_name || c.username), el('span', null, ' ' + c.body)); r.append(socAvatar(c.display_name || c.username, 26), t);
+      const mineC = c.user_id === currentUser.id, canDel = mineC || p.user_id === currentUser.id;
+      const x = el('button', 'spcx', canDel ? '✕' : '⚑'); x.setAttribute('aria-label', canDel ? 'Delete comment' : 'Report comment');
+      x.onclick = async () => { if (canDel) { await sb.from('comments').delete().eq('id', c.id); SOC.comments[p.id] = list.filter(z => z.id !== c.id); p.comment_count = Math.max(0, p.comment_count - 1); socRedraw(p); } else openReport('comment', c.id, 'this comment', () => { SOC.comments[p.id] = list.filter(z => z.id !== c.id); socRedraw(p); }); };
+      r.appendChild(x); box.appendChild(r);
+    });
+    const row = el('div', 'spcin'), inp = mkInput('text', '', 'Add a comment…'); inp.maxLength = 200;
+    const send = el('button', null, 'Post');
+    const go = async () => {
+      const body = inp.value.trim(); if (!body) return; send.disabled = true;
+      const { error } = await sb.from('comments').insert({ post_id: p.id, body }); send.disabled = false;
+      if (error) { snack(socMsg(error)); return; }
+      const { data } = await sb.rpc('post_comments', { pid: p.id }); SOC.comments[p.id] = data || []; p.comment_count = SOC.comments[p.id].length; socRedraw(p);
+    };
+    send.onclick = go; inp.onkeydown = (e) => { if (e.key === 'Enter') go(); }; row.append(inp, send); box.appendChild(row); return box;
+  }
+  function openPostMenu(p) {
+    const mine = p.user_id === currentUser.id;
+    openSheet(mine ? 'Your post' : '@' + p.username, '', () => {}, mine ? [
+      ['Delete post', 'danger', () => { closeSheet(); appConfirm({ icon: '🗑️', title: 'Delete this post?', msg: 'It will disappear for everyone, along with its photo, reactions and comments.', ok: 'Delete', cancel: 'Keep', danger: true }, async () => {
+        const { error } = await sb.from('posts').delete().eq('id', p.id); if (error) { snack(socMsg(error)); return; }
+        if (p.photo_path) socRemovePhotos([p.photo_path]); SOC.feed = SOC.feed.filter(x => x.id !== p.id); renderSocial(); }); }],
+      ['Cancel', 'secondary', closeSheet]
+    ] : [
+      ['Report post', 'danger', () => { closeSheet(); openReport('post', p.id, 'this post', () => { SOC.feed = SOC.feed.filter(x => x.id !== p.id); renderSocial(); }); }],
+      ['Block @' + p.username, 'danger', () => { closeSheet(); socBlockConfirm(p.user_id, p.username); }],
+      ['Cancel', 'secondary', closeSheet]
+    ]);
+  }
+  const REPORT_REASONS = ['Inappropriate or explicit', 'Harassment or bullying', 'Spam or scam', 'Dangerous or harmful advice', 'Something else'];
+  function openReport(kind, target, label, after) {
+    let reason = REPORT_REASONS[0], note = '';
+    openSheet('Report ' + label, 'Reports are private. We review them and remove content that breaks the community rules.', (body) => {
+      body.appendChild(mkChips('mus-wrap', REPORT_REASONS.map(r => [r, r]), k => reason === k, k => { reason = k; refreshSheet(); }));
+      const n = mkInput('text', note, 'Add details (optional)'); n.maxLength = 200; n.style.marginTop = '12px'; n.oninput = () => { note = n.value; }; body.appendChild(n);
+    }, [['Send report', 'danger', async () => {
+      const { error } = await sb.from('reports').insert({ kind, target: String(target).slice(0, 64), reason: (reason + (note.trim() ? ': ' + note.trim() : '')).slice(0, 300) });
+      closeSheet(); if (error) { snack(socMsg(error)); return; } if (after) after(); snack('Thanks. We’ll review it.');
+    }], ['Cancel', 'secondary', closeSheet]]);
+  }
+  function socBlockConfirm(uid, uname, after) {
+    appConfirm({ icon: '🚫', title: 'Block @' + uname + '?', msg: 'You’ll stop seeing each other’s posts and comments, and you’ll be removed as friends. You can unblock them any time in Friends.', ok: 'Block', cancel: 'Cancel', danger: true }, async () => {
+      const { error } = await sb.rpc('block_user', { target: uid }); if (error) { snack(socMsg(error)); return; }
+      try { await Promise.all([socLoadFriends(), socLoadFeed(true), socLoadChallenges(), socLoadBlocks()]); } catch (e) { /* ignore */ }
+      if (after) after(); renderSocial(); snack('Blocked @' + uname);
+    });
+  }
+
+  // ---- compose ----
+  function openCompose(pre) {
+    if (!SOC.me) return;
+    const recent = logs.slice(0, 8); let pick = pre || null, caption = '', file = null, preview = '';
+    if (pick && !recent.includes(pick)) recent.unshift(pick);
+    const draw = (body) => {
+      body.appendChild(el('label', null, 'Workout (optional)'));
+      const wrap = el('div', 'socpick');
+      const none = el('button', 'socpk' + (!pick ? ' on' : ''), 'No workout'); none.onclick = () => { pick = null; refreshSheet(); }; wrap.appendChild(none);
+      recent.forEach(l => { const b = el('button', 'socpk' + (pick === l ? ' on' : ''), pgDate(l.performed_on) + ' · ' + (l.title || 'Workout') + ' · ' + l.minutes + 'm'); b.onclick = () => { pick = l; refreshSheet(); }; wrap.appendChild(b); });
+      body.appendChild(wrap);
+      body.appendChild(el('label', null, 'Caption (optional)'));
+      const ta = document.createElement('textarea'); ta.className = 'soccap'; ta.maxLength = 280; ta.rows = 3; ta.value = caption; ta.placeholder = 'Say something…'; ta.oninput = () => { caption = ta.value; }; body.appendChild(ta);
+      body.appendChild(el('label', null, 'Photo (optional)'));
+      if (preview) { const im = document.createElement('img'); im.className = 'spimg'; im.src = preview; im.alt = 'Selected photo'; body.appendChild(im); }
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+      inp.onchange = async () => { const f = inp.files && inp.files[0]; if (!f) return; try { file = await socCompress(f); preview = URL.createObjectURL(file); } catch (e) { snack(e.message); } refreshSheet(); };
+      const add = el('button', 'secondary', preview ? 'Change photo' : '+ Add photo'); add.onclick = () => inp.click(); body.append(inp, add);
+      if (preview) { const rm = el('button', 'secondary', 'Remove photo'); rm.onclick = () => { file = null; preview = ''; refreshSheet(); }; body.appendChild(rm); }
+      body.appendChild(el('div', 'dpnote', 'Only your friends can see this. Photos are shrunk and stripped of location data.'));
+    };
+    openSheet('New post', 'Share with your friends', draw, [['Post', '', async function () {
+      if (!pick && !file && !caption.trim()) { snack('Add a workout, photo or caption first.'); return; }
+      const btn = document.querySelector('#sheetActions button'); if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }
+      let path = null;
+      try {
+        if (file) { path = currentUser.id + '/' + (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2)) + '.jpg'; const { error } = await sb.storage.from('post-photos').upload(path, file, { contentType: 'image/jpeg' }); if (error) throw error; }
+        const { error } = await sb.from('posts').insert({ caption: caption.trim().slice(0, 280), workout: pick ? socWorkoutJson(pick) : null, photo_path: path }); if (error) { if (path) socRemovePhotos([path]); throw error; }
+      } catch (e) { if (btn) { btn.disabled = false; btn.textContent = 'Post'; } snack(socMsg(e)); return; }
+      if (preview) URL.revokeObjectURL(preview);
+      socBump('posts', (socCounts().posts || 0) + 1); closeSheet(); SOC.tab = 'feed';
+      try { await socLoadFeed(true); } catch (e) { /* ignore */ } renderSocial(); snack('Posted');
+    }], ['Cancel', 'secondary', closeSheet]]);
+  }
+
+  // ---- friends ----
+  function socFriendRow(f, extra) {
+    const r = el('div', 'socfr'), b = el('button', 'socfb'); b.append(socAvatar(f.display_name || f.username, 42));
+    const m = el('span', 'socmid'); m.append(el('span', 'socn', f.display_name || f.username), el('span', 'soch', '@' + f.username)); b.append(m, socShowcase(f.showcase, 24));
+    if (f.status === 'accepted') b.onclick = () => openFriendProfile(f);
+    r.appendChild(b); if (extra) r.appendChild(extra); return r;
+  }
+  function socFriendsView(root) {
+    const find = el('div', 'wdcard'); find.appendChild(el('div', 'socsetup-t', 'Add a friend'));
+    const row = el('div', 'spcin'), q = mkInput('text', '', 'Their exact username'); q.maxLength = 20; q.autocapitalize = 'none'; q.autocomplete = 'off'; q.spellcheck = false;
+    const go = el('button', null, 'Search'); row.append(q, go); find.appendChild(row);
+    const out = el('div', 'socres'); find.appendChild(out);
+    const show = (r, note) => {
+      out.replaceChildren(); if (note) { out.appendChild(el('div', 'dpnote', note)); return; }
+      const f = r, rel = SOC.friends.find(x => x.user_id === f.user_id);
+      const btn = el('button', 'socadd', rel ? (rel.status === 'accepted' ? 'Friends' : rel.direction === 'in' ? 'Accept' : 'Requested') : 'Add friend');
+      btn.disabled = !!rel && (rel.status === 'accepted' || rel.direction === 'out');
+      btn.onclick = async () => { btn.disabled = true; const { error } = await sb.rpc('send_friend_request', { target: f.user_id }); if (error) { snack(socMsg(error)); btn.disabled = false; return; } try { await socLoadFriends(); } catch (e) { /* ignore */ } SOC.search = null; renderSocial(); snack('Request sent'); };
+      out.appendChild(socFriendRow(f, btn));
+    };
+    const search = async () => {
+      const v = q.value.trim().toLowerCase().replace(/^@/, ''); if (!/^[a-z0-9_]{3,20}$/.test(v)) { show(null, 'Enter their full username (3 to 20 letters, numbers or _).'); return; }
+      go.disabled = true; const { data, error } = await sb.rpc('find_user', { uname: v }); go.disabled = false;
+      if (error) { show(null, socMsg(error)); return; } if (!data || !data.length) { show(null, 'No one found with that username.'); return; } show(data[0]);
+    };
+    go.onclick = search; q.onkeydown = (e) => { if (e.key === 'Enter') search(); };
+    root.appendChild(find);
+    const inc = SOC.friends.filter(f => f.status === 'pending' && f.direction === 'in');
+    if (inc.length) {
+      root.appendChild(el('div', 'bdgsub', 'Friend requests'));
+      inc.forEach(f => {
+        const w = el('span', 'socbtns'), ok = el('button', 'socadd', 'Accept'), no = el('button', 'socno', 'Decline');
+        ok.onclick = async () => { ok.disabled = true; const { error } = await sb.from('friendships').update({ status: 'accepted' }).eq('id', f.friendship_id); if (error) { snack(socMsg(error)); return; } try { await socLoadFriends(); await socLoadFeed(true); } catch (e) { /* ignore */ } renderSocial(); };
+        no.onclick = async () => { await sb.from('friendships').delete().eq('id', f.friendship_id); try { await socLoadFriends(); } catch (e) { /* ignore */ } renderSocial(); };
+        w.append(ok, no); root.appendChild(socFriendRow(f, w));
+      });
+    }
+    const fr = SOC.friends.filter(f => f.status === 'accepted');
+    root.appendChild(el('div', 'bdgsub', 'Friends · ' + fr.length));
+    if (!fr.length) root.appendChild(el('div', 'dpnote', 'No friends yet. Search for a username above.'));
+    fr.forEach(f => root.appendChild(socFriendRow(f)));
+    const out2 = SOC.friends.filter(f => f.status === 'pending' && f.direction === 'out');
+    if (out2.length) {
+      root.appendChild(el('div', 'bdgsub', 'Waiting for a reply'));
+      out2.forEach(f => { const c = el('button', 'socno', 'Cancel'); c.onclick = async () => { await sb.from('friendships').delete().eq('id', f.friendship_id); try { await socLoadFriends(); } catch (e) { /* ignore */ } renderSocial(); }; root.appendChild(socFriendRow(f, c)); });
+    }
+    const bl = el('button', 'sociink', 'Blocked users'); bl.onclick = openBlocked; root.appendChild(bl);
+  }
+  function openFriendProfile(f) {
+    const st = f.stats || {};
+    openSheet('@' + f.username, '', (body) => {
+      const top = el('div', 'socprof'); top.append(socAvatar(f.display_name || f.username, 72), el('div', 'socn big', f.display_name || f.username), el('div', 'soch', '@' + f.username)); body.appendChild(top);
+      const ids = (f.showcase || []).filter(id => BADGE_BY_ID[id]);
+      if (ids.length) { body.appendChild(el('div', 'bdgsub', 'Showcase')); const g = el('div', 'bdgmany'); ids.forEach(id => { const b = BADGE_BY_ID[id], t = el('button', 'bdgmi'); t.append(badgeIcon(b, true), el('div', 'bn', b.name)); t.onclick = () => showBadge({ ...b }, 'friend'); g.appendChild(t); }); body.appendChild(g); }
+      const sum = el('div', 'gsum'); [[st.w || 0, 'Workouts'], [(st.s || 0) + 'd', 'Streak'], [st.b || 0, 'Badges']].forEach(([v, k]) => { const t = el('div', 'gsumt'); t.append(el('div', 'v', String(v)), el('div', 'k', k)); sum.appendChild(t); }); body.appendChild(sum);
+    }, [['Remove friend', 'danger', () => { closeSheet(); appConfirm({ icon: '👋', title: 'Remove @' + f.username + '?', msg: 'You’ll stop seeing each other’s posts. You can add each other again later.', ok: 'Remove', cancel: 'Keep', danger: true }, async () => { await sb.from('friendships').delete().eq('id', f.friendship_id); try { await socLoadFriends(); await socLoadFeed(true); } catch (e) { /* ignore */ } renderSocial(); }); }],
+      ['Block', 'danger', () => { closeSheet(); socBlockConfirm(f.user_id, f.username); }],
+      ['Report', 'danger', () => { closeSheet(); openReport('user', f.user_id, '@' + f.username); }],
+      ['Close', 'secondary', closeSheet]]);
+  }
+  async function openBlocked() {
+    await socLoadBlocks();
+    openSheet('Blocked users', 'They can’t see your posts or find you.', (body) => {
+      if (!SOC.blocks.length) body.appendChild(el('div', 'dpnote', 'You haven’t blocked anyone.'));
+      SOC.blocks.forEach(b => { const u = el('button', 'socno', 'Unblock'); u.onclick = async () => { await sb.from('blocks').delete().eq('blocked', b.user_id); await socLoadBlocks(); refreshSheet(); }; body.appendChild(socFriendRow({ username: b.username, display_name: b.display_name, showcase: [], status: 'blocked' }, u)); });
+    });
+  }
+
+  // ---- my profile ----
+  function openSocProfile() {
+    const me = SOC.me; let pickIds = (me.showcase || []).filter(id => BADGE_BY_ID[id]), uname = me.username, vis = me.visibility, msg = '';
+    openSheet('Your profile', 'This is what your friends see', (body) => {
+      const top = el('div', 'socprof'); top.append(socAvatar(displayName(), 72), el('div', 'socn big', displayName())); body.appendChild(top);
+      body.appendChild(el('label', null, 'Username'));
+      const u = mkInput('text', uname, 'username'); u.maxLength = 20; u.autocapitalize = 'none'; u.spellcheck = false; u.oninput = () => { uname = u.value.trim().toLowerCase(); }; body.appendChild(u);
+      body.appendChild(el('label', null, 'Showcase (pick up to 3 badges)'));
+      const earned = socEarned();
+      if (!earned.length) body.appendChild(el('div', 'dpnote', 'Earn badges by working out. They’ll show up here.'));
+      const g = el('div', 'socsel');
+      earned.forEach(b => { const t = el('button', 'bdgmi' + (pickIds.includes(b.id) ? ' sel' : '')); t.append(badgeIcon(b, true), el('div', 'bn', b.name)); t.setAttribute('aria-pressed', String(pickIds.includes(b.id))); t.onclick = () => { if (pickIds.includes(b.id)) pickIds = pickIds.filter(x => x !== b.id); else if (pickIds.length < 3) pickIds.push(b.id); else { msg = 'You can show up to 3.'; } refreshSheet(); }; g.appendChild(t); });
+      body.appendChild(g); if (msg) { const m = el('div', 'okmsg', msg); m.style.color = 'var(--danger-t)'; body.appendChild(m); }
+      body.appendChild(el('label', null, 'Who can find you'));
+      body.appendChild(mkSeg([['friends', 'Friends can find me'], ['private', 'Hidden']], k => vis === k, k => { vis = k; refreshSheet(); }));
+      body.appendChild(el('div', 'dpdesc', VIS_TEXT[vis]));
+    }, [['Save', '', async () => {
+      if (!/^[a-z0-9_]{3,20}$/.test(uname)) { msg = 'Use 3 to 20 letters, numbers or underscores.'; refreshSheet(); return; }
+      const ids = pickIds.length ? pickIds : earned3();
+      const { data, error } = await sb.from('profiles').update({ username: uname, showcase: ids, visibility: vis, display_name: displayName().slice(0, 40), stats: socStatsPayload(), updated_at: new Date().toISOString() }).eq('user_id', currentUser.id).select().single();
+      if (error) { msg = socMsg(error); refreshSheet(); return; }
+      SOC.me = data; appData.prefs.visibility = vis; saveAppData(); closeSheet(); renderSocial();
+    }], ['Cancel', 'secondary', closeSheet]]);
+    function earned3() { return socEarned().slice(0, 3).map(b => b.id); }
+  }
+
+  // ---- challenges ----
+  const socMine = (c) => (SOC.members[c.id] || []).find(m => m.user_id === currentUser.id);
+  function socChallengeRow(c) {
+    const M = SOC_METRIC[c.metric], mem = SOC.members[c.id] || [], my = socMine(c), today = todayLocal();
+    const state = c.end_date < today ? 'Finished' : c.start_date > today ? 'Starts ' + pgDate(c.start_date) : 'Ends ' + pgDate(c.end_date);
+    const b = el('button', 'socch'), ic = el('span', 'pgic ' + c.metric); ic.innerHTML = pgSvg(M[2]); 
+    const m = el('span', 'socmid'); m.append(el('span', 'socn', c.title), el('span', 'soch', M[0] + ' · ' + mem.filter(x => x.status === 'joined').length + ' joined · ' + state)); b.append(ic, m);
+    if (my && my.status === 'invited') b.appendChild(el('span', 'socpill', 'Invited'));
+    b.onclick = () => openChallenge(c); return b;
+  }
+  function socChallengesView(root) {
+    const add = el('button', 'soccomp', ''); add.append(el('span', 'socplus', '+'), el('span', null, 'Start a challenge')); add.onclick = openNewChallenge; root.appendChild(add);
+    const today = todayLocal(), mineOf = (c) => socMine(c);
+    const inv = SOC.challenges.filter(c => mineOf(c) && mineOf(c).status === 'invited' && c.end_date >= today);
+    const act = SOC.challenges.filter(c => mineOf(c) && mineOf(c).status === 'joined' && c.end_date >= today);
+    const done = SOC.challenges.filter(c => mineOf(c) && mineOf(c).status === 'joined' && c.end_date < today);
+    if (inv.length) { root.appendChild(el('div', 'bdgsub', 'Invitations')); inv.forEach(c => root.appendChild(socChallengeRow(c))); }
+    root.appendChild(el('div', 'bdgsub', 'Active & upcoming'));
+    if (!act.length) root.appendChild(el('div', 'dpnote', 'No challenges yet. Start one and invite your friends.')); act.forEach(c => root.appendChild(socChallengeRow(c)));
+    if (done.length) { root.appendChild(el('div', 'bdgsub', 'Finished')); done.slice(0, 10).forEach(c => root.appendChild(socChallengeRow(c))); }
+  }
+  async function openNewChallenge() {
+    const friends = SOC.friends.filter(f => f.status === 'accepted');
+    if (!friends.length) { snack('Add a friend first, then you can challenge them.'); SOC.tab = 'friends'; renderSocial(); return; }
+    let metric = 'steps', days = 7, later = false, title = '', invite = new Set(), msg = '';
+    const defTitle = () => ({ steps: days + '-day step showdown', workouts: days + '-day workout streak-off', minutes: days + '-day active minutes', calories: days + '-day calorie burn' })[metric];
+    openSheet('New challenge', 'Compete with friends. Scores update from your logged workouts and steps.', (body) => {
+      body.appendChild(el('label', null, 'What counts'));
+      body.appendChild(mkChips('mus-wrap', Object.entries(SOC_METRIC).map(([k, v]) => [k, v[0]]), k => metric === k, k => { metric = k; refreshSheet(); }));
+      if (metric === 'steps') body.appendChild(el('div', 'dpnote', 'Steps come from what you log, or sync automatically in the mobile app.'));
+      body.appendChild(el('label', null, 'How long'));
+      body.appendChild(mkChips('mus-wrap', [3, 7, 14, 30].map(n => [n, n + ' days']), k => days === k, k => { days = k; refreshSheet(); }));
+      body.appendChild(mkChips('mus-wrap', [[false, 'Starts today'], [true, 'Starts tomorrow']], k => later === k, k => { later = k; refreshSheet(); }));
+      body.appendChild(el('label', null, 'Name'));
+      const t = mkInput('text', title, defTitle()); t.maxLength = 40; t.oninput = () => { title = t.value; }; body.appendChild(t);
+      body.appendChild(el('label', null, 'Invite friends'));
+      friends.forEach(f => { const on = invite.has(f.user_id), r = el('button', 'socfr socinv' + (on ? ' on' : '')); r.append(socAvatar(f.display_name || f.username, 34), el('span', 'socn', f.display_name || f.username), el('span', 'socck', on ? '✓' : '')); r.setAttribute('aria-pressed', String(on)); r.onclick = () => { on ? invite.delete(f.user_id) : invite.add(f.user_id); refreshSheet(); }; body.appendChild(r); });
+      if (msg) { const m = el('div', 'okmsg', msg); m.style.color = 'var(--danger-t)'; body.appendChild(m); }
+    }, [['Create challenge', '', async () => {
+      if (!invite.size) { msg = 'Pick at least one friend to invite.'; refreshSheet(); return; }
+      const s = new Date(); if (later) s.setDate(s.getDate() + 1); const e = new Date(s); e.setDate(e.getDate() + days - 1);
+      const { error } = await sb.rpc('create_challenge', { p_title: (title.trim() || defTitle()).slice(0, 40), p_metric: metric, p_start: ymd(s), p_end: ymd(e), p_invite: [...invite] });
+      if (error) { msg = socMsg(error); refreshSheet(); return; }
+      closeSheet(); try { await socLoadChallenges(); } catch (x) { /* ignore */ } SOC.tab = 'challenges'; renderSocial(); socSyncSoon(); snack('Challenge created');
+    }], ['Cancel', 'secondary', closeSheet]]);
+  }
+  async function openChallenge(c) {
+    const M = SOC_METRIC[c.metric], my = socMine(c), owner = c.owner === currentUser.id, today = todayLocal();
+    let board = []; try { const { data } = await sb.rpc('challenge_board', { cid: c.id }); board = (data || []).map(r => ({ ...r, total: Number(r.total) || 0 })); } catch (e) { /* ignore */ }
+    const joined = board.filter(b => b.status === 'joined'), top = Math.max(1, ...joined.map(b => b.total));
+    const left = c.end_date < today ? 'Finished' : c.start_date > today ? 'Starts ' + pgDate(c.start_date) : Math.max(0, Math.round((new Date(c.end_date + 'T12:00:00') - new Date(today + 'T12:00:00')) / 86400000)) + ' days left';
+    const actions = [];
+    if (my && my.status === 'invited') actions.push(['Join challenge', '', async () => { const { error } = await sb.from('challenge_members').update({ status: 'joined' }).eq('challenge_id', c.id).eq('user_id', currentUser.id); closeSheet(); if (error) { snack(socMsg(error)); return; } try { await socLoadChallenges(); } catch (e) { /* ignore */ } renderSocial(); socSyncSoon(); }]);
+    if (owner && c.end_date >= today) actions.push(['Invite more friends', 'secondary', () => openInviteMore(c, board)]);
+    if (owner) actions.push(['Delete challenge', 'danger', () => { closeSheet(); appConfirm({ icon: '🗑️', title: 'Delete this challenge?', msg: 'It disappears for everyone.', ok: 'Delete', cancel: 'Keep', danger: true }, async () => { await sb.from('challenges').delete().eq('id', c.id); try { await socLoadChallenges(); } catch (e) { /* ignore */ } renderSocial(); }); }]);
+    else if (my) actions.push([my.status === 'invited' ? 'Decline' : 'Leave challenge', 'danger', async () => { await sb.from('challenge_members').delete().eq('challenge_id', c.id).eq('user_id', currentUser.id); closeSheet(); try { await socLoadChallenges(); } catch (e) { /* ignore */ } renderSocial(); }]);
+    actions.push(['Close', 'secondary', closeSheet]);
+    openSheet(c.title, M[0] + ' · ' + pgDate(c.start_date) + ' to ' + pgDate(c.end_date) + ' · ' + left, (body) => {
+      if (!joined.length) body.appendChild(el('div', 'dpnote', 'No one has joined yet.'));
+      joined.forEach((b, i) => {
+        const me = b.user_id === currentUser.id, r = el('div', 'socrank' + (me ? ' me' : '')), pos = el('span', 'socpos', i === 0 && b.total > 0 ? '🥇' : i === 1 && b.total > 0 ? '🥈' : i === 2 && b.total > 0 ? '🥉' : String(i + 1));
+        const m = el('span', 'socmid'); m.append(el('span', 'socn', (b.display_name || b.username) + (me ? ' (you)' : '')), el('span', 'soch', '@' + b.username));
+        const bar = el('span', 'socbar'), f = el('i'); f.style.width = Math.round(b.total / top * 100) + '%'; bar.appendChild(f);
+        const v = el('span', 'socval', gNum(b.total) + ' ' + M[1]); r.append(pos, m, v); body.append(r, bar);
+      });
+      const inv = board.filter(b => b.status === 'invited'); if (inv.length) body.appendChild(el('div', 'dpnote', 'Invited: ' + inv.map(b => '@' + b.username).join(', ')));
+      body.appendChild(el('div', 'dpnote', 'Everyone in the challenge can see usernames and scores. Scores come from each person’s own logged ' + M[0].toLowerCase() + '.'));
+    }, actions);
+  }
+  function openInviteMore(c, board) {
+    const have = new Set(board.map(b => b.user_id)), friends = SOC.friends.filter(f => f.status === 'accepted' && !have.has(f.user_id));
+    openSheet('Invite friends', c.title, (body) => {
+      if (!friends.length) body.appendChild(el('div', 'dpnote', 'All your friends are already invited.'));
+      friends.forEach(f => { const b = el('button', 'socadd', 'Invite'); b.onclick = async () => { b.disabled = true; const { error } = await sb.rpc('invite_to_challenge', { cid: c.id, target: f.user_id }); b.textContent = error ? 'Failed' : 'Invited'; }; body.appendChild(socFriendRow(f, b)); });
+    });
+  }
+  const socDayValue = (metric, d) => {
+    const P = appData.prefs; if (metric === 'steps') return P.steps[d] || 0; const L = logs.filter(l => l.performed_on === d);
+    return metric === 'workouts' ? L.length : L.reduce((n, l) => n + (Number(metric === 'minutes' ? l.minutes : l.calories) || 0), 0);
+  };
+  let socSig = '';
+  async function socSyncScores() {
+    if (!socOK() || !SOC.me) return;
+    const today = todayLocal(), rows = [], cut = ymd(new Date(Date.now() - 3 * 86400000));
+    SOC.challenges.forEach(c => {
+      const my = socMine(c); if (!my || my.status !== 'joined' || c.start_date > today || c.end_date < cut) return;
+      const last = c.end_date < today ? c.end_date : today;
+      for (const d = new Date(c.start_date + 'T12:00:00'); ymd(d) <= last; d.setDate(d.getDate() + 1)) { const k = ymd(d); rows.push({ challenge_id: c.id, user_id: currentUser.id, day: k, value: Math.max(0, Math.min(1000000, Math.round(socDayValue(c.metric, k)))) }); }
+    });
+    const sig = JSON.stringify(rows.map(r => [r.challenge_id, r.day, r.value])); if (!rows.length || sig === socSig) return;
+    const { error } = await sb.from('challenge_scores').upsert(rows, { onConflict: 'challenge_id,user_id,day' }); if (!error) socSig = sig;
+  }
+  async function socCheckWins() {
+    const P = appData.prefs, today = todayLocal(); P.socDone = Array.isArray(P.socDone) ? P.socDone : []; P.socWon = Array.isArray(P.socWon) ? P.socWon : [];
+    for (const c of SOC.challenges) {
+      if (c.end_date >= today || P.socDone.includes(c.id)) continue; const my = socMine(c); if (!my || my.status !== 'joined') continue;
+      const { data } = await sb.rpc('challenge_board', { cid: c.id }); const j = (data || []).filter(b => b.status === 'joined').map(b => ({ ...b, total: Number(b.total) || 0 }));
+      const mine = j.find(b => b.user_id === currentUser.id), best = Math.max(0, ...j.map(b => b.total));
+      P.socDone.push(c.id); if (P.socDone.length > 200) P.socDone.shift();
+      if (j.length >= 2 && mine && mine.total > 0 && mine.total >= best && !P.socWon.includes(c.id)) P.socWon.push(c.id);
+      saveAppData();
+    }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && appData && appData.prefs.socOn && SOC.loaded) { socSyncSoon(); } });
+  // permanently remove everything shared on Social (profile, posts, photos, friends, challenges)
+  async function socDeleteAll() {
+    await socRemoveAllMyPhotos();
+    const { error } = await sb.rpc('delete_my_social'); if (error) throw error;
+    socReset(); appData.prefs.socOn = false; appData.prefs.socStats = {}; saveAppData();
   }
 
   // ---- add / edit a goal ----
@@ -5713,6 +6292,7 @@
       msg.style.color = 'var(--muted)'; msg.textContent = 'Deleting...';
       try {
         clearTimeout(saveTimer);
+        if (appData.prefs.socOn) await socRemoveAllMyPhotos();
         const { error } = await sb.rpc('delete_my_account');
         if (error) throw error;
         ['data', 'logs'].forEach(k => { try { localStorage.removeItem(lsKey(k)); } catch (e) { /* ignore */ } });
@@ -5929,6 +6509,7 @@
         'Steps: day totals you type in or, only if you turn on step sync in the mobile app, read from Apple Health or Health Connect after you give permission. We read steps only. We never write to those apps.',
         'Activity: workouts you complete and their length and calories, your weekly schedule, goals, challenges, personal records and app settings.',
         'Technical details: when the app loads, the hosting and library services can see standard information such as your IP address and browser type.']],
+      ['Social features', 'Social is optional and off until you create a Social profile. If you join, we store your public-to-friends username, display name, up to 3 showcase badges, simple stats (workouts, streak, badges), posts (captions, workout summaries and photos), reactions, comments, your friend list, challenges you join (every participant can see usernames and scores), and your reports and blocks. Only your accepted friends can see your profile, posts and photos; there is no public feed. Photos are shrunk and stripped of location data before upload and kept in a private storage area. You can delete any post, leave or delete challenges, and remove all Social data at once in Data & Privacy. Reports are kept so we can review and act on them.'],
       ['Health-related information', 'Injuries, limitations, age, height, weight and sex are health-related, so we treat them with extra care. You decide whether to share them. We use them only to build your workouts (for example, leaving out moves that may stress an injured area) and to estimate calories. We don’t use them for advertising and we don’t share them. By entering them you agree that we can store and use them for these purposes. You can remove them at any time in Data & Privacy → Health & body info, and your workouts will keep working without them.'],
       ['Where it is stored', 'On your device (in the browser’s storage) and, if Cloud backup is on, in our cloud database provided by Supabase. Each account can only read and change its own rows. The app is delivered through GitHub Pages and a code library is loaded from the jsDelivr network.'],
       ['How we use it', 'To sign you in, show your history and stats, build and schedule your workouts, estimate calories, and sync your data between your devices. We don’t use it for anything else, and we don’t make automated decisions about you beyond choosing exercises for your workouts.'],
@@ -5950,7 +6531,8 @@
       ['Injuries and limitations', 'If you tell the app about an injury or limitation, it tries to leave out moves that commonly stress that area. It works from exercise names and can’t judge your situation, so it can’t guarantee that a workout is safe for you. You are responsible for choosing exercises, weights and intensity that are right for your body, and for swapping or skipping anything that doesn’t feel right.'],
       ['Exercise at your own risk', 'Exercise carries a risk of injury. Use proper form, a safe space and equipment in good condition, and get a spotter when lifting heavy. You use the app and follow its workouts at your own risk.'],
       ['Your account', 'Keep your sign-in details safe. You are responsible for what happens under your account. Don’t use the app to break the law, to try to access other people’s data, or to disrupt the service.'],
-      ['Your content', 'The workouts, profile details and photo you add stay yours. You let us store and process them so the app can work for you.'],
+      ['Your content', 'The workouts, profile details and photo you add stay yours. You let us store and process them so the app can work for you. If you use Social, you also let us show your posts, photos, comments and challenge scores to the friends and challenge participants you choose.'],
+      ['Community rules', 'On Social, don’t post anything illegal, sexual, hateful, harassing, threatening, misleading or dangerous, don’t post other people’s photos without permission, don’t spam, and don’t try to cheat challenges. Use the report button on any post, comment or profile, or block a person at any time. We may remove content or suspend Social access, or the account, for breaking these rules. Challenge results rely on what members log themselves and aren’t verified; prizes, if any, are between participants.'],
       ['Our content', 'The app, its design, workout builder, exercise library and text belong to Vulcan Health and its owner. You may use them through the app, but you may not copy, resell or build a competing service from them.'],
       ['Third-party services', 'Vulcan Health relies on services such as Supabase, GitHub Pages, jsDelivr and, if you choose it, Google sign-in. If you use the mobile app, step sync relies on Apple Health or Health Connect. Their availability and rules are outside our control.'],
       ['Availability', 'Vulcan Health is provided “as is” and “as available”, without promises that it will always work, be accurate or be error-free. Features may change or be removed, and data could be lost, so use the export option to keep your own copy.'],
@@ -5968,6 +6550,8 @@
       ['How long we keep things', ['Account, profile, sign-up answers and settings: until you delete your account.',
         'Health and body details (injuries, age, height, weight, sex): until you clear them in Data & Privacy or delete your account.',
         'Workout history: until you delete it or delete your account.',
+        'Social posts, photos, comments, reactions, friendships and challenges: until you delete them, leave or delete the challenge, remove your Social data, or delete your account. Deleting a post also deletes its photo, reactions and comments. Blocking removes the friendship.',
+        'Reports about content: kept for as long as needed to review them and keep the community safe.',
         'Data on your device: until you clear your browser data or reset the app.',
         'Files you export: they are saved on your device and are yours to keep or delete.']],
       ['When you clear health info', 'Choosing “Clear health & body info” removes those details from this device and from your account the next time the app saves.'],
@@ -6000,9 +6584,8 @@
 
   // ----- data & privacy page -----
   const VIS_TEXT = {
-    public: 'Anyone could see your profile details and workout history.',
-    friends: 'Only friends you approve could see your profile details and workout history.',
-    private: 'Only you can see your profile details and workout history.'
+    friends: 'People who know your exact username can send you a friend request. Only accepted friends can see your profile, posts and photos.',
+    private: 'Hidden: no one can find you or send you friend requests. Your current friends still see your posts.'
   };
   async function setCloudBackup(on) {
     const P = appData.prefs; P.cloudBackup = on;
@@ -6023,13 +6606,18 @@
 
     sec('Profile visibility');
     let c = card();
-    c.appendChild(mkSeg([['public', 'Public'], ['friends', 'Friends'], ['private', 'Private']], k => P.visibility === k, k => { P.visibility = k; saveAppData(); renderDataPrivacy(); }));
+    c.appendChild(mkSeg([['friends', 'Friends can find me'], ['private', 'Hidden']], k => P.visibility === k, k => { P.visibility = k; saveAppData(); renderDataPrivacy(); if (SOC.me) sb.from('profiles').update({ visibility: k }).eq('user_id', currentUser.id).then(() => { SOC.me.visibility = k; }); }));
     c.appendChild(el('div', 'dpdesc', VIS_TEXT[P.visibility]));
 
     sec('Social sharing');
     c = card();
-    c.appendChild(mkToggle('Share workout activity', 'Broadcast completed sessions to your friends feed', P.shareActivity, v => { P.shareActivity = v; saveAppData(); }));
-    root.appendChild(el('div', 'dpnote', 'Friends and a feed aren’t part of Vulcan Health yet. These choices are saved now and will apply when they arrive. Nothing is shared today.'));
+    c.appendChild(mkToggle('Auto-share completed workouts', 'Post each workout you complete to your friends-only feed', P.shareActivity, v => { P.shareActivity = v; saveAppData(); }));
+    root.appendChild(el('div', 'dpnote', P.socOn ? 'Only your accepted friends can see what you share. You can delete any post from the feed.' : 'Join Social from the Social tab to share with friends. Nothing is shared until you do.'));
+    if (P.socOn) {
+      const ds = el('button', 'danger dpdanger', 'Delete my Social profile & posts');
+      ds.onclick = () => appConfirm({ icon: '🗑️', title: 'Delete your Social data?', msg: 'This removes your profile, posts, photos, comments, friendships and challenges. Your workouts and badges stay.', ok: 'Delete', cancel: 'Keep', danger: true }, async () => { try { await socDeleteAll(); renderDataPrivacy(); snack('Social data deleted'); } catch (e) { snack(socMsg(e)); } });
+      c.appendChild(ds);
+    }
 
     sec('Export your data');
     c = card();
