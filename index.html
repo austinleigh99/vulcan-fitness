@@ -841,6 +841,13 @@
   .onb .onbskip { margin-left:auto; }
   .onbmsg { color:var(--danger-t); font-size:13px; font-weight:700; margin:0 0 10px; text-align:center; }
   .onb .pv { margin-top:18px; }
+  .pausedcard { margin:14px 0 4px; padding:16px; border-radius:18px; background:color-mix(in srgb, var(--accent) 16%, var(--card)); border:1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .pausedcard .pck { font-size:11px; font-weight:900; letter-spacing:.08em; color:var(--accent); }
+  .pausedcard .pct { font-size:19px; font-weight:900; margin-top:3px; }
+  .pausedcard .pcs { font-size:13px; color:var(--muted); margin-top:3px; }
+  .pausedcard .pcb { display:flex; gap:10px; margin-top:12px; align-items:center; }
+  .pausedcard .pcgo { flex:1 1 0; width:auto; min-width:0; margin:0; padding:13px 10px; font-size:15px; white-space:nowrap; background:var(--accent); color:var(--on-accent); }
+  .pausedcard .pcx { flex:none; width:auto; margin:0; padding:13px 18px; background:transparent; color:var(--muted); border:1px solid var(--line); }
   .setupcard { position:relative; margin:14px 0 4px; padding:16px 44px 16px 16px; border-radius:18px; background:color-mix(in srgb, var(--accent) 14%, var(--card)); border:1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); }
   .setupcard .sut { font-size:16px; font-weight:900; } .setupcard .sus { font-size:13px; color:var(--muted); margin-top:5px; line-height:1.45; }
   .setupcard .sugo { width:auto; margin:12px 0 0; padding:10px 18px; font-size:14px; border-radius:999px; }
@@ -988,6 +995,7 @@
         <button id="homeSettings" class="gearbtn" aria-label="Settings" data-gear="1"></button>
       </div>
 
+      <div id="pausedCard"></div>
       <div id="setupCard"></div>
 
       <div class="stats">
@@ -3910,6 +3918,7 @@
     $('stStreak').textContent = logStreak() + 'd';
     renderSchedule();
     renderChallenges();
+    renderPausedCard();
     renderSetupCard();
     checkBadges();
   }
@@ -5946,15 +5955,85 @@
   // ----- guided workouts: the session -----
   const Guided = { steps: [], i: 0, title: '', info: null, paused: false, done: false, remaining: 0, endAt: 0, pausedMs: 0, lastTick: -1, timer: null };
   const RING = 2 * Math.PI * 88;
-  function guidedStart(title, steps, info) {
+  // ----- "Finish workout later": the unfinished workout waits on Home until the day is over or it is finished -----
+  // Stored on this device only (one slot). Steps hold functions and shared objects, so they are flattened here and rebuilt on resume.
+  const prim = (o) => { const r = {}; Object.keys(o || {}).forEach(k => { const v = o[k]; if (v === null || ['string', 'number', 'boolean'].includes(typeof v)) r[k] = v; }); return r; };
+  function packGuided() {
+    const items = [], groups = [];
+    const ii = (it) => { if (!it) return -1; let k = items.indexOf(it); if (k < 0) { items.push(it); k = items.length - 1; } return k; };
+    const gg = (g) => { let k = groups.indexOf(g); if (k < 0) { groups.push(g); k = groups.length - 1; } return k; };
+    const steps = Guided.steps.map(st => {
+      const o = {}; ['kind', 'name', 'secs', 'detail', 'say', 'gset', 'what', 'ex', 'w', 'skippable'].forEach(k => { if (st[k] !== undefined && typeof st[k] !== 'function') o[k] = st[k]; });
+      if (st.item) o.it = ii(st.item);
+      if (st.g) o.g = gg(st.g);
+      if (st.det) o.rd = st.g && st.g.hold ? 1 : 2;
+      return o;
+    });
+    const gl = groups.map(g => Object.assign(prim(g), { it: ii(g.item) }));
+    let info = null; try { info = JSON.parse(JSON.stringify(Guided.info, (k, v) => (k[0] === '_' || typeof v === 'function') ? undefined : v)); } catch (e) { info = prim(Guided.info); }
+    return { v: 1, date: todayLocal(), at: new Date().toISOString(), title: Guided.title, i: Guided.i, steps, groups: gl, items: items.map(prim), info };
+  }
+  function unpackGuided(rec) {
+    const items = rec.items.map(x => Object.assign({}, x));
+    const groups = rec.groups.map(g => { const o = Object.assign({}, g); o.item = items[g.it]; delete o.it; return o; });
+    const steps = rec.steps.map(o => {
+      const st = Object.assign({}, o); if (o.it != null) st.item = items[o.it]; if (o.g != null) st.g = groups[o.g];
+      delete st.it; delete st.rd;
+      if (o.rd) { const it = st.item || (st.g && st.g.item); st.det = () => st.detail + ((it && it.wt > 0) ? '' : (o.rd === 1 ? ' · enter a weight you can keep for the full time' : ' · enter the weight you are using')); }
+      return st;
+    });
+    return steps;
+  }
+  function pausedWorkout() {
+    const r = lsGet('paused', null);
+    if (!r || r.v !== 1 || !Array.isArray(r.steps) || !r.steps.length) return null;
+    if (r.date !== todayLocal()) { lsSet('paused', null); return null; }   // the day is over
+    return r;
+  }
+  const clearPaused = () => { lsSet('paused', null); };
+  function guidedExit() {
+    if (document.querySelector('.cfm')) return;
+    if (Guided.done) { guidedClose(); return; }
+    const back = el('div', 'cfm'), card = el('div', 'cfmc'), btns = el('div', 'cfmb');
+    card.setAttribute('role', 'alertdialog'); card.setAttribute('aria-modal', 'true'); card.setAttribute('aria-label', 'Leave this workout?');
+    const close = () => { back.remove(); document.removeEventListener('keydown', onKey, true); };
+    const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+    const later = el('button', 'secondary', 'Finish workout later'), end = el('button', 'danger', 'End workout'), keep = el('button', null, 'Keep going');
+    keep.onclick = close;
+    later.onclick = () => {
+      close(); const replaced = !!pausedWorkout() && !Guided.resumed;
+      lsSet('paused', packGuided()); guidedClose(); Guided.resumed = false; renderHomeUI();
+      snack('Saved. Pick it up on Home before the day ends' + (replaced ? ' (this replaced your earlier saved workout)' : '') + '.');
+    };
+    end.onclick = () => { close(); const r = Guided.resumed; guidedClose(); if (r) clearPaused(); renderHomeUI(); };
+    btns.append(later, end, keep);
+    card.append(el('div', 'cfmic', '🏁'), el('div', 'cfmt', 'Leave this workout?'), el('div', 'cfmm', 'Finish later saves your place on the Home screen until the end of today. Ending it throws away your place.'), btns);
+    back.onclick = (e) => { if (e.target === back) close(); };
+    back.appendChild(card); document.body.appendChild(back); document.addEventListener('keydown', onKey, true); keep.focus();
+  }
+  function renderPausedCard() {
+    const box = $('pausedCard'); if (!box) return;
+    box.replaceChildren();
+    const r = pausedWorkout(); if (!r) return;
+    const c = el('div', 'pausedcard'), st = r.steps[Math.min(r.i, r.steps.length - 1)];
+    const gs = []; r.steps.forEach(x => { if (x.g != null && !gs.includes(x.g)) gs.push(x.g); });
+    const where = st && st.g != null ? 'Exercise ' + (gs.indexOf(st.g) + 1) + ' of ' + gs.length : 'Step ' + (r.i + 1) + ' of ' + r.steps.length;
+    c.append(el('div', 'pck', 'WORKOUT IN PROGRESS'), el('div', 'pct', r.title || 'Workout'), el('div', 'pcs', where + ' · saved ' + new Date(r.at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) + '. Stays here until the day ends.'));
+    const row = el('div', 'pcb'), go = el('button', 'pcgo', '▶ Resume workout'), drop = el('button', 'pcx', 'Discard');
+    go.onclick = () => { const q = pausedWorkout(); if (!q) { renderPausedCard(); return; } guidedStart(q.title, unpackGuided(q), q.info || { type: 'strength', title: q.title, mins: 0, lifts: 0, items: [] }, q.i); };
+    drop.onclick = () => appConfirm({ icon: '🗑', title: 'Discard this workout?', msg: 'Your saved place is deleted. You can start the workout again from your plan.', ok: 'Discard', cancel: 'Keep it', danger: true }, () => { clearPaused(); renderPausedCard(); });
+    row.append(go, drop); c.appendChild(row); box.appendChild(c);
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && typeof renderPausedCard === 'function' && appData) renderPausedCard(); });
+  function guidedStart(title, steps, info, startAt) {
     if (!steps || !steps.length) return;
-    if (appData && appData.prefs && appData.prefs.restBetween === false) { const kept = steps.filter(x => !(x.kind === 'rest' && x.skippable)); if (kept.length) steps = kept; }
+    if (startAt == null && appData && appData.prefs && appData.prefs.restBetween === false) { const kept = steps.filter(x => !(x.kind === 'rest' && x.skippable)); if (kept.length) steps = kept; }
     clearInterval(Guided.timer);
-    Object.assign(Guided, { steps, title, info, done: false, paused: false });
+    Object.assign(Guided, { steps, title, info, done: false, paused: false, resumed: startAt != null });
     Guided.gl = []; steps.forEach(s => { if (s.g && !Guided.gl.includes(s.g)) Guided.gl.push(s.g); });
     Cue.prime(); LockTimer.begin();
     $('guidedModal').classList.remove('hidden');
-    guidedEnter(0);
+    guidedEnter(startAt != null ? Math.min(Math.max(0, startAt), steps.length - 1) : 0);
     Guided.timer = setInterval(guidedTick, 250);
   }
   function guidedEnter(i) {
@@ -6001,6 +6080,7 @@
   }
   function guidedFinish() {
     clearInterval(Guided.timer); Guided.done = true; LockTimer.end();
+    if (Guided.resumed) { clearPaused(); renderHomeUI(); }
     Cue.play('done', 'Workout complete. Nice work!');
     const box = $('gBox'); box.replaceChildren();
     box.append(el('div', 'gdone-ic', '🎉'), el('div', 'gname', 'Workout complete!'), el('div', 'gdetail', Guided.title));
@@ -6014,7 +6094,7 @@
     box.replaceChildren();
     const top = el('div', 'gtop'), x = el('button', 'gx', '✕'), gt = el('div', 'gt');
     x.setAttribute('aria-label', 'End workout');
-    x.onclick = () => appConfirm({ icon: '🏁', title: 'End this workout?', msg: 'Your place in this workout won’t be saved. You can start it again from your plan.', ok: 'End workout', cancel: 'Keep going', danger: true }, guidedClose);
+    x.onclick = guidedExit;
     gt.append(el('b', null, Guided.title), el('span', null, st.g ? 'Exercise ' + (Guided.gl.indexOf(st.g) + 1) + ' of ' + Guided.gl.length : 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length));
     top.append(x, gt); box.appendChild(top);
     const prog = el('div', 'gprog'), bar = el('i'); bar.style.width = Math.round(Guided.i / Guided.steps.length * 100) + '%'; prog.appendChild(bar); box.appendChild(prog);
