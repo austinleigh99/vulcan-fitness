@@ -3906,6 +3906,8 @@
     if (!['ftin', 'cm'].includes(P.heightUnit)) P.heightUnit = P.units === 'kg' ? 'cm' : 'ftin';
     P.restOn = !!P.restOn; P.restSecs = Math.min(600, Math.max(10, Math.round(Number(P.restSecs)) || 60));
     P.restBetween = P.restBetween === undefined ? true : !!P.restBetween;
+    P.warmup = !!P.warmup; P.cooldown = !!P.cooldown; P.cardioInStrength = !!P.cardioInStrength;
+    P.cardioMin = Math.min(30, Math.max(5, Math.round(+P.cardioMin || 10)));
     { const o = P.orders && typeof P.orders === 'object' ? P.orders : {}, clean = {};
       Object.keys(o).slice(0, 60).forEach(k => { if (/^\d{4}-\d{2}-\d{2}\|[a-z]+$/.test(k) && Array.isArray(o[k])) clean[k] = o[k].filter(x => typeof x === 'string').slice(0, 30); });
       P.orders = clean; }
@@ -6182,7 +6184,7 @@
     const gg = (g) => { let k = groups.indexOf(g); if (k < 0) { groups.push(g); k = groups.length - 1; } return k; };
     const itemIdx = (gi0.items || []).map(ii);   // the workout's full exercise list first, so swapping still works after resuming
     const steps = Guided.steps.map(st => {
-      const o = {}; ['kind', 'name', 'secs', 'detail', 'say', 'gset', 'what', 'ex', 'w', 'skippable'].forEach(k => { if (st[k] !== undefined && typeof st[k] !== 'function') o[k] = st[k]; });
+      const o = {}; ['kind', 'name', 'secs', 'detail', 'say', 'gset', 'what', 'ex', 'w', 'skippable', 'extra'].forEach(k => { if (st[k] !== undefined && typeof st[k] !== 'function') o[k] = st[k]; });
       if (st.item) o.it = ii(st.item);
       if (st.g) o.g = gg(st.g);
       if (st.det) o.rd = st.g && st.g.hold ? 1 : 2;
@@ -6255,6 +6257,30 @@
     row.append(go, drop); c.appendChild(row); box.appendChild(c);
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && typeof renderPausedCard === 'function' && appData) renderPausedCard(); });
+  // ----- optional warm-up, cardio and cool-down added around strength-style workouts (Settings → Workout defaults) -----
+  // Cardio, HIIT and yoga/recovery workouts have their own warm-up / cool-down options, so they are left alone.
+  const WARM_MOVES = [['Jumping Jacks', 40, 'Easy pace. Get your heart rate up and your joints warm.'], ['Arm Circles', 30, 'Small circles that grow bigger: 15 seconds forward, 15 back.'], ['Bodyweight Squats', 40, 'Slow and controlled, as deep as feels good.'], ['Inchworms', 40, 'Walk your hands out to a plank, then walk your feet up to your hands.'], ['Hip Circles', 30, 'Big, slow circles: 15 seconds each direction.']];
+  const COOL_MOVES = [['Quad Stretch', 30, 'Pull your heel toward your glute and stand tall. Switch legs halfway.'], ['Hamstring Stretch', 30, 'Heel forward, hinge at the hips with a flat back. Switch legs halfway.'], ['Chest Opener Stretch', 30, 'Clasp your hands behind you, lift them and open your chest.'], ['Child’s Pose', 40, 'Sit back on your heels, reach forward and relax your shoulders.'], ['Deep Breathing', 30, 'In through the nose for 4 seconds, out through the mouth for 6.']];
+  function extraSteps(info) {
+    const P = appData && appData.prefs; if (!P || !info) return null;
+    const type = info.type; if (type !== 'strength' && type !== 'calisthenics' && type !== 'abs') return null;
+    const hid = hiddenSet(), pick = (list) => { const f = list.filter(m => !hid.has(m[0])); return f.length >= 3 ? f : list; };
+    const swapIn = (list, from, to) => list.map(m => m[0] === from ? to : m);
+    const mk = (m, tag) => Object.assign(gWork(m[0], m[1], m[2]), { extra: tag });
+    let warm = WARM_MOVES, cool = COOL_MOVES;
+    if (type === 'abs') { warm = swapIn(warm, 'Arm Circles', ['Torso Twists', 30, 'Rotate gently from side to side with loose arms.']); cool = swapIn(cool, 'Chest Opener Stretch', ['Cobra Stretch', 30, 'Lie face down, press your chest up and let your lower back relax.']); }
+    const out = { pre: [], mid: [], post: [] };
+    if (P.warmup) out.pre = pick(warm).map(m => mk(m, 'warm'));
+    if (P.cardioInStrength && type !== 'abs') out.mid = [mk(['Cardio finisher', (P.cardioMin || 10) * 60, 'Steady, conversational pace. Treadmill, bike, rower, stairs, jump rope or a brisk walk: whatever you have. Tap skip any time to move on.'], 'cardio')];
+    if (P.cooldown) out.post = pick(cool).map(m => mk(m, 'cool'));
+    return out.pre.length || out.mid.length || out.post.length ? out : null;
+  }
+  function finalizeSteps(steps, info) {
+    steps = applyRestPref(steps);
+    const ex = extraSteps(info); if (!ex || steps.some(x => x.extra)) return steps;
+    const has = (re) => steps.some(x => re.test(x.name || ''));   // the plan already has its own warm-up or cool-down
+    return (has(/warm/i) ? [] : ex.pre).concat(steps, ex.mid, has(/cool/i) ? [] : ex.post);
+  }
   // "Rest between sets" off: drop the between-set rests (HIIT and cardio recovery stay)
   function applyRestPref(steps) {
     if (!(appData && appData.prefs && appData.prefs.restBetween === false)) return steps;
@@ -6264,7 +6290,7 @@
   function guidedElapsed() { return Guided.done && Guided.endMs != null ? Guided.endMs : Guided.acc + Math.max(0, Date.now() - Guided.t0); }
   function guidedStart(title, steps, info, startAt, elapsedMs) {
     if (!steps || !steps.length) return;
-    if (startAt == null) steps = applyRestPref(steps);
+    if (startAt == null) steps = finalizeSteps(steps, info);
     clearInterval(Guided.timer);
     if (info) delete info.actualSecs;
     Object.assign(Guided, { steps, title, info, done: false, paused: false, resumed: startAt != null, acc: Math.max(0, +elapsedMs || 0), t0: Date.now(), endMs: null });
@@ -6338,7 +6364,7 @@
     const top = el('div', 'gtop'), x = el('button', 'gx', '✕'), gt = el('div', 'gt');
     x.setAttribute('aria-label', 'End workout');
     x.onclick = guidedExit;
-    gt.append(el('b', null, Guided.title), el('span', null, st.g ? 'Exercise ' + (Guided.gl.indexOf(st.g) + 1) + ' of ' + Guided.gl.length : 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length));
+    gt.append(el('b', null, Guided.title), el('span', null, st.extra ? { warm: 'Warm-up', cardio: 'Cardio finisher', cool: 'Cool-down' }[st.extra] : st.g ? 'Exercise ' + (Guided.gl.indexOf(st.g) + 1) + ' of ' + Guided.gl.length : 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length));
     const lb = el('button', 'gx glist', '☰'); lb.setAttribute('aria-label', 'See all exercises'); lb.onclick = () => guidedOverview(true);
     top.append(x, gt, lb); box.appendChild(top);
     const prog = el('div', 'gprog'), bar = el('i'); bar.style.width = Math.round(Guided.i / Guided.steps.length * 100) + '%'; prog.appendChild(bar); box.appendChild(prog);
@@ -6444,7 +6470,7 @@
   }
   // "Don't show again" during a workout: hide it for good, then swap in a similar exercise (or skip it when that isn't possible)
   function guidedHideBtn(box, st) {
-    if (st.kind !== 'work' || Guided.done) return;
+    if (st.kind !== 'work' || Guided.done || st.extra) return;
     const it = st.item || (st.g && st.g.item), name = st.g ? st.g.name : (it ? it.name : st.name), type = Guided.info && Guided.info.type;
     if (!name || type === 'cardio' || /interval|warm|cool|breath|get ready|round \d/i.test(name)) return;
     const b = el('button', 'gswap gno', '⊘ Don’t show this exercise again'); b.setAttribute('aria-label', 'Never show ' + name + ' again');
@@ -6588,7 +6614,7 @@
     const itemOf = (s) => s.item || (s.g && s.g.item), works = (s, m) => itemOf(s) === m && s.kind === 'work';
     let ord = 0; for (let j = 0; j < Guided.i; j++) if (works(Guided.steps[j], oldIt)) ord++;
     const nu = c.make(parseRx(oldIt.rx).sets); items[k] = nu;
-    const steps = applyRestPref(gi.rebuild()); let idx = -1, seen = 0;
+    const steps = finalizeSteps(gi.rebuild(), gi); let idx = -1, seen = 0;
     steps.forEach((s, j) => { if (idx < 0 && works(s, nu)) { if (seen === ord) idx = j; seen++; } });
     if (idx < 0) idx = Math.max(0, steps.findIndex(s => works(s, nu)));
     Guided.steps = steps; Guided.gl = []; steps.forEach(s => { if (s.g && !Guided.gl.includes(s.g)) Guided.gl.push(s.g); });
@@ -7035,6 +7061,14 @@
       r.appendChild(right); c.appendChild(r);
     }
     c.appendChild(mkToggle('Rest between sets', 'Off: strength and circuit workouts go straight to the next set with no rest screen', P.restBetween, v => { P.restBetween = v; saveAppData(); redraw(); }));
+    c.appendChild(mkToggle('Warm-up before workouts', 'Adds about 3 minutes of easy movement to the start of strength, calisthenics and abs workouts', P.warmup, v => { P.warmup = v; saveAppData(); }));
+    c.appendChild(mkToggle('Cool-down after workouts', 'Adds about 3 minutes of stretching and slow breathing to the end of those workouts', P.cooldown, v => { P.cooldown = v; saveAppData(); }));
+    c.appendChild(mkToggle('Add cardio to strength workouts', 'A steady cardio finisher after your lifts, before the cool-down. Strength and calisthenics workouts', P.cardioInStrength, v => { P.cardioInStrength = v; saveAppData(); redraw(); }));
+    if (P.cardioInStrength) {
+      const r = el('div', 'wdrow'); r.append(el('span', 'wl', 'Cardio length'));
+      const right = el('span'); right.append(mkNum(P.cardioMin, 5, 30, v => { P.cardioMin = v; saveAppData(); }), el('span', 'wu', 'min'));
+      r.appendChild(right); c.appendChild(r);
+    }
     c.appendChild(mkToggle('Auto-start rest', 'In a guided workout, start the rest countdown as soon as you finish a set', P.autoRest, v => { P.autoRest = v; saveAppData(); }));
     c.appendChild(mkToggle('Smart weights', 'Lowers an exercise after a miss and raises it as you get stronger. Dumbbells, kettlebells and machines move ' + (pgUnit() === 'kg' ? '2.5 kg' : '5 lb') + ' at a time; barbells and plate lifts move ' + (pgUnit() === 'kg' ? '1 kg' : '2.5 lb'), P.progOn, v => { P.progOn = v; saveAppData(); redraw(); }));
     if (P.progOn) {
