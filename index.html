@@ -2215,6 +2215,7 @@
     const gi = { type:'strength', title:'Strength', mins:cfg.dur, lifts:items.length, intensity:cfg.intensity, items, rated: new Set(), equip: new Set(cfg.equip), loc: planLoc };
     const sup = cfg.sup, rest = restFor(I);
     gi.rebuild = () => repSteps(items, rest, sup, progOn());
+    gi.rb = { k: 'rep', rest, sup: !!sup, p: 1 };   // lets a saved workout rebuild itself after "finish later"
     actions.append(shuffle, edit, makeCompleteBtn(gi));
     addGuide(actions, title, repSteps(items, rest, sup, progOn()), gi);
     card.appendChild(actions);
@@ -2552,6 +2553,7 @@
     const gi = { type:'calisthenics', title:'Calisthenics', mins:calCfg.dur, lifts:items.length, intensity:calCfg.intensity, items, loc: planLoc };
     const rest = restFor(I);
     gi.rebuild = () => repSteps(items, rest, false);
+    gi.rb = { k: 'rep', rest, sup: false, p: 0 };
     actions.append(shuffle, edit, makeCompleteBtn(gi));
     addGuide(actions, title, repSteps(items, rest, false), gi);
     card.appendChild(actions);
@@ -2734,6 +2736,7 @@
     const gi = { type:'abs', title:'Abs', mins:absCfg.dur, lifts:items.length, intensity:absCfg.intensity, items, rated: new Set(), wtOn: absCfg.wt, absOpt: opt, loc: planLoc };
     const stepsFor = () => circ ? circuitSteps(items, S, restEx, restSet, progOn()) : repSteps(items, restSet, false, progOn());
     gi.rebuild = stepsFor;
+    gi.rb = { k: 'abs', circ: !!circ, S, restEx, restSet };
     actions.append(shuffle, edit, makeCompleteBtn(gi));
     addGuide(actions, title, stepsFor(), gi);
     card.appendChild(actions);
@@ -5959,9 +5962,10 @@
   // Stored on this device only (one slot). Steps hold functions and shared objects, so they are flattened here and rebuilt on resume.
   const prim = (o) => { const r = {}; Object.keys(o || {}).forEach(k => { const v = o[k]; if (v === null || ['string', 'number', 'boolean'].includes(typeof v)) r[k] = v; }); return r; };
   function packGuided() {
-    const items = [], groups = [];
+    const items = [], groups = [], gi0 = Guided.info || {};
     const ii = (it) => { if (!it) return -1; let k = items.indexOf(it); if (k < 0) { items.push(it); k = items.length - 1; } return k; };
     const gg = (g) => { let k = groups.indexOf(g); if (k < 0) { groups.push(g); k = groups.length - 1; } return k; };
+    const itemIdx = (gi0.items || []).map(ii);   // the workout's full exercise list first, so swapping still works after resuming
     const steps = Guided.steps.map(st => {
       const o = {}; ['kind', 'name', 'secs', 'detail', 'say', 'gset', 'what', 'ex', 'w', 'skippable'].forEach(k => { if (st[k] !== undefined && typeof st[k] !== 'function') o[k] = st[k]; });
       if (st.item) o.it = ii(st.item);
@@ -5970,7 +5974,9 @@
       return o;
     });
     const gl = groups.map(g => Object.assign(prim(g), { it: ii(g.item) }));
-    let info = null; try { info = JSON.parse(JSON.stringify(Guided.info, (k, v) => (k[0] === '_' || typeof v === 'function') ? undefined : v)); } catch (e) { info = prim(Guided.info); }
+    let info = null;
+    try { info = JSON.parse(JSON.stringify(Guided.info, (k, v) => (k[0] === '_' || k === 'items' || typeof v === 'function') ? undefined : (v instanceof Set ? { setOf: Array.from(v) } : v))); } catch (e) { info = prim(Guided.info); }
+    if (info) info.itemIdx = itemIdx;
     return { v: 1, date: todayLocal(), at: new Date().toISOString(), title: Guided.title, i: Guided.i, steps, groups: gl, items: items.map(prim), info };
   }
   function unpackGuided(rec) {
@@ -5982,7 +5988,16 @@
       if (o.rd) { const it = st.item || (st.g && st.g.item); st.det = () => st.detail + ((it && it.wt > 0) ? '' : (o.rd === 1 ? ' · enter a weight you can keep for the full time' : ' · enter the weight you are using')); }
       return st;
     });
-    return steps;
+    const info = Object.assign({ type: 'strength', title: rec.title, mins: 0, lifts: 0 }, rec.info || {});
+    Object.keys(info).forEach(k => { const v = info[k]; if (v && typeof v === 'object' && Array.isArray(v.setOf)) info[k] = new Set(v.setOf); });
+    info.items = (info.itemIdx || []).map(k => items[k]).filter(Boolean); delete info.itemIdx;
+    // swapping needs the exercise list and the way to rebuild the steps from it
+    const rb = info.rb;
+    if (rb && info.items.length) {
+      if (rb.k === 'rep') info.rebuild = () => repSteps(info.items, rb.rest, rb.sup, rb.p ? progOn() : undefined);
+      else if (rb.k === 'abs') info.rebuild = () => rb.circ ? circuitSteps(info.items, rb.S, rb.restEx, rb.restSet, progOn()) : repSteps(info.items, rb.restSet, false, progOn());
+    }
+    return { steps, info };
   }
   function pausedWorkout() {
     const r = lsGet('paused', null);
@@ -6020,14 +6035,19 @@
     const where = st && st.g != null ? 'Exercise ' + (gs.indexOf(st.g) + 1) + ' of ' + gs.length : 'Step ' + (r.i + 1) + ' of ' + r.steps.length;
     c.append(el('div', 'pck', 'WORKOUT IN PROGRESS'), el('div', 'pct', r.title || 'Workout'), el('div', 'pcs', where + ' · saved ' + new Date(r.at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) + '. Stays here until the day ends.'));
     const row = el('div', 'pcb'), go = el('button', 'pcgo', '▶ Resume workout'), drop = el('button', 'pcx', 'Discard');
-    go.onclick = () => { const q = pausedWorkout(); if (!q) { renderPausedCard(); return; } guidedStart(q.title, unpackGuided(q), q.info || { type: 'strength', title: q.title, mins: 0, lifts: 0, items: [] }, q.i); };
+    go.onclick = () => { const q = pausedWorkout(); if (!q) { renderPausedCard(); return; } const u = unpackGuided(q); guidedStart(q.title, u.steps, u.info, q.i); };
     drop.onclick = () => appConfirm({ icon: '🗑', title: 'Discard this workout?', msg: 'Your saved place is deleted. You can start the workout again from your plan.', ok: 'Discard', cancel: 'Keep it', danger: true }, () => { clearPaused(); renderPausedCard(); });
     row.append(go, drop); c.appendChild(row); box.appendChild(c);
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && typeof renderPausedCard === 'function' && appData) renderPausedCard(); });
+  // "Rest between sets" off: drop the between-set rests (HIIT and cardio recovery stay)
+  function applyRestPref(steps) {
+    if (!(appData && appData.prefs && appData.prefs.restBetween === false)) return steps;
+    const kept = steps.filter(x => !(x.kind === 'rest' && x.skippable)); return kept.length ? kept : steps;
+  }
   function guidedStart(title, steps, info, startAt) {
     if (!steps || !steps.length) return;
-    if (startAt == null && appData && appData.prefs && appData.prefs.restBetween === false) { const kept = steps.filter(x => !(x.kind === 'rest' && x.skippable)); if (kept.length) steps = kept; }
+    if (startAt == null) steps = applyRestPref(steps);
     clearInterval(Guided.timer);
     Object.assign(Guided, { steps, title, info, done: false, paused: false, resumed: startAt != null });
     Guided.gl = []; steps.forEach(s => { if (s.g && !Guided.gl.includes(s.g)) Guided.gl.push(s.g); });
@@ -6239,7 +6259,7 @@
     const itemOf = (s) => s.item || (s.g && s.g.item), works = (s, m) => itemOf(s) === m && s.kind === 'work';
     let ord = 0; for (let j = 0; j < Guided.i; j++) if (works(Guided.steps[j], oldIt)) ord++;
     const nu = c.make(parseRx(oldIt.rx).sets); items[k] = nu;
-    const steps = gi.rebuild(); let idx = -1, seen = 0;
+    const steps = applyRestPref(gi.rebuild()); let idx = -1, seen = 0;
     steps.forEach((s, j) => { if (idx < 0 && works(s, nu)) { if (seen === ord) idx = j; seen++; } });
     if (idx < 0) idx = Math.max(0, steps.findIndex(s => works(s, nu)));
     Guided.steps = steps; Guided.gl = []; steps.forEach(s => { if (s.g && !Guided.gl.includes(s.g)) Guided.gl.push(s.g); });
