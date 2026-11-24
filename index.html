@@ -454,6 +454,13 @@
   .rbtn.x { background:var(--chip); color:var(--muted); padding:8px 11px; }
   .lrow { display:flex; justify-content:space-between; gap:10px; padding:11px 0; border-bottom:1px solid var(--line); font-size:14px; }
   .lrow:last-child { border-bottom:0; }
+  .calwh { width:100%; background:none; border:0; border-bottom:1px solid var(--line); color:inherit; font:inherit; text-align:left; cursor:pointer; align-items:center; }
+  .calwo.open .calwh { border-bottom-color:transparent; }
+  .calchev { font-size:22px; color:var(--muted); transition:transform .15s; flex:none; line-height:1; }
+  .calwo.open .calchev { transform:rotate(90deg); }
+  .calex { padding:2px 0 10px 12px; border-bottom:1px solid var(--line); }
+  .calexr { display:flex; justify-content:space-between; gap:10px; padding:6px 0; font-size:13px; }
+  .calexr .r { color:var(--muted); white-space:nowrap; }
   .lrow .lm { color:var(--muted); font-size:12px; margin-top:2px; }
   .cstep { display:flex; align-items:center; gap:8px; }
   .cstep button { width:36px; height:36px; margin:0; padding:0; border-radius:10px; background:var(--chip); font-size:18px; }
@@ -6944,7 +6951,7 @@
 
   // ----- calendar page -----
   const CAL_PAST_MONTHS = 24, CAL_FUTURE_MONTHS = 12;
-  let calCursor = null, calSel = null;
+  let calCursor = null, calSel = null; const calOpen = new Set();
   const pad2 = (n) => String(n).padStart(2, '0');
   const monthIdx = (d) => d.getFullYear() * 12 + d.getMonth();
   const longDate = (key, withYear) => new Date(key + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: withYear ? 'numeric' : undefined });
@@ -7022,10 +7029,21 @@
     const dayLogs = byDay[calSel] || [], plans = plannedFor(calSel).filter(p => !planDone(calSel, p));
     if (!dayLogs.length && !plans.length) panel.appendChild(el('div', 'sheet-note', calSel < today ? 'No workouts logged this day.' : 'Nothing scheduled yet.'));
     dayLogs.forEach(l => {
-      const row = el('div', 'lrow'), left = el('div'), t = el('div', null, l.title);
+      // tap a finished workout to drop down the exercises that were done (kept on the device that logged it)
+      const open = calOpen.has(l.id), wrap = el('div', 'calwo' + (open ? ' open' : '')), row = el('button', 'lrow calwh'), left = el('div'), t = el('div', null, l.title);
+      row.setAttribute('aria-expanded', open ? 'true' : 'false');
       t.appendChild(el('span', 'tag done', '✓ DONE'));
       left.append(t, el('div', 'lm', l.minutes + ' min · ' + l.calories + ' cal' + (l.lifts ? ' · ' + l.lifts + ' lifts' : '')));
-      row.appendChild(left); panel.appendChild(row);
+      row.append(left, el('span', 'calchev', '›'));
+      row.onclick = () => { if (calOpen.has(l.id)) calOpen.delete(l.id); else calOpen.add(l.id); renderCalendarPage(); };
+      wrap.appendChild(row);
+      if (open) {
+        const box = el('div', 'calex'), ex = Array.isArray(l.ex) ? l.ex : [];
+        if (ex.length) ex.forEach(x => { const r = el('div', 'calexr'); r.append(el('span', 'n', x.n), el('span', 'r', x.r || '')); box.appendChild(r); });
+        else box.appendChild(el('div', 'lm', 'No exercise list was saved for this workout. Workouts you start from the app save theirs on the device you used.'));
+        wrap.appendChild(box);
+      }
+      panel.appendChild(wrap);
     });
     plans.forEach(p => {
       if (daysFromToday(calSel) < PLAN_AHEAD) {   // workouts are made up to two weeks ahead, so show the real one
