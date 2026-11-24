@@ -982,6 +982,10 @@
   .dragging { position:relative; z-index:5; box-shadow:0 8px 24px rgba(0,0,0,.45); background:var(--card); border-radius:12px; user-select:none; -webkit-user-select:none; opacity:.97; }
   .mv.dragging { padding-left:8px; padding-right:8px; }
   .reord .mv .exno { display:none; }
+  .hxsearch { width:100%; margin:0 0 10px; padding:12px 14px; border-radius:12px; background:var(--chip); border:1px solid var(--line); color:var(--text); font-size:15px; box-sizing:border-box; }
+  .hxrow { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid var(--line); }
+  .hxrow .hxn { flex:1; min-width:0; font-weight:700; font-size:15px; }
+  .hxrow .hxbtn { flex:none; width:auto; margin:0; padding:9px 14px; border-radius:999px; background:var(--chip); border:1px solid var(--line); color:var(--text); font-size:13px; font-weight:800; }
   .mv .exno { flex:none; width:30px; height:30px; margin:0 0 0 2px; padding:0; border-radius:50%; background:transparent; border:1px solid var(--line); color:var(--muted); display:inline-flex; align-items:center; justify-content:center; }
   .mv .exno svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
   .mv .exno:active { background:var(--chip); }
@@ -1726,7 +1730,7 @@
     b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>';
     b.onclick = (e) => {
       e.stopPropagation();
-      appConfirm({ icon: '🚫', title: 'Don’t show this exercise?', msg: name + ' will be left out of every workout from now on' + ', and replaced in this one. You can bring it back in Settings → Workout defaults → Hidden exercises.', ok: 'Hide it', cancel: 'Keep it', danger: true }, onDone);
+      appConfirm({ icon: '🚫', title: 'Don’t show this exercise?', msg: name + ' will be left out of every workout from now on' + ', and replaced in this one. You can bring it back in Settings → Hidden exercises.', ok: 'Hide it', cancel: 'Keep it', danger: true }, onDone);
     };
     return b;
   }
@@ -1734,7 +1738,7 @@
   function hideAndRefresh(name, row, rebuild) {
     hideEx(name);
     if (!row.dispatchEvent(new CustomEvent('exhidden', { bubbles: true, cancelable: true }))) return;
-    rebuild(); snack('Hidden from future workouts. Here is a fresh workout without ' + name + '.');
+    rebuild(); snack('Hidden from future workouts. Here is a fresh workout without ' + name + '.', 'Hidden list', openHiddenExercises);
   }
   // ----- exercise order: drag handle on each row (Reorder mode) -----
   // scheduled workouts are regenerated each time they are drawn, so their chosen order is remembered by day + type
@@ -1823,7 +1827,7 @@
     if (!row.dispatchEvent(new CustomEvent('exhidden', { bubbles: true, cancelable: true }))) return;
     const pools = swapPools(gi, m), ok = (c) => c.have !== false && !isHidden(c.name);
     const c = pools.near.find(ok) || pools.all.find(ok), k = items.indexOf(m);
-    if (!c || k < 0) { snack('Hidden from future workouts. No other exercise fits this one, so tap Shuffle for a new mix.'); row.remove(); items.splice(Math.max(0, k), k < 0 ? 0 : 1); return; }
+    if (!c || k < 0) { snack('Hidden from future workouts. No other exercise fits this one, so tap Shuffle for a new mix.', 'Hidden list', openHiddenExercises); row.remove(); items.splice(Math.max(0, k), k < 0 ? 0 : 1); return; }
     const nu = c.make(parseRx(m.rx).sets); items[k] = nu; const nr = mkRow(nu); row.replaceWith(nr);
     snack('Hidden. Swapped in ' + nu.name + '.', 'Undo', () => { unhideEx(m.name); const j = items.indexOf(nu); if (j >= 0) items[j] = m; nr.replaceWith(mkRow(m)); });
   }
@@ -1909,7 +1913,7 @@
           const row = el('div', 'mv');
           const left = el('div');
           left.append(exNameNode(m.name), el('div', 'mr', m.rx));
-          row.append(left, exHideBtn(m.name, () => { hideEx(m.name); renderLibrary(); }), exMoveBtns(row, o.moves, m));
+          row.append(left, exHideBtn(m.name, () => { hideEx(m.name); renderLibrary(); snack('Hidden. Swapped for another move.', 'Undo', () => { unhideEx(m.name); renderLibrary(); }); }), exMoveBtns(row, o.moves, m));
           body.appendChild(row);
         });
         addReorderToggle(body);
@@ -2070,6 +2074,30 @@
   function hideEx(name) {
     const P = appData.prefs, a = Array.isArray(P.hiddenEx) ? P.hiddenEx : (P.hiddenEx = []);
     if (!a.includes(name)) { a.push(name); if (a.length > 200) a.shift(); saveAppData(); }
+  }
+  // Settings → Hidden exercises: everything marked "don't show again", with a way to bring each one back
+  function openHiddenExercises() {
+    let q = '';
+    const render = (body) => {
+      const all = Array.isArray(appData.prefs.hiddenEx) ? appData.prefs.hiddenEx.slice().sort((a, b) => a.localeCompare(b)) : [];
+      $('sheetSub').textContent = all.length ? all.length + ' left out of every workout' : 'Nothing hidden';
+      body.replaceChildren();
+      if (!all.length) { body.appendChild(el('div', 'dpnote', 'When you tap ⊘ next to an exercise, or “Don’t show this exercise again” during a workout, it’s listed here. You can bring it back at any time.')); return; }
+      if (all.length > 8) { const inp = el('input', 'hxsearch'); inp.type = 'search'; inp.placeholder = 'Search hidden exercises'; inp.value = q; inp.setAttribute('aria-label', 'Search hidden exercises'); inp.oninput = () => { q = inp.value; fill(); }; body.appendChild(inp); }
+      const list = el('div', 'hxlist'); body.appendChild(list);
+      const fill = () => {
+        list.replaceChildren(); const f = all.filter(n => n.toLowerCase().includes(q.trim().toLowerCase()));
+        if (!f.length) list.appendChild(el('div', 'dpnote', 'No match.'));
+        f.forEach(n => {
+          const r = el('div', 'hxrow'), b = el('button', 'hxbtn', 'Show again');
+          b.setAttribute('aria-label', 'Show ' + n + ' again');
+          b.onclick = () => { unhideEx(n); snack(n + ' will show up in workouts again.'); renderHomeUI(); refreshSheet(); };
+          r.append(el('span', 'hxn', n), b); list.appendChild(r);
+        });
+      };
+      fill();
+    };
+    openSheet('Hidden exercises', '', render, [['Done', '', closeSheet]]);
   }
   function unhideEx(name) { const P = appData.prefs; P.hiddenEx = (P.hiddenEx || []).filter(x => x !== name); saveAppData(); }
   // hid = true leaves hidden exercises out too. Only swap suggestions do; the builders pick as usual and then trade any hidden pick (subHiddenItems),
@@ -6420,14 +6448,14 @@
     const it = st.item || (st.g && st.g.item), name = st.g ? st.g.name : (it ? it.name : st.name), type = Guided.info && Guided.info.type;
     if (!name || type === 'cardio' || /interval|warm|cool|breath|get ready|round \d/i.test(name)) return;
     const b = el('button', 'gswap gno', '⊘ Don’t show this exercise again'); b.setAttribute('aria-label', 'Never show ' + name + ' again');
-    b.onclick = () => appConfirm({ icon: '🚫', title: 'Don’t show this exercise?', msg: name + ' will be left out of every workout from now on. We’ll swap in a similar one for this workout when we can, or skip it.', ok: 'Hide it', cancel: 'Keep it', danger: true }, () => {
+    b.onclick = () => appConfirm({ icon: '🚫', title: 'Don’t show this exercise?', msg: name + ' will be left out of every workout from now on. We’ll swap in a similar one for this workout when we can, or skip it. You can bring it back in Settings → Hidden exercises.', ok: 'Hide it', cancel: 'Keep it', danger: true }, () => {
       hideEx(name);
       const gi = Guided.info;
       if (it && gi && gi.rebuild && gi.items && gi.items.indexOf(it) >= 0) {
         const pools = swapPools(gi, it), ok = (c) => c.have !== false && !isHidden(c.name), c = pools.near.find(ok) || pools.all.find(ok);
-        if (c) { guidedSwap(it, c); snack('Hidden. Swapped in ' + c.name + '.'); return; }
+        if (c) { guidedSwap(it, c); snack('Hidden. Swapped in ' + c.name + '. Bring it back in Settings → Hidden exercises.'); return; }
       }
-      guidedSkipExercise(st, name); snack('Hidden. Skipped it.');
+      guidedSkipExercise(st, name); snack('Hidden. Skipped it. Bring it back in Settings → Hidden exercises.');
     });
     box.appendChild(b);
   }
@@ -6680,6 +6708,7 @@
     ]],
     ['Workout settings', [
       ['Workout defaults', 'sliders', '#a78bfa', 'rgba(167,139,250,.22)', () => openWorkoutDefaults()],
+      ['Hidden exercises', 'eye', '#fb7185', 'rgba(251,113,133,.2)', () => openHiddenExercises()],
       ['Health & Integration', 'heart', 'var(--danger-t)', 'rgba(251,113,133,.2)', () => openHealth()]
     ]],
     ['Support', [
@@ -7048,7 +7077,7 @@
     c = card();
     const hid = Array.isArray(P.hiddenEx) ? P.hiddenEx : [];
     c.appendChild(el('div', 'wdlab', hid.length ? 'These are left out of every workout' : 'Nothing hidden'));
-    if (!hid.length) c.appendChild(el('div', 'dpnote', 'Tap the ⊘ button next to an exercise in a workout, or “Don’t show again” during a workout, to leave it out for good. Hidden exercises show up here so you can bring them back.'));
+    if (!hid.length) c.appendChild(el('div', 'dpnote', 'Tap the ⊘ button next to an exercise in a workout, or “Don’t show again” during a workout, to leave it out for good. They’re also listed under Settings → Hidden exercises.'));
     hid.forEach(n => {
       const r = el('div', 'wdrow'), b = el('button', 'pgadd', 'Show again'); b.style.margin = '0'; b.style.width = 'auto'; b.style.padding = '8px 14px';
       b.onclick = () => { unhideEx(n); redraw(); };
