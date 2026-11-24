@@ -156,6 +156,22 @@
   .gbox { width:100%; max-width:520px; min-height:100%; padding:calc(14px + env(safe-area-inset-top)) 20px calc(22px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; align-items:center; text-align:center; }
   .gtop { width:100%; display:flex; align-items:center; gap:12px; }
   .gtop .gx { width:44px; height:44px; margin:0; padding:0; border-radius:14px; background:var(--chip); color:var(--text); font-size:18px; flex:none; }
+  .gov { position:fixed; inset:0; z-index:2100; background:var(--bg); overflow-y:auto; padding:18px 16px 40px; }
+  .gov .govh { display:flex; gap:12px; align-items:center; max-width:560px; margin:0 auto 14px; }
+  .gov .govh .gx { width:44px; height:44px; margin:0; padding:0; border-radius:14px; background:var(--chip); color:var(--text); font-size:18px; flex:none; }
+  .gov .govh .gt { flex:1; min-width:0; text-align:left; } .gov .govh .gt b { display:block; font-size:18px; } .gov .govh .gt span { display:block; font-size:12px; color:var(--muted); margin-top:2px; }
+  .govl { max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:8px; }
+  .govr { display:flex; align-items:center; gap:12px; padding:12px; border-radius:14px; background:var(--card); border:1px solid var(--line); cursor:pointer; }
+  .govr.cur { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 14%, var(--card)); }
+  .govr.done { opacity:.6; }
+  .govr .govd { flex:none; width:30px; height:30px; border-radius:50%; background:var(--chip); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; }
+  .govr.cur .govd { background:var(--accent); color:var(--on-accent); }
+  .govr .govt { flex:1; min-width:0; } .govr .govt b { display:block; font-size:15px; } .govr .govt span { display:block; font-size:12px; color:var(--muted); margin-top:2px; }
+  .govr .govm { display:flex; align-items:center; gap:6px; flex:none; }
+  .govr .govm .govg { width:36px; height:48px; margin:0; padding:0; border-radius:10px; background:var(--chip); border:1px solid var(--line); color:var(--text); font-size:20px; letter-spacing:-2px; }
+  .govr.dragging { box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  .govr .govm button { width:38px; height:26px; margin:0; padding:0; border-radius:8px; background:var(--chip); border:1px solid var(--line); color:var(--text); font-size:11px; line-height:1; }
+  .govr .govm button:disabled { opacity:.3; }
   .gtop .gt { flex:1; text-align:left; min-width:0; }
   .gtop .gt b { display:block; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .gtop .gt span { font-size:12px; font-weight:700; color:var(--muted); }
@@ -955,6 +971,14 @@
   .socexi { flex:none; width:20px; color:var(--muted); font-weight:800; font-size:12px; } .socexn { flex:1; min-width:0; font-weight:700; } .socexs { flex:none; color:var(--muted); font-weight:700; font-size:13px; }
   .spost .socexm { width:100%; margin:6px 0 0; padding:8px; background:none; color:var(--accent2); font-size:13px; font-weight:800; }
   .mv .mn .exi { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; margin:0 0 0 8px; padding:0; border-radius:50%; background:var(--chip); color:var(--accent2); font-size:12px; font-weight:900; font-style:italic; font-family:Georgia, serif; vertical-align:middle; line-height:1; }
+  .reordbtn { display:block; margin:2px 0 8px auto; width:auto; padding:7px 14px; border-radius:999px; background:var(--chip); border:1px solid var(--line); color:var(--text); font-size:12px; font-weight:800; }
+  .mv .exmv { display:none; flex:none; align-items:center; gap:6px; margin-left:6px; }
+  .mv .exmv .exgrip { width:34px; height:44px; font-size:20px; letter-spacing:-2px; }
+  .mv .exmv button { width:34px; height:24px; margin:0; padding:0; border-radius:8px; background:var(--chip); border:1px solid var(--line); color:var(--text); font-size:11px; line-height:1; }
+  .reord .mv .exmv { display:flex; }
+  .dragging { position:relative; z-index:5; box-shadow:0 8px 24px rgba(0,0,0,.45); background:var(--card); border-radius:12px; user-select:none; -webkit-user-select:none; opacity:.97; }
+  .mv.dragging { padding-left:8px; padding-right:8px; }
+  .reord .mv .exno { display:none; }
   .mv .exno { flex:none; width:30px; height:30px; margin:0 0 0 2px; padding:0; border-radius:50%; background:transparent; border:1px solid var(--line); color:var(--muted); display:inline-flex; align-items:center; justify-content:center; }
   .mv .exno svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
   .mv .exno:active { background:var(--chip); }
@@ -1709,6 +1733,78 @@
     if (!row.dispatchEvent(new CustomEvent('exhidden', { bubbles: true, cancelable: true }))) return;
     rebuild(); snack('Hidden from future workouts. Here is a fresh workout without ' + name + '.');
   }
+  // ----- exercise order: drag handle on each row (Reorder mode) -----
+  // scheduled workouts are regenerated each time they are drawn, so their chosen order is remembered by day + type
+  function orderKey(type) { return GEN_DATE ? ymd(GEN_DATE) + '|' + type : null; }
+  function applyStoredOrder(items, key) {
+    const names = key && appData && appData.prefs && appData.prefs.orders && appData.prefs.orders[key]; if (!Array.isArray(names)) return;
+    const pos = (m) => { const k = names.indexOf(m.name); return k < 0 ? 1e6 : k; };
+    const sorted = items.map((m, k) => [m, k]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map(x => x[0]);
+    items.splice(0, items.length, ...sorted);
+  }
+  function saveOrder(key, items) {
+    if (!key) return; const P = appData.prefs, o = P.orders && typeof P.orders === 'object' ? P.orders : (P.orders = {});
+    o[key] = items.map(m => m.name);
+    Object.keys(o).sort().slice(0, Math.max(0, Object.keys(o).length - 40)).forEach(k => delete o[k]);   // keep the newest 40 days
+    saveAppData();
+  }
+  // drag a row by its ⠿ handle (finger or mouse). The row follows the pointer and the others make room; onDrop runs when it is let go in a new place.
+  // opts.eligible(node): which siblings can swap places with it. opts.scroller: the scrolling box (default: the page)
+  function dragSort(handle, row, opts) {
+    handle.style.touchAction = 'none';
+    handle.addEventListener('click', (e) => e.stopPropagation());
+    handle.addEventListener('pointerdown', (e) => {
+      if (e.button != null && e.button !== 0) return;
+      e.preventDefault(); e.stopPropagation();
+      const parent = row.parentNode, sibs = () => [...parent.children].filter(opts.eligible), start = sibs().indexOf(row);
+      const grab = e.clientY - row.getBoundingClientRect().top; let lastY = e.clientY, raf = 0, ended = false;
+      try { handle.setPointerCapture(e.pointerId); } catch (x) { /* ignore */ }
+      row.classList.add('dragging');
+      const place = () => {
+        row.style.transform = '';
+        for (let guard = 0; guard < 60; guard++) {
+          const list = sibs(), k = list.indexOf(row), prev = list[k - 1], next = list[k + 1]; let moved = false;
+          if (prev) { const r = prev.getBoundingClientRect(); if (lastY < r.top + r.height / 2) { parent.insertBefore(row, prev); moved = true; } }
+          if (!moved && next) { const r = next.getBoundingClientRect(); if (lastY > r.top + r.height / 2) { parent.insertBefore(next, row); moved = true; } }
+          if (!moved) break;
+        }
+        row.style.transform = 'translateY(' + Math.round(lastY - grab - row.getBoundingClientRect().top) + 'px)';
+      };
+      const tick = () => {   // scroll while the finger is near the top or bottom edge
+        if (ended) return;
+        const sc = opts.scroller || window, h = opts.scroller ? opts.scroller.clientHeight : window.innerHeight, top = opts.scroller ? opts.scroller.getBoundingClientRect().top : 0;
+        const y = lastY - top; let d = 0; if (y < 70) d = -Math.ceil((70 - y) / 5); else if (y > h - 70) d = Math.ceil((y - (h - 70)) / 5);
+        if (d) { sc.scrollBy(0, d); place(); }
+        raf = requestAnimationFrame(tick);
+      };
+      const move = (ev) => { lastY = ev.clientY; place(); };
+      const end = () => {
+        if (ended) return; ended = true; cancelAnimationFrame(raf);
+        handle.removeEventListener('pointermove', move); handle.removeEventListener('pointerup', end); handle.removeEventListener('pointercancel', end);
+        row.classList.remove('dragging'); row.style.transform = '';
+        if (sibs().indexOf(row) !== start && opts.onDrop) opts.onDrop();
+      };
+      handle.addEventListener('pointermove', move); handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
+      place(); raf = requestAnimationFrame(tick);
+    });
+  }
+  // the ⠿ drag handle at the end of a row; moving the row moves the matching entry in the workout's list (guided steps are built from that list)
+  function exMoveBtns(row, items, m, onMoved) {
+    row._m = m;
+    const box = el('div', 'exmv'), grip = el('button', 'exgrip', '⠿');
+    grip.setAttribute('aria-label', 'Drag ' + m.name + ' to move it');
+    dragSort(grip, row, { eligible: (c) => c.classList && c.classList.contains('mv'), onDrop: () => {
+      const rows = [...row.parentNode.children].filter(c => c.classList.contains('mv') && c._m);
+      if (rows.length === items.length) { items.splice(0, items.length, ...rows.map(r => r._m)); if (onMoved) onMoved(); }
+    } });
+    box.appendChild(grip); return box;
+  }
+  function addReorderToggle(body) {
+    const first = body.querySelector('.mv'); if (!first || body.querySelectorAll('.mv').length < 2) return;
+    const b = el('button', 'reordbtn', '↕ Reorder exercises');
+    b.onclick = () => { const on = body.classList.toggle('reord'); b.textContent = on ? '✓ Done reordering' : '↕ Reorder exercises'; };
+    body.insertBefore(b, first);
+  }
   // a builder just picked its exercises: trade any hidden one for the closest allowed exercise (same muscle / category, your equipment)
   function subHiddenItems(items, gi) {
     const h = hiddenSet(); if (!h.size) return;
@@ -1810,9 +1906,10 @@
           const row = el('div', 'mv');
           const left = el('div');
           left.append(exNameNode(m.name), el('div', 'mr', m.rx));
-          row.append(left, exHideBtn(m.name, () => { hideEx(m.name); renderLibrary(); }));
+          row.append(left, exHideBtn(m.name, () => { hideEx(m.name); renderLibrary(); }), exMoveBtns(row, o.moves, m));
           body.appendChild(row);
         });
+        addReorderToggle(body);
         card.appendChild(body);
         const acts = el('div', 'plan-actions');
         acts.appendChild(startBtn(activeCat, o.title, o.mins, o.moves));
@@ -2217,6 +2314,7 @@
 
     const items = picked.map(e => strengthItem(e, I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1)), cfg.intensity));
     subHiddenItems(items, { type: 'strength', items, intensity: cfg.intensity, equip: new Set(cfg.equip), loc: planLoc });
+    const okey = cfg.sup ? null : orderKey('strength'); applyStoredOrder(items, okey);
 
     const title = cfg.muscles.size
       ? (groups.length <= 3 ? groups.map(cap).join(groups.length === 2 ? ' & ' : ', ') : 'Custom Split')
@@ -2254,6 +2352,7 @@
         paint(); row.appendChild(pill);
       }
       row.appendChild(exHideBtn(m.name, () => hideInPlace(m, row, gi, items, mkRow)));
+      if (!cfg.sup) row.appendChild(exMoveBtns(row, items, m, () => saveOrder(okey, items)));
       return row;
     };
     const addRow = (m) => body.appendChild(mkRow(m));
@@ -2265,6 +2364,7 @@
       }
     } else {
       items.forEach(addRow);
+      addReorderToggle(body);
     }
     card.appendChild(body);
 
@@ -2581,6 +2681,7 @@
 
     const items = picked.map(e => calisItem(e, I, I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1))));
     subHiddenItems(items, { type: 'calisthenics', items, intensity: calCfg.intensity, loc: planLoc });
+    const okey = orderKey('calisthenics'); applyStoredOrder(items, okey);
     lastCalItems = items;
 
     const names = CAL_CATS.filter(c => calCfg.cats.has(c[0])).map(c => c[1]);
@@ -2604,9 +2705,11 @@
       left.append(exNameNode(m.name), el('div', 'mr', m.rx + ' • ' + CAL_LABEL[m.cat]));
       row.appendChild(left);
       row.appendChild(exHideBtn(m.name, () => hideInPlace(m, row, gi, items, mkRow)));
+      row.appendChild(exMoveBtns(row, items, m, () => saveOrder(okey, items)));
       return row;
     };
     items.forEach(m => body.appendChild(mkRow(m)));
+    addReorderToggle(body);
     card.appendChild(body);
 
     const actions = el('div', 'plan-actions');
@@ -2760,6 +2863,7 @@
     const opt = { mode: absCfg.mode, work: absCfg.work };
     const items = picked.map(e => absItem(e, I, circ ? S : I.sets[0] + Math.floor(r() * (I.sets[1] - I.sets[0] + 1)), opt));
     subHiddenItems(items, { type: 'abs', items, intensity: absCfg.intensity, wtOn: absCfg.wt, absOpt: opt, loc: planLoc });
+    const okey = orderKey('abs'); applyStoredOrder(items, okey);
 
     const names = ABS_FOCUS.filter(c => absCfg.focus.has(c[0]) && c[0] !== 'full').map(c => c[1]);
     const title = absCfg.focus.has('full') ? 'Full Core' : names.length <= 2 ? names.join(' + ') : 'Custom Core';
@@ -2790,9 +2894,11 @@
         paint(); row.appendChild(pill);
       }
       row.appendChild(exHideBtn(m.name, () => hideInPlace(m, row, gi, items, mkRow)));
+      row.appendChild(exMoveBtns(row, items, m, () => saveOrder(okey, items)));
       return row;
     };
     items.forEach(m => body.appendChild(mkRow(m)));
+    addReorderToggle(body);
     card.appendChild(body);
 
     const actions = el('div', 'plan-actions');
@@ -3769,6 +3875,9 @@
     if (!['ftin', 'cm'].includes(P.heightUnit)) P.heightUnit = P.units === 'kg' ? 'cm' : 'ftin';
     P.restOn = !!P.restOn; P.restSecs = Math.min(600, Math.max(10, Math.round(Number(P.restSecs)) || 60));
     P.restBetween = P.restBetween === undefined ? true : !!P.restBetween;
+    { const o = P.orders && typeof P.orders === 'object' ? P.orders : {}, clean = {};
+      Object.keys(o).slice(0, 60).forEach(k => { if (/^\d{4}-\d{2}-\d{2}\|[a-z]+$/.test(k) && Array.isArray(o[k])) clean[k] = o[k].filter(x => typeof x === 'string').slice(0, 30); });
+      P.orders = clean; }
     P.hiddenEx = (Array.isArray(P.hiddenEx) ? P.hiddenEx : []).filter(x => typeof x === 'string' && x.length > 0 && x.length <= 80).map(x => x.trim()).filter((x, i, a) => x && a.indexOf(x) === i).slice(0, 200);
     // one-time reset: rest now starts by itself after every set for everyone; the toggle in Settings still turns it off afterwards
     if (!P.autoRestV2) { P.autoRest = true; P.autoRestV2 = true; } else P.autoRest = P.autoRest === undefined ? true : !!P.autoRest;
@@ -5920,7 +6029,9 @@
     return out;
   }
   function startBtn(key, title, mins, moves) {
-    const b = guideBtn(title, libSteps(key, moves), { type: key, title, mins, lifts: key === 'strength' ? moves.length : 0, items: moves.map(m => ({ name: m.name, rx: m.rx })) });
+    // built when tapped, so the order on the card (after dragging) is the order of the workout
+    const b = guideBtn(title, () => libSteps(key, moves), null);
+    b.onclick = () => guidedStart(title, libSteps(key, moves), { type: key, title, mins, lifts: key === 'strength' ? moves.length : 0, items: moves.map(m => ({ name: m.name, rx: m.rx })) });
     b.textContent = '▶ Start workout'; return b;
   }
   function addGuide(actions, title, steps, info) { if (steps && steps.length) actions.prepend(guideBtn(title, info && info.rebuild ? info.rebuild : steps, info)); }
@@ -6166,11 +6277,13 @@
     Guided.paused = false; Guided.endAt = Date.now() + Guided.pausedMs; guidedRender(); LockTimer.update();
   }
   function guidedClose() {
+    guidedOverview(false);
     clearInterval(Guided.timer); LockTimer.end();
     try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { /* ignore */ }
     $('guidedModal').classList.add('hidden'); Guided.done = true;
   }
   function guidedFinish() {
+    guidedOverview(false);
     clearInterval(Guided.timer); Guided.done = true; LockTimer.end();
     if (Guided.resumed) { clearPaused(); renderHomeUI(); }
     Cue.play('done', 'Workout complete. Nice work!');
@@ -6188,7 +6301,8 @@
     x.setAttribute('aria-label', 'End workout');
     x.onclick = guidedExit;
     gt.append(el('b', null, Guided.title), el('span', null, st.g ? 'Exercise ' + (Guided.gl.indexOf(st.g) + 1) + ' of ' + Guided.gl.length : 'Step ' + (Guided.i + 1) + ' of ' + Guided.steps.length));
-    top.append(x, gt); box.appendChild(top);
+    const lb = el('button', 'gx glist', '☰'); lb.setAttribute('aria-label', 'See all exercises'); lb.onclick = () => guidedOverview(true);
+    top.append(x, gt, lb); box.appendChild(top);
     const prog = el('div', 'gprog'), bar = el('i'); bar.style.width = Math.round(Guided.i / Guided.steps.length * 100) + '%'; prog.appendChild(bar); box.appendChild(prog);
     if (st.g) return guidedGroup(box, st, nx);
     if (st.kind === 'rate') return guidedRate(box, st);
@@ -6306,6 +6420,77 @@
       guidedSkipExercise(st, name); snack('Hidden. Skipped it.');
     });
     box.appendChild(b);
+  }
+  // ----- all exercises of the running workout: see them, jump to one, and reorder the ones still to come -----
+  // An exercise is a "block": its sets, rests and rating. Rests, ratings and get-ready steps ride with the exercise before them.
+  function guidedBlocks() {
+    const steps = Guided.steps, keyOf = (x) => x.g || x.item || (x.kind === 'work' ? x.name : null);
+    const blocks = [], byKey = new Map(), lead = []; let last = null, together = true;
+    steps.forEach((x, j) => {
+      const k = keyOf(x);
+      if (k == null) { if (last) last.idx.push(j); else lead.push(j); return; }
+      let b = byKey.get(k);
+      if (!b) { b = { key: k, idx: [], name: x.g ? x.g.name : x.item ? x.item.name : x.name }; byKey.set(k, b); blocks.push(b); }
+      else if (b !== last) together = false;   // circuits and supersets come back to the same exercise: their order is fixed
+      b.idx.push(j); last = b;
+    });
+    return { blocks, lead, together };
+  }
+  // order: the exercise blocks (from guidedBlocks) in their new order; the finished and current ones must stay first and unchanged
+  function guidedApplyOrder(order, B) {
+    const steps = Guided.steps, cur = B.blocks.findIndex(b => b.idx.includes(Guided.i));
+    if (!B.together || order.length !== B.blocks.length || order.slice(0, cur + 1).some((b, n) => b !== B.blocks[n])) return;
+    const tpl = steps.find((x, k) => x.kind === 'rest' && B.blocks.some(b => b.idx[b.idx.length - 1] === k));   // an exercise-ending rest to copy
+    const out = B.lead.map(k => steps[k]);
+    order.forEach((b, n) => {
+      b.idx.forEach(k => out.push(steps[k]));
+      const end = out[out.length - 1];
+      if (n < order.length - 1 && end && end.kind !== 'rest' && tpl) { const r = Object.assign({}, tpl); if (end.g) { r.g = end.g; r.gset = end.gset; } else { delete r.g; delete r.gset; } out.push(r); }
+    });
+    while (out.length && out[out.length - 1].kind === 'rest') out.pop();
+    Guided.steps = out; Guided.gl = []; out.forEach(x => { if (x.g && !Guided.gl.includes(x.g)) Guided.gl.push(x.g); });
+    const gi = Guided.info;
+    if (gi && Array.isArray(gi.items)) {   // keep the exercise list in the same order, so a swap or a saved workout rebuilds in this order
+      const pos = new Map(order.map((b, n) => [b.name, n])), sorted = gi.items.map((m, n) => [m, n]).sort((a, c) => ((pos.has(a[0].name) ? pos.get(a[0].name) : 1e6) - (pos.has(c[0].name) ? pos.get(c[0].name) : 1e6)) || (a[1] - c[1])).map(x => x[0]);
+      gi.items.splice(0, gi.items.length, ...sorted);
+    }
+    guidedOverview(true);
+  }
+  function guidedOverview(open) {
+    let ov = $('gOverview');
+    if (!open) { if (ov) ov.remove(); return; }
+    if (Guided.done) return;
+    if (!ov) { ov = el('div', 'gov'); ov.id = 'gOverview'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'All exercises'); $('guidedModal').appendChild(ov); }
+    ov.replaceChildren();
+    const B = guidedBlocks(), cur = B.blocks.findIndex(b => b.idx.includes(Guided.i)), type = Guided.info && Guided.info.type;
+    const canMove = B.together && type !== 'cardio' && B.blocks.length > 1;
+    const head = el('div', 'govh'), close = el('button', 'gx', '✕'); close.setAttribute('aria-label', 'Close the list'); close.onclick = () => guidedOverview(false);
+    const ttl = el('div', 'gt'); ttl.append(el('b', null, 'All exercises'), el('span', null, canMove ? 'Tap one to jump to it. Drag ⠿ to change the order of the ones still to come.' : 'Tap one to jump to it.' + (B.together ? '' : ' The order is fixed in circuits and supersets.')));
+    head.append(close, ttl); ov.appendChild(head);
+    const list = el('div', 'govl');
+    B.blocks.forEach((b, n) => {
+      const done = b.idx[b.idx.length - 1] < Guided.i, isCur = b.idx.includes(Guided.i);
+      const first = Guided.steps[b.idx[0]], itm = Guided.info && Array.isArray(Guided.info.items) ? Guided.info.items.find(m => m.name === b.name) : null;
+      const sub = (itm && itm.rx) || (first && (first.secs ? clock(first.secs) : first.detail)) || '';
+      const row = el('div', 'govr' + (isCur ? ' cur' : done ? ' done' : '')), dot = el('span', 'govd', isCur ? '▶' : done ? '✓' : String(n + 1)), tx = el('div', 'govt');
+      tx.append(el('b', null, b.name), el('span', null, sub));
+      row.append(dot, tx);
+      if (canMove && n > cur) {
+        const mv = el('div', 'govm');
+        const grip = el('button', 'govg', '⠿'); grip.setAttribute('aria-label', 'Drag ' + b.name + ' to move it');
+        row._b = b; row.classList.add('up');
+        dragSort(grip, row, { scroller: ov, eligible: (c) => c.classList && c.classList.contains('up'), onDrop: () => {
+          const ups = [...list.children].filter(c => c.classList.contains('up')).map(c => c._b);
+          guidedApplyOrder(B.blocks.slice(0, cur + 1).concat(ups), B);
+        } });
+        mv.appendChild(grip); row.appendChild(mv);
+      }
+      row.tabIndex = 0;
+      const jump = () => { guidedOverview(false); if (!isCur) guidedEnter(Math.min(...b.idx)); };
+      row.onclick = jump; row.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jump(); } };
+      list.appendChild(row);
+    });
+    ov.appendChild(list);
   }
   // takes every remaining step of one exercise out of the running workout and carries on from the same place
   function guidedSkipExercise(cur, name) {
