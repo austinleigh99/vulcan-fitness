@@ -3679,7 +3679,9 @@
     if (!['mi', 'km'].includes(P.distUnit)) P.distUnit = P.units === 'kg' ? 'km' : 'mi';
     if (!['ftin', 'cm'].includes(P.heightUnit)) P.heightUnit = P.units === 'kg' ? 'cm' : 'ftin';
     P.restOn = !!P.restOn; P.restSecs = Math.min(600, Math.max(10, Math.round(Number(P.restSecs)) || 60));
-    P.autoRest = P.autoRest === undefined ? true : !!P.autoRest;
+    P.restBetween = P.restBetween === undefined ? true : !!P.restBetween;
+    // one-time reset: rest now starts by itself after every set for everyone; the toggle in Settings still turns it off afterwards
+    if (!P.autoRestV2) { P.autoRest = true; P.autoRestV2 = true; } else P.autoRest = P.autoRest === undefined ? true : !!P.autoRest;
     P.incStep = [2.5, 5, 10].includes(Number(P.incStep)) ? Number(P.incStep) : 5;
     P.setsRepsOn = !!P.setsRepsOn;
     P.defSets = Math.min(10, Math.max(1, Math.round(Number(P.defSets)) || 3));
@@ -5721,6 +5723,7 @@
   // ----- guided workouts: step builders -----
   const gWork = (name, secs, detail, say) => ({ kind: 'work', name, secs: secs || 0, detail: detail || '', say });
   const gRest = (secs, detail) => ({ kind: 'rest', name: 'Rest', secs, detail: detail || '' });
+  const gRestS = (secs, detail) => Object.assign(gRest(secs, detail), { skippable: true });   // rests between sets: can be turned off in Settings
   const gInfo = (name, secs, detail) => ({ kind: 'info', name, secs, detail: detail || '' });
   function parseRx(rx) {
     const m = /^(\d+)\s*×\s*(.+)$/.exec(String(rx));
@@ -5744,15 +5747,15 @@
     if (sup) {
       for (let i = 0; i < P.length; i += 2) {
         const A = P[i], B = P[i + 1];
-        if (!B) { for (let s = 1; s <= A.sets; s++) { out.push(setStep(A, s)); if (s === A.sets && rated(A)) out.push(gRate(A)); out.push(gRest(rest)); } continue; }
+        if (!B) { for (let s = 1; s <= A.sets; s++) { out.push(setStep(A, s)); if (s === A.sets && rated(A)) out.push(gRate(A)); out.push(gRestS(rest)); } continue; }
         const n = Math.min(A.sets, B.sets);
-        for (let s = 1; s <= n; s++) { out.push(setStep(A, s)); out.push(gRest(30)); out.push(setStep(B, s)); if (s === n) { if (rated(A)) out.push(gRate(A)); if (rated(B)) out.push(gRate(B)); } out.push(gRest(90)); }
+        for (let s = 1; s <= n; s++) { out.push(setStep(A, s)); out.push(gRestS(30)); out.push(setStep(B, s)); if (s === n) { if (rated(A)) out.push(gRate(A)); if (rated(B)) out.push(gRate(B)); } out.push(gRestS(90)); }
       }
     } else {
       // every exercise is one page: its sets, rests and rating are tagged with a shared group so the screen stays put until the last set
       const grp = (x) => x._g || (x._g = { name: x.name, item: x.item, sets: x.sets, hold: x.hold, what: x.what });
       const tag = (st, x, s) => { st.g = grp(x); st.gset = s; return st; };
-      P.forEach(x => { for (let s = 1; s <= x.sets; s++) { out.push(tag(setStep(x, s), x, s)); if (s === x.sets && rated(x)) out.push(tag(gRate(x), x, s)); out.push(tag(gRest(rest), x, s)); } });
+      P.forEach(x => { for (let s = 1; s <= x.sets; s++) { out.push(tag(setStep(x, s), x, s)); if (s === x.sets && rated(x)) out.push(tag(gRate(x), x, s)); out.push(tag(gRestS(rest), x, s)); } });
     }
     while (out.length && out[out.length - 1].kind === 'rest') out.pop();
     return out;
@@ -5767,9 +5770,9 @@
         st.item = x.item; st.what = x.what;
         if (rate && x.item.weighted) st.det = () => base + (x.item.wt > 0 ? '' : ' · enter the weight you are using');
         out.push(st);
-        if (k < P.length - 1) out.push(gRest(restEx));
+        if (k < P.length - 1) out.push(gRestS(restEx));
       });
-      if (s < S) out.push(gRest(restSet, 'Set ' + s + ' done. Rest, then set ' + (s + 1) + ' starts with ' + P[0].name));
+      if (s < S) out.push(gRestS(restSet, 'Set ' + s + ' done. Rest, then set ' + (s + 1) + ' starts with ' + P[0].name));
     }
     if (rate) P.filter(x => x.item.weighted).forEach(x => out.push({ kind: 'rate', name: 'How was ' + x.name + '?', ex: x.name, item: x.item, secs: 0, detail: '', say: 'How did ' + x.name + ' feel?' }));
     return out;
@@ -5938,6 +5941,7 @@
   const RING = 2 * Math.PI * 88;
   function guidedStart(title, steps, info) {
     if (!steps || !steps.length) return;
+    if (appData && appData.prefs && appData.prefs.restBetween === false) { const kept = steps.filter(x => !(x.kind === 'rest' && x.skippable)); if (kept.length) steps = kept; }
     clearInterval(Guided.timer);
     Object.assign(Guided, { steps, title, info, done: false, paused: false });
     Guided.gl = []; steps.forEach(s => { if (s.g && !Guided.gl.includes(s.g)) Guided.gl.push(s.g); });
@@ -6593,6 +6597,7 @@
       const right = el('span'); right.append(mkNum(P.restSecs, 10, 600, v => { P.restSecs = v; saveAppData(); }), el('span', 'wu', 'sec'));
       r.appendChild(right); c.appendChild(r);
     }
+    c.appendChild(mkToggle('Rest between sets', 'Off: strength and circuit workouts go straight to the next set with no rest screen', P.restBetween, v => { P.restBetween = v; saveAppData(); redraw(); }));
     c.appendChild(mkToggle('Auto-start rest', 'In a guided workout, start the rest countdown as soon as you finish a set', P.autoRest, v => { P.autoRest = v; saveAppData(); }));
     c.appendChild(mkToggle('Smart weights', 'Lowers an exercise after a miss and raises it as you get stronger. Dumbbells, kettlebells and machines move ' + (pgUnit() === 'kg' ? '2.5 kg' : '5 lb') + ' at a time; barbells and plate lifts move ' + (pgUnit() === 'kg' ? '1 kg' : '2.5 lb'), P.progOn, v => { P.progOn = v; saveAppData(); redraw(); }));
     if (P.progOn) {
