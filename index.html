@@ -172,6 +172,9 @@
   .govr.dragging { box-shadow:0 8px 24px rgba(0,0,0,.5); }
   .govr .govm button { width:38px; height:26px; margin:0; padding:0; border-radius:8px; background:var(--chip); border:1px solid var(--line); color:var(--text); font-size:11px; line-height:1; }
   .govr .govm button:disabled { opacity:.3; }
+  .gtotal { margin:14px auto 0; padding:12px 22px; border-radius:16px; background:var(--chip); border:1px solid var(--line); text-align:center; }
+  .gtotal span { display:block; font-size:11px; font-weight:900; letter-spacing:.1em; color:var(--muted); }
+  .gtotal b { display:block; font-size:30px; font-weight:900; margin-top:2px; font-variant-numeric:tabular-nums; }
   .gtop .gt { flex:1; text-align:left; min-width:0; }
   .gtop .gt b { display:block; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .gtop .gt span { font-size:12px; font-weight:700; color:var(--muted); }
@@ -4042,10 +4045,11 @@
 
   // ----- completing workouts -----
   async function addLog(info) {
+    const mins = info.actualSecs ? Math.max(1, Math.round(info.actualSecs / 60)) : Math.max(1, Math.round(info.mins || 0));   // a guided workout logs the time it really took
     const entry = {
       id: 'local-' + Date.now() + Math.random().toString(36).slice(2, 6), performed_on: todayLocal(), wtype: info.type,
-      title: info.title || (WTYPES[info.type] || {}).label || 'Workout', minutes: Math.max(1, Math.round(info.mins || 0)),
-      calories: calcCal(info), lifts: info.lifts || 0
+      title: info.title || (WTYPES[info.type] || {}).label || 'Workout', minutes: mins,
+      calories: calcCal(Object.assign({}, info, { mins })), lifts: info.lifts || 0
     };
     if (Array.isArray(info.items) && info.items.length) entry.ex = info.items.filter(it => it && it.name).slice(0, 20).map(it => ({ n: String(it.name).slice(0, 50), r: String(it.rx || '').slice(0, 24) }));
     logs.unshift(entry); lsSet('logs', logs); renderHomeUI(); socAfterLog(entry);
@@ -6139,7 +6143,7 @@
   }
 
   // ----- guided workouts: the session -----
-  const Guided = { steps: [], i: 0, title: '', info: null, paused: false, done: false, remaining: 0, endAt: 0, pausedMs: 0, lastTick: -1, timer: null };
+  const Guided = { acc: 0, t0: 0, steps: [], i: 0, title: '', info: null, paused: false, done: false, remaining: 0, endAt: 0, pausedMs: 0, lastTick: -1, timer: null };
   const RING = 2 * Math.PI * 88;
   // ----- "Finish workout later": the unfinished workout waits on Home until the day is over or it is finished -----
   // Stored on this device only (one slot). Steps hold functions and shared objects, so they are flattened here and rebuilt on resume.
@@ -6160,7 +6164,7 @@
     let info = null;
     try { info = JSON.parse(JSON.stringify(Guided.info, (k, v) => (k[0] === '_' || k === 'items' || typeof v === 'function') ? undefined : (v instanceof Set ? { setOf: Array.from(v) } : v))); } catch (e) { info = prim(Guided.info); }
     if (info) info.itemIdx = itemIdx;
-    return { v: 1, date: todayLocal(), at: new Date().toISOString(), title: Guided.title, i: Guided.i, steps, groups: gl, items: items.map(prim), info };
+    return { v: 1, date: todayLocal(), at: new Date().toISOString(), el: guidedElapsed(), title: Guided.title, i: Guided.i, steps, groups: gl, items: items.map(prim), info };
   }
   function unpackGuided(rec) {
     const items = rec.items.map(x => Object.assign({}, x));
@@ -6218,7 +6222,7 @@
     const where = st && st.g != null ? 'Exercise ' + (gs.indexOf(st.g) + 1) + ' of ' + gs.length : 'Step ' + (r.i + 1) + ' of ' + r.steps.length;
     c.append(el('div', 'pck', 'WORKOUT IN PROGRESS'), el('div', 'pct', r.title || 'Workout'), el('div', 'pcs', where + ' · saved ' + new Date(r.at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) + '. Stays here until the day ends.'));
     const row = el('div', 'pcb'), go = el('button', 'pcgo', '▶ Resume workout'), drop = el('button', 'pcx', 'Discard');
-    go.onclick = () => { const q = pausedWorkout(); if (!q) { renderPausedCard(); return; } const u = unpackGuided(q); guidedStart(q.title, u.steps, u.info, q.i); };
+    go.onclick = () => { const q = pausedWorkout(); if (!q) { renderPausedCard(); return; } const u = unpackGuided(q); guidedStart(q.title, u.steps, u.info, q.i, q.el); };
     drop.onclick = () => appConfirm({ icon: '🗑', title: 'Discard this workout?', msg: 'Your saved place is deleted. You can start the workout again from your plan.', ok: 'Discard', cancel: 'Keep it', danger: true }, () => { clearPaused(); renderPausedCard(); });
     row.append(go, drop); c.appendChild(row); box.appendChild(c);
   }
@@ -6228,11 +6232,14 @@
     if (!(appData && appData.prefs && appData.prefs.restBetween === false)) return steps;
     const kept = steps.filter(x => !(x.kind === 'rest' && x.skippable)); return kept.length ? kept : steps;
   }
-  function guidedStart(title, steps, info, startAt) {
+  // the real time a workout took: counts from Start to the end, rests included, but not the time it was saved for later. Shown only on the finish screen.
+  function guidedElapsed() { return Guided.done && Guided.endMs != null ? Guided.endMs : Guided.acc + Math.max(0, Date.now() - Guided.t0); }
+  function guidedStart(title, steps, info, startAt, elapsedMs) {
     if (!steps || !steps.length) return;
     if (startAt == null) steps = applyRestPref(steps);
     clearInterval(Guided.timer);
-    Object.assign(Guided, { steps, title, info, done: false, paused: false, resumed: startAt != null });
+    if (info) delete info.actualSecs;
+    Object.assign(Guided, { steps, title, info, done: false, paused: false, resumed: startAt != null, acc: Math.max(0, +elapsedMs || 0), t0: Date.now(), endMs: null });
     Guided.gl = []; steps.forEach(s => { if (s.g && !Guided.gl.includes(s.g)) Guided.gl.push(s.g); });
     Cue.prime(); LockTimer.begin();
     $('guidedModal').classList.remove('hidden');
@@ -6284,11 +6291,14 @@
   }
   function guidedFinish() {
     guidedOverview(false);
-    clearInterval(Guided.timer); Guided.done = true; LockTimer.end();
+    const spent = guidedElapsed(); clearInterval(Guided.timer); Guided.endMs = spent; Guided.done = true; LockTimer.end();
+    if (Guided.info) Guided.info.actualSecs = Math.max(1, Math.round(spent / 1000));
     if (Guided.resumed) { clearPaused(); renderHomeUI(); }
     Cue.play('done', 'Workout complete. Nice work!');
     const box = $('gBox'); box.replaceChildren();
-    box.append(el('div', 'gdone-ic', '🎉'), el('div', 'gname', 'Workout complete!'), el('div', 'gdetail', Guided.title));
+    const secs = Math.max(1, Math.round(spent / 1000)), h = Math.floor(secs / 3600), tm = (h ? h + ':' + String(Math.floor(secs % 3600 / 60)).padStart(2, '0') : String(Math.floor(secs / 60))) + ':' + String(secs % 60).padStart(2, '0');
+    const wt = el('div', 'gtotal'); wt.append(el('span', null, 'WORKOUT TIME'), el('b', null, tm));
+    box.append(el('div', 'gdone-ic', '🎉'), el('div', 'gname', 'Workout complete!'), el('div', 'gdetail', Guided.title), wt);
     const ctl = el('div', 'gctl');
     const col = el('div'); col.style.cssText = 'flex:1;display:flex;flex-direction:column;gap:0';
     const close = el('button', 'secondary', 'Close'); close.onclick = guidedClose;
