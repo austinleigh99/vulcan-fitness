@@ -6603,7 +6603,7 @@
       const k = keyOf(x);
       if (k == null) { if (last) last.idx.push(j); else lead.push(j); return; }
       let b = byKey.get(k);
-      if (!b) { b = { key: k, idx: [], name: x.g ? x.g.name : x.item ? x.item.name : x.name }; byKey.set(k, b); blocks.push(b); }
+      if (!b) { b = { key: k, idx: [], name: x.g ? x.g.name : x.item ? x.item.name : x.name, extra: !!x.extra }; byKey.set(k, b); blocks.push(b); }
       else if (b !== last) together = false;   // circuits and supersets come back to the same exercise: their order is fixed
       b.idx.push(j); last = b;
     });
@@ -6611,8 +6611,10 @@
   }
   // order: the exercise blocks (from guidedBlocks) in their new order; the finished and current ones must stay first and unchanged
   function guidedApplyOrder(order, B) {
-    const steps = Guided.steps, cur = B.blocks.findIndex(b => b.idx.includes(Guided.i));
-    if (!B.together || order.length !== B.blocks.length || order.slice(0, cur + 1).some((b, n) => b !== B.blocks[n])) return;
+    const steps = Guided.steps, cur = B.blocks.findIndex(b => b.idx.includes(Guided.i)), curStep = steps[Guided.i];
+    // finished exercises and the warm-up / cardio / cool-down blocks stay where they are; the one you are on can move
+    if (!B.together || order.length !== B.blocks.length || order.some((b, n) => (n < cur || B.blocks[n].extra) && b !== B.blocks[n])) return;
+    const curMoved = order.indexOf(B.blocks[cur]) !== cur;
     const tpl = steps.find((x, k) => x.kind === 'rest' && B.blocks.some(b => b.idx[b.idx.length - 1] === k));   // an exercise-ending rest to copy
     const out = B.lead.map(k => steps[k]);
     order.forEach((b, n) => {
@@ -6622,11 +6624,14 @@
     });
     while (out.length && out[out.length - 1].kind === 'rest') out.pop();
     Guided.steps = out; Guided.gl = []; out.forEach(x => { if (x.g && !Guided.gl.includes(x.g)) Guided.gl.push(x.g); });
+    if (curMoved) { const nb = order[cur], at = out.indexOf(steps[Math.min(...nb.idx)]); Guided.i = Math.max(0, at); }   // the exercise you are now up to is the one that took its place
+    else Guided.i = Math.max(0, out.indexOf(curStep));
     const gi = Guided.info;
     if (gi && Array.isArray(gi.items)) {   // keep the exercise list in the same order, so a swap or a saved workout rebuilds in this order
       const pos = new Map(order.map((b, n) => [b.name, n])), sorted = gi.items.map((m, n) => [m, n]).sort((a, c) => ((pos.has(a[0].name) ? pos.get(a[0].name) : 1e6) - (pos.has(c[0].name) ? pos.get(c[0].name) : 1e6)) || (a[1] - c[1])).map(x => x[0]);
       gi.items.splice(0, gi.items.length, ...sorted);
     }
+    if (curMoved) guidedEnter(Guided.i);
     guidedOverview(true);
   }
   function guidedOverview(open) {
@@ -6638,7 +6643,7 @@
     const B = guidedBlocks(), cur = B.blocks.findIndex(b => b.idx.includes(Guided.i)), type = Guided.info && Guided.info.type;
     const canMove = B.together && type !== 'cardio' && B.blocks.length > 1;
     const head = el('div', 'govh'), close = el('button', 'gx', '✕'); close.setAttribute('aria-label', 'Close the list'); close.onclick = () => guidedOverview(false);
-    const ttl = el('div', 'gt'); ttl.append(el('b', null, 'All exercises'), el('span', null, canMove ? 'Tap one to jump to it. Drag ⠿ to change the order of the ones still to come.' : 'Tap one to jump to it.' + (B.together ? '' : ' The order is fixed in circuits and supersets.')));
+    const ttl = el('div', 'gt'); ttl.append(el('b', null, 'All exercises'), el('span', null, canMove ? 'Tap one to jump to it. Drag ⠿ to change the order of the ones not finished yet.' : 'Tap one to jump to it.' + (B.together ? '' : ' The order is fixed in circuits and supersets.')));
     head.append(close, ttl); ov.appendChild(head);
     const list = el('div', 'govl');
     B.blocks.forEach((b, n) => {
@@ -6648,13 +6653,17 @@
       const row = el('div', 'govr' + (isCur ? ' cur' : done ? ' done' : '')), dot = el('span', 'govd', isCur ? '▶' : done ? '✓' : String(n + 1)), tx = el('div', 'govt');
       tx.append(el('b', null, b.name), el('span', null, sub));
       row.append(dot, tx);
-      if (canMove && n > cur) {
+      if (canMove && n >= cur && !b.extra) {
         const mv = el('div', 'govm');
         const grip = el('button', 'govg', '⠿'); grip.setAttribute('aria-label', 'Drag ' + b.name + ' to move it');
         row._b = b; row.classList.add('up');
         dragSort(grip, row, { scroller: ov, eligible: (c) => c.classList && c.classList.contains('up'), onDrop: () => {
           const ups = [...list.children].filter(c => c.classList.contains('up')).map(c => c._b);
-          guidedApplyOrder(B.blocks.slice(0, cur + 1).concat(ups), B);
+          const order = B.blocks.map((bb, k) => (k >= cur && !bb.extra) ? ups.shift() : bb);
+          const curB = B.blocks[cur], movedCur = order.indexOf(curB) !== cur, begun = Guided.i > Math.min(...curB.idx);
+          if (movedCur && begun && !curB.extra) appConfirm({ icon: '↕️', title: 'Move ' + curB.name + '?', msg: 'You’ve already started it. If you move it later, you’ll start it again from the beginning when you get to it.', ok: 'Move it', cancel: 'Keep it here' }, () => guidedApplyOrder(order, B));
+          else guidedApplyOrder(order, B);
+          if (movedCur && begun && !curB.extra) guidedOverview(true);
         } });
         mv.appendChild(grip); row.appendChild(mv);
       }
