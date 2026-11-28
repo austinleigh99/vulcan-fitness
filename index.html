@@ -415,6 +415,19 @@
   @media (prefers-reduced-motion: reduce) { .cfm, .cfmc { animation:none; } }
   .gsets { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:14px 0 2px; }
   .gs { width:40px; height:40px; border-radius:12px; background:var(--chip); color:var(--muted); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; }
+  #gBox:has(.gtab) .gring { width:min(56vw, 210px); margin:14px 0 8px; } #gBox:has(.gtab) .gtime { font-size:44px; } #gBox:has(.gtab) .gtgt { margin-top:10px; }
+  .gtabs { align-self:stretch; display:flex; flex-direction:column; gap:8px; }
+  .gth { padding:8px 12px 2px; font-size:12px; font-weight:800; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
+  .gtab { flex:none; align-self:stretch; margin:10px 0 4px; border-radius:14px; border:1px solid var(--line); overflow:hidden; background:var(--card); }
+  .gtr { display:grid; grid-template-columns:34px 1fr 20px 1fr; align-items:center; gap:6px; padding:9px 12px; border-top:1px solid var(--line); font-size:15px; }
+  .gtr:first-child { border-top:0; }
+  .gtr .gtn { width:26px; height:26px; border-radius:8px; background:var(--chip); color:var(--muted); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px; }
+  .gtr.done .gtn { background:var(--green); color:#04230f; }
+  .gtr.now { background:color-mix(in srgb, var(--accent) 14%, var(--card)); }
+  .gtr.now .gtn { background:var(--accent); color:var(--on-accent); }
+  .gtr .gtv b { font-weight:900; font-size:17px; } .gtr .gtv i { font-style:normal; color:var(--muted); font-size:12px; font-weight:700; }
+  .gtr .gtv.w { text-align:right; } .gtr .gtx { color:var(--muted); font-weight:900; text-align:center; }
+  .gtr:not(.done):not(.now) .gtv { opacity:.6; }
   .gs.done { background:var(--green); color:#04230f; }
   .gs.now { background:var(--accent); color:var(--on-accent); }
   .gtgt { display:flex; gap:10px; width:100%; margin:18px 0 4px; }
@@ -968,6 +981,7 @@
   .socrank { display:flex; align-items:center; gap:10px; margin-top:12px; } .socrank.me .socn { color:var(--accent2); } .socpos { flex:none; width:30px; text-align:center; font-weight:900; font-size:18px; } .socval { font-weight:900; font-size:14px; flex:none; }
   .socbar { display:block; height:6px; border-radius:99px; background:var(--chip); overflow:hidden; margin:6px 0 0 40px; } .socbar i { display:block; height:100%; background:var(--accent); border-radius:99px; }
   .snack { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(86px + env(safe-area-inset-bottom, 0px)); z-index:3900; display:flex; align-items:center; gap:14px; max-width:92vw; padding:12px 16px; border-radius:99px; background:var(--text); color:var(--bg); font-size:14px; font-weight:700; box-shadow:0 8px 30px rgba(0,0,0,.4); animation:cfmFade .2s ease; }
+  .snack.top { bottom:calc(190px + env(safe-area-inset-bottom, 0px)); white-space:nowrap; }   /* the “Share it” prompt floats above the bottom buttons so it never covers Logged */
   .snack button { width:auto; margin:0; padding:6px 12px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-size:13px; font-weight:800; }
   .sochdr { display:flex; align-items:center; justify-content:space-between; margin:8px 0 16px; } .sochdr h1 { margin:0; }
   .sochdr .socmebtn { width:auto; margin:0; padding:0; background:none; border-radius:50%; line-height:0; border:2px solid var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); } .sochdr .socmebtn .socav { width:42px; height:42px; font-size:18px; }
@@ -2325,6 +2339,7 @@
     const it = { name: e[0], muscle: e[1], rx };
     if (e[4] === 'oly') it.oly = true;
     if (progOn() && isWeighted(e)) { it.weighted = true; it.wt = progSuggest(e[0], e[3] ? 0 : e[4] === 'oly' ? 3 : Number(DP ? DP.defReps : pr)); it.last = progLast(e[0]); it.w0 = it.wt; it.r0 = e[3] ? 0 : itemReps(it); }
+    else if (isWeighted(e) && !e[3] && e[4] !== 'oly') { it.wshow = true; it.libW = true; const mw = (lsGet('libW', {}) || {})[e[0]]; it.wt = mw > 0 ? mw : null; }   // smart weights off: still give you a weight box (it remembers what you typed last time, nothing is tracked)
     return it;
   }
   function buildStrength() {
@@ -5202,9 +5217,9 @@
   }
   let socSyncTimer = null;
   function socSyncSoon() { clearTimeout(socSyncTimer); socSyncTimer = setTimeout(() => { socSyncScores().catch(() => {}); }, 1500); }
-  function snack(msg, label, fn) {
+  function snack(msg, label, fn, top) {
     document.querySelectorAll('.snack').forEach(s => s.remove());
-    const s = el('div', 'snack'); s.appendChild(el('span', null, msg));
+    const s = el('div', 'snack' + (top ? ' top' : '')); s.appendChild(el('span', null, msg));
     if (label) { const b = el('button', null, label); b.onclick = () => { s.remove(); if (fn) fn(); }; s.appendChild(b); }
     document.body.appendChild(s); setTimeout(() => s.remove(), 6500);
   }
@@ -5220,7 +5235,7 @@
   }
   function socAfterLog(entry) {
     const P = appData.prefs; if (!P.socOn || !socOK()) return;
-    if (P.shareActivity) socAutoPost(entry); else snack('Workout logged', 'Share it', () => { showTab('social'); setTimeout(() => openCompose(entry), 50); });
+    if (P.shareActivity) socAutoPost(entry); else snack('Workout logged', 'Share it', () => { showTab('social'); setTimeout(() => openCompose(entry), 50); }, true);
     socSyncSoon(); socPushStatsSoon();
   }
   function socAfterUnlog(entry) {
@@ -6041,6 +6056,23 @@
   }
   // "Start workout" for the quick library and basic plan cards: builds guided steps from the rx text
   // ("3 × 8-10", "10 min easy", "40s on / 20s off", "45 sec each side") so it runs like a scheduled workout
+  // quick-search strength workouts get a weight box too. It starts at the last weight you used for that exercise (from your progress, or what you typed here before) and is remembered per exercise.
+  function libWeightItems(items) {
+    const mem = lsGet('libW', {}) || {};
+    return items.map(m => {
+      const e = EXERCISES.find(x => x[0] === m.name);
+      if (e ? !isWeighted(e) || e[3] : false) return m;
+      if (parseRx(m.rx).hold > 0) return m;
+      const reps = (parseRx(m.rx) || {}).what ? Number(String(parseRx(m.rx).what).match(/\d+/) || 0) : 0;
+      let w = null; try { w = progSuggest(m.name, reps); } catch (x) { w = null; }
+      if (!(w > 0) && mem[m.name] > 0) w = mem[m.name];
+      return Object.assign({}, m, { weighted: true, libW: true, wt: w > 0 ? w : null });
+    });
+  }
+  function libWeightSave(it) {
+    if (!it || !it.libW || !(it.wt > 0)) return;
+    const mem = lsGet('libW', {}) || {}; mem[it.name] = it.wt; lsSet('libW', mem);
+  }
   function libSteps(key, moves) {
     const secOf = (rx) => {
       let m;
@@ -6051,7 +6083,8 @@
       return 45;
     };
     const items = moves.map(m => ({ name: m.name, rx: m.rx })), out = [];
-    if (key === 'strength' || key === 'calisthenics') return repSteps(items, 75, false, false);
+    if (key === 'strength') return repSteps(libWeightItems(items), 75, false, false);
+    if (key === 'calisthenics') return repSteps(items, 75, false, false);
     if (key === 'pilates') return repSteps(items.map(m => ({ name: m.name, rx: '1 × ' + (/(\d+)\s*sec hold/.test(m.rx) ? m.rx.replace(/(\d+)\s*sec hold/, '$1s hold') : m.rx) })), 20, false, false);
     if (key === 'cardio') {
       moves.forEach(m => {
@@ -6430,7 +6463,17 @@
     }
     if (rem <= 0) guidedNext();
   }
-  function guidedNext() { if (!Guided.done) guidedEnter(Guided.i + 1); }
+  // remembers the weight and reps used for a finished set, so the rest page can list every set (kept as plain text so saving for later keeps it)
+  function guidedLogSet(st) {
+    if (!st || st.kind !== 'work') return;
+    const it = (st.g && st.g.item) || st.item; if (!it) return;
+    libWeightSave(it);
+    const what = st.what || (st.g && st.g.what), hold = st.g ? st.g.hold > 0 : !!st.secs;
+    let k = st.gset;
+    if (!k) { k = 1; for (let j = 0; j < Guided.i; j++) { const x = Guided.steps[j]; if (x.kind === 'work' && x.item === it) k++; } }   // supersets and circuits: count which set this is
+    it['l' + k] = ((it.weighted || it.wshow) && it.wt > 0 ? it.wt : 0) + '|' + (hold ? '' : (it.reps != null ? it.reps : (what || '')));
+  }
+  function guidedNext() { if (!Guided.done) { guidedLogSet(Guided.steps[Guided.i]); guidedEnter(Guided.i + 1); } }
   // going back inside an exercise page skips the rest countdowns, so you land on the previous set instead of restarting a rest
   function guidedBack() {
     if (Guided.done) return;
@@ -6491,7 +6534,9 @@
     if (st.kind !== 'rest') exHowBtn(box, st.name);
     guidedSwapBtn(box, st);
     guidedHideBtn(box, st);
-    guidedTargets(box, st);
+    guidedSetTable(box, st);
+    if (st.kind === 'rest') { let n = Guided.i + 1; while (n < Guided.steps.length && !(Guided.steps[n].kind === 'work' && Guided.steps[n].item)) n++; if (Guided.steps[n]) guidedTargets(box, Guided.steps[n]); }   // change the next set's weight or reps while you rest
+    else guidedTargets(box, st);
     const dt = st.det ? st.det() : st.detail;
     if (dt) box.appendChild(el('div', 'gdetail', dt));
     if (nx) { const n = el('div', 'gnext'); n.append('Next: ', el('b', null, nx.name === 'Rest' ? 'Rest ' + clock(nx.secs) : nx.name)); box.appendChild(n); }
@@ -6514,6 +6559,46 @@
     }
     box.appendChild(row);
   }
+  // every set of the exercise with its reps and weight: finished sets show what you actually did, the rest show the plan (and follow any change you make)
+  function guidedSetTable(box, st) {
+    // which exercise(s) this page is about: the one you are on, or (on a rest page of a superset / circuit) the one just done and the one coming up
+    const steps = Guided.steps, work = (j) => steps[j] && steps[j].kind === 'work' && steps[j].item ? steps[j].item : null;
+    let items = [];
+    if (st.g) items = [st.g.item || st.item]; else if (st.kind === 'work') items = [st.item];
+    else { let p = Guided.i - 1, n = Guided.i + 1; while (p >= 0 && !work(p)) p--; while (n < steps.length && !work(n)) n++; items = [p >= 0 ? work(p) : null, n < steps.length ? work(n) : null]; }
+    items = items.filter((it, k) => it && items.indexOf(it) === k);
+    const specs = items.map(it => {
+      const idx = []; steps.forEach((x, j) => { if (x.kind === 'work' && x.item === it) idx.push(j); });
+      if (!idx.length) return null;
+      const first = steps[idx[0]], hold = (first.g ? first.g.hold : first.secs) || 0;
+      return { it, name: first.name, sets: idx.length, hold, what: first.what || (first.g && first.g.what), cur: idx.filter(j => j < Guided.i).length + 1 + (st.kind === 'rest' && st.g ? 0 : 0) };
+    }).filter(Boolean).filter(sp => !(sp.hold > 0 && !(sp.it.weighted || sp.it.wshow)) && !(sp.sets < 2 && !(sp.it.weighted || sp.it.wshow)));
+    if (!specs.length) return false;
+    // a rest page: the set you just finished counts as done (the rest step sits after it, so it is already before this step)
+    const wrap = el('div', 'gtabs'), paint = [];
+    specs.forEach(sp => {
+      const tab = el('div', 'gtab'); tab.setAttribute('role', 'table'); tab.setAttribute('aria-label', sp.name + ' sets');
+      const fill = () => {
+        tab.replaceChildren();
+        if (specs.length > 1) tab.appendChild(el('div', 'gth', sp.name));
+        const it = sp.it, showW = !!(it.weighted || it.wshow);
+        for (let k = 1; k <= sp.sets; k++) {
+          const done = k < sp.cur, now = k === sp.cur && sp === specs[specs.length - 1], rec = it['l' + k] ? String(it['l' + k]).split('|') : null;
+          const w = done && rec ? Number(rec[0]) : it.wt, r = done && rec ? rec[1] : (it.reps != null ? it.reps : sp.what);
+          const row = el('div', 'gtr' + (done ? ' done' : now ? ' now' : '')); row.setAttribute('role', 'row');
+          const n = el('span', 'gtn', done ? '✓' : String(k));
+          const rr = el('span', 'gtv'); if (sp.hold <= 0) rr.append(el('b', null, String(r || '—')), el('i', null, ' reps')); else rr.append(el('b', null, clock(sp.hold)), el('i', null, ' hold'));
+          const ww = el('span', 'gtv w'); if (showW) ww.append(el('b', null, w > 0 ? wFmt(w) : '—'), el('i', null, ' ' + pgUnit()));
+          row.setAttribute('aria-label', 'Set ' + k + ', ' + (sp.hold > 0 ? '' : r + ' reps, ') + (showW && w > 0 ? wFmt(w) + ' ' + pgUnit() : '') + (done ? ', done' : now ? ', next' : ''));
+          row.append(n, rr, el('span', 'gtx', showW ? '×' : ''), ww); tab.appendChild(row);
+        }
+      };
+      fill(); paint.push(fill); wrap.appendChild(tab);
+    });
+    box.appendChild(wrap);
+    Guided.repaintSets = () => { if (wrap.isConnected) paint.forEach(f => f()); };
+    return true;
+  }
   function guidedGroup(box, st, nx) {
     if (st.kind === 'rate') return guidedRate(box, st);
     const G = st.g, rest = st.kind === 'rest', timed = !!st.secs, last = st.gset >= G.sets;
@@ -6528,7 +6613,7 @@
     if (!rest) exHowBtn(box, G.name);
     if (!rest) guidedSwapBtn(box, st);
     if (!rest) guidedHideBtn(box, st);
-    guidedSets(box, st);
+    if (!guidedSetTable(box, st)) guidedSets(box, st);   // the table already shows every set, so the little number boxes are only for exercises without it
     guidedTargets(box, st);
     const dt = rest ? '' : (st.det ? st.det() : st.detail);
     if (dt) box.appendChild(el('div', 'gdetail', dt));
@@ -6742,7 +6827,7 @@
   function guidedTargets(box, st) {
     const it = st.item || (st.g && st.g.item); if (!it || (st.kind !== 'work' && !st.g)) return;
     const what = st.what || (st.g && st.g.what), isHold = st.g ? st.g.hold > 0 : !!st.secs;
-    const showW = !!it.weighted, showR = !isHold; if (!showW && !showR) return;
+    const showW = !!(it.weighted || it.wshow), showR = !isHold; if (!showW && !showR) return;
     const row = el('div', 'gtgt'), step = wStep(it.name); let wInp = null;
     // changing the reps also shifts the weight (fewer reps = a bit heavier, more reps = lighter) until the user types their own weight
     const syncW = () => { const n = repsNum(it.reps); if (it.weighted && !it.wtTouched && it.w0 > 0 && it.r0 > 0 && n > 0) { it.wt = repAdjust(it.w0, it.r0, n, step); if (wInp) { wInp.value = wFmt(it.wt); const d = document.querySelector('#gBox .gdetail'); if (d) d.textContent = d.textContent.replace(/ · enter .*$/, ''); } } };
@@ -6766,6 +6851,8 @@
       const move = (d) => { let s = inp.value.trim(); const g = /^(\d+)\s*-\s*(\d+)$/.exec(s); if (g) s = g[2]; if (!/\d/.test(s)) return; s = s.replace(/(\d+)(?!.*\d)/, m => String(Math.min(200, Math.max(1, Number(m) + d)))); inp.value = s; it.reps = s; syncW(); };
       tile('Reps', () => move(-1), inp, () => move(1), 'per set');
     }
+    row.addEventListener('input', () => Guided.repaintSets && Guided.repaintSets());
+    row.addEventListener('click', () => setTimeout(() => Guided.repaintSets && Guided.repaintSets(), 0));
     box.appendChild(row);
   }
   // the "how did it go?" step: weight used + how it felt, then the rules set the next weight
@@ -6818,7 +6905,7 @@
   document.addEventListener('visibilitychange', syncWakeLock);
 
   // ----- settings page -----
-  const APP_VERSION = '1.0-beta';
+  const APP_VERSION = '1.0-beta · build Nov 28 (sets table)';
   const SET_ICONS = {
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
     shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
