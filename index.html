@@ -861,6 +861,14 @@
   .onb .onbskip { margin-left:auto; }
   .onbmsg { color:var(--danger-t); font-size:13px; font-weight:700; margin:0 0 10px; text-align:center; }
   .onb .pv { margin-top:18px; }
+  .sharebtn { flex:none; width:auto; margin:0; padding:13px 14px; background:transparent; color:inherit; border:1px solid var(--line); font-size:15px; font-weight:800; }
+  .plan-actions .sharebtn { flex:1 1 100%; }
+  .dwtop .sharebtn { padding:13px 12px; }
+  .pausedcard.sharedc .pcb { flex-wrap:wrap; }
+  .shfr { display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
+  .shfr:first-child { border-top:0; }
+  .shfr .shn { flex:1; min-width:0; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .shfr button { flex:none; width:auto; margin:0; padding:9px 16px; }
   .pausedcard { margin:14px 0 4px; padding:16px; border-radius:18px; background:color-mix(in srgb, var(--accent) 16%, var(--card)); border:1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); }
   .pausedcard .pck { font-size:11px; font-weight:900; letter-spacing:.08em; color:var(--accent); }
   .pausedcard .pct { font-size:19px; font-weight:900; margin-top:3px; }
@@ -1030,6 +1038,7 @@
         <button id="homeSettings" class="gearbtn" aria-label="Settings" data-gear="1"></button>
       </div>
 
+      <div id="sharedCard"></div>
       <div id="pausedCard"></div>
       <div id="setupCard"></div>
 
@@ -1919,7 +1928,7 @@
         addReorderToggle(body);
         card.appendChild(body);
         const acts = el('div', 'plan-actions');
-        acts.appendChild(startBtn(activeCat, o.title, o.mins, o.moves));
+        { const sb0 = startBtn(activeCat, o.title, o.mins, o.moves); acts.append(sb0, sb0.shareBtn); }
         card.appendChild(acts);
       }
       list.appendChild(card);
@@ -2028,7 +2037,7 @@
     const actions = el('div', 'plan-actions');
     const shuffle = el('button', 'secondary', 'Shuffle');
     shuffle.onclick = buildPlan;
-    actions.append(shuffle, startBtn(planType, p.label, mins, moves));
+    { const sb0 = startBtn(planType, p.label, mins, moves); actions.append(shuffle, sb0, sb0.shareBtn); }
     card.appendChild(actions);
 
     out.appendChild(card);
@@ -4137,6 +4146,7 @@
     renderSchedule();
     renderChallenges();
     renderPausedCard();
+    renderSharedCard(); sharedRefresh();
     renderSetupCard();
     checkBadges();
   }
@@ -6026,6 +6036,7 @@
   function guideBtn(title, steps, info) {
     const b = el('button', 'startg', '▶ Start guided workout');
     b.onclick = () => guidedStart(title, typeof steps === 'function' ? steps() : steps, info);   // a function builds the steps when you tap, so swapped or hidden exercises are included
+    b.shareBtn = shareButton(title, () => typeof steps === 'function' ? steps() : steps, info);
     return b;
   }
   // "Start workout" for the quick library and basic plan cards: builds guided steps from the rx text
@@ -6066,9 +6077,10 @@
     // built when tapped, so the order on the card (after dragging) is the order of the workout
     const b = guideBtn(title, () => libSteps(key, moves), null);
     b.onclick = () => guidedStart(title, libSteps(key, moves), { type: key, title, mins, lifts: key === 'strength' ? moves.length : 0, items: moves.map(m => ({ name: m.name, rx: m.rx })) });
+    b.shareBtn = shareButton(title, () => libSteps(key, moves), { type: key, title, mins, lifts: key === 'strength' ? moves.length : 0, items: moves.map(m => ({ name: m.name, rx: m.rx })) });
     b.textContent = '▶ Start workout'; return b;
   }
-  function addGuide(actions, title, steps, info) { if (steps && steps.length) actions.prepend(guideBtn(title, info && info.rebuild ? info.rebuild : steps, info)); }
+  function addGuide(actions, title, steps, info) { if (steps && steps.length) { const g = guideBtn(title, info && info.rebuild ? info.rebuild : steps, info); actions.prepend(g, g.shareBtn); } }
 
   // ----- guided workouts: audio cues -----
   const Cue = (() => {
@@ -6178,12 +6190,13 @@
   // ----- "Finish workout later": the unfinished workout waits on Home until the day is over or it is finished -----
   // Stored on this device only (one slot). Steps hold functions and shared objects, so they are flattened here and rebuilt on resume.
   const prim = (o) => { const r = {}; Object.keys(o || {}).forEach(k => { const v = o[k]; if (v === null || ['string', 'number', 'boolean'].includes(typeof v)) r[k] = v; }); return r; };
-  function packGuided() {
-    const items = [], groups = [], gi0 = Guided.info || {};
+  function packGuided(o) {
+    o = o || {}; const gSteps = o.steps || Guided.steps, gInfoO = o.info !== undefined ? o.info : Guided.info, gTitle = o.title !== undefined ? o.title : Guided.title;
+    const items = [], groups = [], gi0 = gInfoO || {};
     const ii = (it) => { if (!it) return -1; let k = items.indexOf(it); if (k < 0) { items.push(it); k = items.length - 1; } return k; };
     const gg = (g) => { let k = groups.indexOf(g); if (k < 0) { groups.push(g); k = groups.length - 1; } return k; };
     const itemIdx = (gi0.items || []).map(ii);   // the workout's full exercise list first, so swapping still works after resuming
-    const steps = Guided.steps.map(st => {
+    const steps = gSteps.map(st => {
       const o = {}; ['kind', 'name', 'secs', 'detail', 'say', 'gset', 'what', 'ex', 'w', 'skippable', 'extra'].forEach(k => { if (st[k] !== undefined && typeof st[k] !== 'function') o[k] = st[k]; });
       if (st.item) o.it = ii(st.item);
       if (st.g) o.g = gg(st.g);
@@ -6192,9 +6205,9 @@
     });
     const gl = groups.map(g => Object.assign(prim(g), { it: ii(g.item) }));
     let info = null;
-    try { info = JSON.parse(JSON.stringify(Guided.info, (k, v) => (k[0] === '_' || k === 'items' || typeof v === 'function') ? undefined : (v instanceof Set ? { setOf: Array.from(v) } : v))); } catch (e) { info = prim(Guided.info); }
+    try { info = JSON.parse(JSON.stringify(gInfoO, (k, v) => (k[0] === '_' || k === 'items' || typeof v === 'function') ? undefined : (v instanceof Set ? { setOf: Array.from(v) } : v))); } catch (e) { info = prim(gInfoO); }
     if (info) info.itemIdx = itemIdx;
-    return { v: 1, date: todayLocal(), at: new Date().toISOString(), el: guidedElapsed(), title: Guided.title, i: Guided.i, steps, groups: gl, items: items.map(prim), info };
+    return { v: 1, date: todayLocal(), at: new Date().toISOString(), el: o.steps ? 0 : guidedElapsed(), title: gTitle, i: o.steps ? 0 : Guided.i, steps, groups: gl, items: items.map(prim), info };
   }
   function unpackGuided(rec) {
     const items = rec.items.map(x => Object.assign({}, x));
@@ -6243,6 +6256,102 @@
     back.onclick = (e) => { if (e.target === back) close(); };
     back.appendChild(card); document.body.appendChild(back); document.addEventListener('keydown', onKey, true); keep.focus();
   }
+
+  // ===== Share a workout with a friend =====
+  // The sender's whole workout (exercises, order, rests, warm-up) is saved as one small record. The friend sees it on Home and
+  // taps Start; both people then do the same workout on their own phones. Weights are NOT shared, each person uses their own.
+  const SHARED = { list: [], seen: 0, busy: false, err: '' };
+  function shareButton(title, stepsFn, info) {
+    const b = el('button', 'sharebtn', '👥 Share'); b.setAttribute('aria-label', 'Do this workout with a friend');
+    b.onclick = () => openShareSheet(title, stepsFn, info);
+    return b;
+  }
+  function sharePayload(title, stepsFn, info) {
+    const steps = finalizeSteps(stepsFn(), info);
+    const rec = packGuided({ steps, info, title });
+    rec.items.forEach(it => { if (it && typeof it === 'object') { it.wt = 0; delete it.lastWt; } });
+    rec.steps.forEach(st => { delete st.w; });
+    rec.groups.forEach(g => { if (g) g.wt = 0; });
+    return rec;
+  }
+  async function openShareSheet(title, stepsFn, info) {
+    if (!socOK()) { snack('Sign in to share a workout with a friend.'); return; }
+    let rec; try { rec = sharePayload(title, stepsFn, info); } catch (e) { snack('Couldn’t prepare this workout to share.'); return; }
+    const st = { friends: null, sent: new Set(), busy: null, err: '' };
+    const draw = () => openSheet('Do it with a friend', 'Pick a friend to send “' + title + '” to. They’ll see it on their Home screen today.', (body) => {
+      if (st.friends === null) { body.appendChild(el('div', 'dpnote', 'Loading your friends…')); return; }
+      if (st.err) { body.appendChild(el('div', 'dpnote', st.err)); return; }
+      if (!st.friends.length) { body.appendChild(el('div', 'dpnote', SOC.me ? 'You don’t have any friends added yet. Add one in the Social tab, then come back here.' : 'Turn on Social first (Social tab), add a friend, and then you can share workouts.')); return; }
+      st.friends.forEach(f => {
+        const row = el('div', 'shfr'); row.appendChild(el('span', 'shn', (f.display_name ? f.display_name + ' ' : '') + '@' + f.username));
+        const b = el('button', st.sent.has(f.user_id) ? 'secondary' : '', st.sent.has(f.user_id) ? 'Sent ✓' : st.busy === f.user_id ? 'Sending…' : 'Send');
+        b.disabled = st.sent.has(f.user_id) || !!st.busy;
+        b.onclick = async () => {
+          st.busy = f.user_id; draw();
+          const { error } = await sb.from('shared_workouts').insert({ recipient: f.user_id, title: String(title).slice(0, 80), payload: rec });
+          st.busy = null;
+          if (error) { st.err = socMissing(error) ? 'Sharing isn’t switched on yet. (App owner: run share_setup.sql in the Supabase SQL Editor.)' : socMsg(error); draw(); return; }
+          st.sent.add(f.user_id); draw(); snack('Sent to @' + f.username + '. Start yours whenever you’re ready.');
+        };
+        row.appendChild(b); body.appendChild(row);
+      });
+    }, [['Done', '', closeSheet]]);
+    draw();
+    try { if (!SOC.me) { const { data } = await sb.from('profiles').select('*').eq('user_id', currentUser.id).maybeSingle(); SOC.me = data || null; } if (SOC.me) await socLoadFriends(); st.friends = SOC.me ? SOC.friends.filter(f => f.status === 'accepted') : []; }
+    catch (e) { st.err = socMissing(e) ? 'Social isn’t switched on yet.' : socMsg(e); st.friends = []; }
+    draw();
+  }
+  // checks for workouts friends sent you (and tells you when a friend started one you sent). Runs when Home opens and when you come back to the app.
+  async function sharedRefresh(force) {
+    if (!socOK() || SHARED.busy || !appData.prefs.socOn) return;
+    if (!force && Date.now() - SHARED.seen < 45000) return;
+    SHARED.busy = true; SHARED.seen = Date.now();
+    try {
+      const since = new Date(Date.now() - 36 * 3600 * 1000).toISOString();
+      const { data, error } = await sb.from('shared_workouts').select('id,sender,recipient,title,payload,status,created_at').gte('created_at', since).order('created_at', { ascending: false }).limit(20);
+      if (error) throw error;
+      const rows = data || [], ids = [...new Set(rows.map(r => r.sender === currentUser.id ? r.recipient : r.sender))];
+      let names = {};
+      if (ids.length) { const { data: ps } = await sb.from('profiles').select('user_id,username').in('user_id', ids); (ps || []).forEach(x => { names[x.user_id] = x.username; }); }
+      rows.forEach(r => { r.who = names[r.sender === currentUser.id ? r.recipient : r.sender] || 'a friend'; });
+      SHARED.list = rows.filter(r => r.recipient === currentUser.id && r.status === 'pending' && r.payload && r.payload.date === todayLocal());
+      const told = lsGet('sharedTold', []), fresh = rows.filter(r => r.sender === currentUser.id && r.status === 'accepted' && !told.includes(r.id));
+      if (fresh.length) { lsSet('sharedTold', told.concat(fresh.map(r => r.id)).slice(-40)); snack('@' + fresh[0].who + ' is doing “' + fresh[0].title + '” with you 💪'); }
+    } catch (e) { SHARED.list = []; }
+    SHARED.busy = false; renderSharedCard();
+  }
+  function sharedClean(rec) {
+    // a friend's workout is treated as untrusted: keep only plain values and sensible sizes
+    if (!rec || !Array.isArray(rec.steps) || !rec.steps.length || rec.steps.length > 400 || !Array.isArray(rec.items) || rec.items.length > 80 || !Array.isArray(rec.groups) || rec.groups.length > 200) return null;
+    const cl = (o) => { const r = {}; Object.keys(o || {}).forEach(k => { const v = o[k]; if (v === null || typeof v === 'boolean' || typeof v === 'number' || (typeof v === 'string' && v.length < 600)) r[k] = v; else if (Array.isArray(v) && v.length < 40 && v.every(x => typeof x === 'string')) r[k] = v; }); return r; };
+    const out = { v: 1, date: rec.date, at: rec.at, el: 0, title: String(rec.title || 'Workout').slice(0, 80), i: 0 };
+    out.items = rec.items.map(cl); out.groups = rec.groups.map(cl);
+    out.steps = rec.steps.map(cl).map(st => { if (!['work', 'rest', 'info', 'rate'].includes(st.kind)) st.kind = 'info'; st.secs = Math.min(3600, Math.max(0, +st.secs || 0)); delete st.w; return st; });
+    const inf = rec.info && typeof rec.info === 'object' ? rec.info : {};
+    out.info = cl(inf); out.info.itemIdx = Array.isArray(inf.itemIdx) ? inf.itemIdx.filter(n => Number.isInteger(n) && n >= 0 && n < out.items.length) : [];
+    if (inf.rb && typeof inf.rb === 'object') out.info.rb = cl(inf.rb);
+    ['equip'].forEach(k => { if (inf[k] && Array.isArray(inf[k].setOf)) out.info[k] = { setOf: inf[k].setOf.filter(x => typeof x === 'string').slice(0, 80) }; });
+    return out;
+  }
+  async function sharedStart(r) {
+    const rec = sharedClean(r.payload); if (!rec) { snack('That workout couldn’t be opened.'); return; }
+    sb.from('shared_workouts').update({ status: 'accepted' }).eq('id', r.id).then(() => {});
+    SHARED.list = SHARED.list.filter(x => x.id !== r.id); renderSharedCard();
+    const u = unpackGuided(rec); u.info.sharedWith = r.who;
+    guidedStart(rec.title, u.steps, u.info, 0, 0); Guided.resumed = false;   // opens at the first step; it is a fresh workout, not a saved one
+  }
+  function renderSharedCard() {
+    const box = $('sharedCard'); if (!box) return; box.replaceChildren();
+    SHARED.list.forEach(r => {
+      const c = el('div', 'pausedcard sharedc'), rec = r.payload || {}, n = (rec.groups || []).length || (rec.items || []).length;
+      c.append(el('div', 'pck', 'WORKOUT FROM @' + String(r.who).toUpperCase()), el('div', 'pct', r.title), el('div', 'pcs', (n ? n + ' exercise' + (n === 1 ? '' : 's') + ' · ' : '') + 'Start it when you’re ready and you’ll both be doing the same workout. Your own weights are used.'));
+      const row = el('div', 'pcb'), go = el('button', 'pcgo', '▶ Start together'), no = el('button', 'pcx', 'Not now');
+      go.onclick = () => sharedStart(r);
+      no.onclick = () => { sb.from('shared_workouts').update({ status: 'declined' }).eq('id', r.id).then(() => {}); SHARED.list = SHARED.list.filter(x => x.id !== r.id); renderSharedCard(); };
+      row.append(go, no); c.appendChild(row); box.appendChild(c);
+    });
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && appData) sharedRefresh(); });
   function renderPausedCard() {
     const box = $('pausedCard'); if (!box) return;
     box.replaceChildren();
@@ -7950,7 +8059,7 @@
       tog.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
       tog.onclick = head.onclick = () => { dayOpen[sk] = !dayOpen[sk]; paint(); };
       head.style.cursor = 'pointer';
-      if (start) top.appendChild(start); else top.classList.add('solo');
+      if (start) { top.appendChild(start); if (start.shareBtn) top.appendChild(start.shareBtn); } else top.classList.add('solo');
       top.appendChild(tog); card.append(top, more); paint();
     }
     const scope = el('div', 'w-' + ((GEN_OUT[p.type] || ['none'])[0]));
