@@ -874,6 +874,9 @@
   .onb .onbskip { margin-left:auto; }
   .onbmsg { color:var(--danger-t); font-size:13px; font-weight:700; margin:0 0 10px; text-align:center; }
   .onb .pv { margin-top:18px; }
+  .fmtbox { margin:0 0 12px; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--card); }
+  .fmtl { font-size:11px; font-weight:800; letter-spacing:.08em; color:var(--muted); margin:8px 0 6px; } .fmtbox .fmtl:first-child { margin-top:0; }
+  .fmtbox .chips { gap:8px; flex-wrap:wrap; overflow:visible; } .fmtbox .chip { padding:9px 16px; }
   .sharebtn { flex:none; width:auto; margin:0; padding:13px 14px; background:transparent; color:inherit; border:1px solid var(--line); font-size:15px; font-weight:800; }
   .plan-actions .sharebtn { flex:1 1 100%; }
   .dwtop .sharebtn { padding:13px 12px; }
@@ -2923,21 +2926,51 @@
     const names = ABS_FOCUS.filter(c => absCfg.focus.has(c[0]) && c[0] !== 'full').map(c => c[1]);
     const title = absCfg.focus.has('full') ? 'Full Core' : names.length <= 2 ? names.join(' + ') : 'Custom Core';
 
+    const fmt = { mode: timed ? 'timed' : 'reps', circ: !!circ, work: absCfg.work, S: S, mins: absCfg.dur };
+    const base0 = Math.round((I.sets[0] + I.sets[1]) / 2); items.forEach(m => { m.s0 = circ ? base0 : parseRx(m.rx).sets; });
+    const meta = el('div', 'opt-meta');
+    const paintMeta = () => { meta.textContent = fmt.mins + 'm • ' + items.length + (items.length === 1 ? ' Exercise' : ' Exercises') + ' • ' + I.label + (fmt.mode === 'timed' ? ' • Timed' : '') + (fmt.circ ? ' • ' + fmt.S + (fmt.S === 1 ? ' Round' : ' Rounds') : '') + (absCfg.wt ? ' • Weighted' : '') + ' • ' + LOC_LABEL[planLoc]; };
+    paintMeta();
     const card = el('div', 'opt'), head = el('div', 'opt-head'), info = el('div', 'opt-info');
     head.style.cursor = 'default';
     info.append(el('span', 'opt-tag', 'YOUR WORKOUT'), el('div', 'opt-title', title),
-      el('div', 'opt-meta', absCfg.dur + 'm • ' + items.length + (items.length === 1 ? ' Exercise' : ' Exercises') + ' • ' + I.label + (timed ? ' • Timed' : '') + (circ ? ' • ' + S + ' Sets' : '') + (absCfg.wt ? ' • Weighted' : '') + ' • ' + LOC_LABEL[planLoc]));
+      meta);
     const ico = el('div', 'opt-ico'); ico.innerHTML = iconSvg('core'); ico.firstChild.style.cssText = 'width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round';
     head.append(ico, info);
     card.appendChild(head);
 
+    // Format picker on the card itself: normal reps, or a timed circuit (each move for the same time, then start the round again)
+    const restEx0 = 15;
+    const applyFmt = () => {
+      opt.mode = fmt.mode; opt.work = fmt.work;
+      items.forEach(m => { const e = ABS_EX.find(x => x[0] === m.name); if (!e) return; m.rx = absRx(e, I, fmt.circ ? fmt.S : (m.s0 || base0), opt).rx; });
+      fmt.mins = fmt.circ ? Math.max(5, Math.round((fmt.S * items.length * (fmt.work + restEx0) + (fmt.S - 1) * restSet) / 60)) : absCfg.dur;
+      gi.mins = fmt.mins; gi.rb = { k: 'abs', circ: !!fmt.circ, S: fmt.S, restEx, restSet };
+      paintMeta(); fillBody();
+    };
+    const formatBox = () => {
+      const box = el('div', 'fmtbox'); box.appendChild(el('div', 'fmtl', 'FORMAT'));
+      const seg = el('div', 'chips'), mkChip = (label, on, fn) => { const b = el('button', 'chip' + (on ? ' active' : ''), label); b.onclick = fn; return b; };
+      seg.append(mkChip('Reps', !fmt.circ, () => { fmt.circ = false; fmt.mode = 'reps'; applyFmt(); }), mkChip('Timed circuit', fmt.circ, () => { fmt.circ = true; fmt.mode = 'timed'; if (!(fmt.work > 0)) fmt.work = 45; if (!(fmt.S > 1)) fmt.S = 3; applyFmt(); }));
+      box.appendChild(seg);
+      if (fmt.circ) {
+        box.appendChild(el('div', 'fmtl', 'SECONDS PER EXERCISE'));
+        const w = el('div', 'chips'); ABS_WORK.forEach(d => w.appendChild(mkChip(String(d), fmt.work === d, () => { fmt.work = d; applyFmt(); }))); box.appendChild(w);
+        box.appendChild(el('div', 'fmtl', 'ROUNDS'));
+        const r = el('div', 'chips'); ABS_SETS.forEach(d => r.appendChild(mkChip(String(d), fmt.S === d, () => { fmt.S = d; applyFmt(); }))); box.appendChild(r);
+      }
+      return box;
+    };
     const body = el('div', 'opt-body');
-    body.appendChild(el('div', 'rest-note', (circ ? 'Circuit: do each exercise once in order (' + restEx + 's to switch between them), then rest ' + restSet + 's and repeat for ' + S + ' sets. ' : 'Rest ' + restSet + 's between sets. ') + 'Move slowly, keep your lower back steady and breathe out on the hard part. Stop a set when your form slips, and never pull on your neck.'));
+    const fillBody = () => {
+    body.replaceChildren(); body.classList.remove('reord');
+    body.appendChild(formatBox());
+    body.appendChild(el('div', 'rest-note', (fmt.circ ? 'Timed circuit: do each exercise once in order (' + restEx + 's to switch between them), then rest ' + restSet + 's and repeat for ' + fmt.S + ' rounds. ' : 'Rest ' + restSet + 's between sets. ') + 'Move slowly, keep your lower back steady and breathe out on the hard part. Stop a set when your form slips, and never pull on your neck.'));
     if (items.length < n) body.appendChild(el('div', 'rest-note', 'Only ' + items.length + ' exercise' + (items.length === 1 ? '' : 's') + ' match your choices. Add more focus areas for a fuller workout.'));
     if (items.some(m => m.weighted)) body.appendChild(el('div', 'rest-note', 'Start light. Core work is about control, not load. Weights adjust from how your last workouts went. Tap a weight to set or change it.'));
     else if (items.some(m => m.wtd)) body.appendChild(el('div', 'rest-note', 'Pick a weight you can control for every rep.'));
     const mkRow = (m) => {
-      const row = el('div', 'mv'), left = el('div'), sub = el('div', 'mr', (circ ? m.rx.replace(/^\d+ × /, '') : m.rx) + ' • ' + ABS_LABEL[m.focus]);
+      const row = el('div', 'mv'), left = el('div'), sub = el('div', 'mr', (fmt.circ ? m.rx.replace(/^\d+ × /, '') : m.rx) + ' • ' + ABS_LABEL[m.focus]);
       left.append(exNameNode(m.name), sub);
       row.appendChild(left);
       if (m.weighted) {
@@ -2954,6 +2987,7 @@
     };
     items.forEach(m => body.appendChild(mkRow(m)));
     addReorderToggle(body);
+    };
     card.appendChild(body);
 
     const actions = el('div', 'plan-actions');
@@ -2962,13 +2996,14 @@
     const edit = el('button', 'secondary', 'Edit settings');
     edit.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
     const gi = { type:'abs', title:'Abs', mins:absCfg.dur, lifts:items.length, intensity:absCfg.intensity, items, rated: new Set(), wtOn: absCfg.wt, absOpt: opt, loc: planLoc };
-    const stepsFor = () => circ ? circuitSteps(items, S, restEx, restSet, progOn()) : repSteps(items, restSet, false, progOn());
+    const stepsFor = () => fmt.circ ? circuitSteps(items, fmt.S, restEx, restSet, progOn()) : repSteps(items, restSet, false, progOn());
     gi.rebuild = stepsFor;
-    gi.rb = { k: 'abs', circ: !!circ, S, restEx, restSet };
+    gi.rb = { k: 'abs', circ: !!fmt.circ, S: fmt.S, restEx, restSet };
     actions.append(shuffle, edit, makeCompleteBtn(gi));
     addGuide(actions, title, stepsFor(), gi);
     card.appendChild(actions);
 
+    fillBody();
     $('absOut').replaceChildren(card);
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -6905,7 +6940,7 @@
   document.addEventListener('visibilitychange', syncWakeLock);
 
   // ----- settings page -----
-  const APP_VERSION = '1.0-beta · build Nov 28 (sets table)';
+  const APP_VERSION = '1.0-beta · build Nov 28b (abs circuit)';
   const SET_ICONS = {
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
     shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
